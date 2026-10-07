@@ -208,6 +208,16 @@
   @keyframes fall { 0% { transform:translateY(-6px); opacity:0; } 20% { opacity:.9; } 100% { transform:translateY(26px); opacity:0; } }
   @keyframes step { 0%, 24% { background:var(--lime); color:var(--ink); transform:scale(1.04); } 25%, 100% { background:var(--soft); color:var(--mut); transform:none; } }
 
+  /* Match cut: shared names pair an element of the loading scene with one of the results. */
+  .loader svg, .sunmark { view-transition-name:prk-sun; }
+  .lsteps, #out .strip { view-transition-name:prk-grid; }
+  .lnote, #out .items { view-transition-name:prk-body; }
+  ::view-transition-group(prk-sun), ::view-transition-group(prk-grid), ::view-transition-group(prk-body) { animation-duration:.65s; animation-timing-function:cubic-bezier(.2,.8,.2,1); }
+  ::view-transition-old(prk-grid), ::view-transition-new(prk-grid), ::view-transition-old(prk-body), ::view-transition-new(prk-body) { height:100%; object-fit:fill; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation-duration:.35s; }
+  #out h2 { display:flex; align-items:center; gap:10px; }
+  .sunmark { width:30px; height:30px; flex:none; }
+
   /* Results arrive one after another. "backwards" so the audit-link dimming still works afterwards. */
   #out .cell, #out .item, #out .quiet { animation:pop .45s cubic-bezier(.2,.8,.2,1) backwards; }
   @keyframes pop { from { opacity:0; transform:translateY(10px) scale(.98); } }
@@ -232,7 +242,7 @@
   @keyframes twinkle { 0%, 100% { transform:scale(1) rotate(0); opacity:1; } 50% { transform:scale(.82) rotate(12deg); opacity:.7; } }
   @keyframes bob { 0%, 100% { transform:rotate(-7deg) translateY(0); } 50% { transform:rotate(-5deg) translateY(-8px); } }
 
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .cell, .item { transition:none; } .loader *, .lsteps li, .sticker, .d-spark, #out .cell, #out .item, #out .quiet { animation:none !important; } .d-under path { stroke-dashoffset:0; animation:none; } .loader .ln { stroke-dasharray:none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .cell, .item { transition:none; } .loader *, .lsteps li, .sticker, .d-spark, #out .cell, #out .item, #out .quiet { animation:none !important; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation:none !important; } .d-under path { stroke-dashoffset:0; animation:none; } .loader .ln { stroke-dasharray:none; } }
   @media (max-width:900px) {
     .links { display:none; } nav { justify-content:space-between; }
     .hero .wrap { grid-template-columns:1fr; min-height:0; padding-top:30px; }
@@ -256,7 +266,7 @@
   <nav aria-label="Main">
     <a class="logo" href="#top"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#fff3d6"/><path d="M18 34a14 14 0 0128 0z" fill="#f4a04c" stroke="#101a13" stroke-width="3.5" stroke-linejoin="round"/><g fill="none" stroke="#101a13" stroke-width="4" stroke-linecap="round"><path d="M12 34h40"/><path d="M18 42.5h28"/><path d="M25 51h14"/></g></svg>Prakira</a>
     <div class="links">
-      <a href="#meet" data-t="nav1"></a><a href="#hazards" data-t="nav2"></a><a href="#process" data-t="nav3"></a><a href="#evidence" data-t="nav4"></a><a href="#faq" data-t="nav5"></a>
+      <a href="#meet" data-t="nav1"></a><a href="#hazards" data-t="nav2"></a><a href="#process" data-t="nav3"></a><a href="#evidence" data-t="nav4"></a><a href="#faq" data-t="nav5"></a><a href="/about" data-t="nav6"></a>
     </div>
     <div class="seg" role="group" aria-label="Language">
       <button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="id" aria-pressed="false">ID</button>
@@ -402,13 +412,13 @@
 
 <footer><div class="wrap">
   <span><b style="color:var(--ink);font-family:var(--head);font-weight:500;font-size:1.05rem">Prakira</b> · <span data-t="foot1"></span></span>
-  <span><span data-t="foot2"></span> <a href="https://open-meteo.com/" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), CAMS · <a href="https://github.com/rofiperlungoding/prakira" rel="noopener" data-t="method"></a></span>
+  <span><span data-t="foot2"></span> <a href="https://open-meteo.com/" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), CAMS · <a href="https://github.com/rofiperlungoding/prakira" rel="noopener" data-t="method"></a> · <a href="/about" data-t="nav6"></a></span>
 </div></footer>
 
 <script>
 const T = {
   en: {
-    nav1: 'Audit trail', nav2: 'Hazards', nav3: 'How it works', nav4: 'Evidence', nav5: 'Questions', navCta: 'Get a briefing',
+    nav1: 'Audit trail', nav2: 'Hazards', nav3: 'How it works', nav4: 'Evidence', nav5: 'Questions', nav6: 'About', navCta: 'Get a briefing',
     h1: 'Know what the next 72 hours mean for your home.',
     heroP: 'Prakira turns the heat, rain, air and UV forecast into a few clear actions for the people you live with. Every number is checked against the data before you see it.',
     heroCta: 'Get my briefing', heroCta2: 'See how it is checked', heroSmall: 'Free. No account. English and Bahasa Indonesia.',
@@ -473,7 +483,7 @@ const T = {
     profiles: { older_adult: 'Older adult', young_child: 'Young child', outdoor_worker: 'Outdoor worker', respiratory_condition: 'Asthma or lung condition', pregnant: 'Pregnant', flood_prone_home: 'Flood-prone home', no_air_conditioning: 'No air conditioning' },
   },
   id: {
-    nav1: 'Jejak audit', nav2: 'Bahaya', nav3: 'Cara kerja', nav4: 'Bukti', nav5: 'Pertanyaan', navCta: 'Buat ringkasan',
+    nav1: 'Jejak audit', nav2: 'Bahaya', nav3: 'Cara kerja', nav4: 'Bukti', nav5: 'Pertanyaan', nav6: 'Tentang', navCta: 'Buat ringkasan',
     h1: 'Pahami arti 72 jam ke depan bagi rumah Anda.',
     heroP: 'Prakira mengubah prakiraan panas, hujan, udara, dan UV menjadi beberapa tindakan yang jelas bagi orang serumah Anda. Setiap angka dicek terhadap data sebelum Anda melihatnya.',
     heroCta: 'Buat ringkasan saya', heroCta2: 'Lihat cara pengecekannya', heroSmall: 'Gratis. Tanpa akun. Bahasa Indonesia dan Inggris.',
@@ -707,7 +717,11 @@ function render(d) {
   out.onclick = () => light([]);
   for (const w of d.warnings || []) out.appendChild(el('p', 'msg err', w));
 
-  const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
+  const s1 = el('section');
+  const h = el('h2');
+  const sun = document.querySelector('.logo svg').cloneNode(true); sun.setAttribute('class', 'sunmark');
+  h.append(sun, document.createTextNode(`${L.strip} · ${placeName(state.place)}`));
+  s1.appendChild(h);
   s1.appendChild(strip(d));
   if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote));
   out.appendChild(s1);
@@ -748,7 +762,7 @@ function skeleton() {
   out.appendChild(node);
 }
 function stagger() {
-  [...$('out').querySelectorAll('.cell, .item, .quiet')].forEach((n, i) => { n.style.animationDelay = Math.min(i * 40, 900) + 'ms'; });
+  [...$('out').querySelectorAll('.cell, .item, .quiet')].forEach((n, i) => { n.style.animationDelay = 250 + Math.min(i * 40, 900) + 'ms'; });
 }
 
 async function generate() {
@@ -761,7 +775,10 @@ async function generate() {
       profile: [...document.querySelectorAll('#profile input:checked')].map((i) => i.value) }) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Request failed');
-    state.data = d; render(d); stagger(); $('status').textContent = '';
+    state.data = d;
+    const show = () => { render(d); stagger(); $('status').textContent = ''; };
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !calm) await document.startViewTransition(show).updateCallbackDone; else show();
   } catch (e) {
     $('out').textContent = ''; state.data = null;
     $('status').className = 'msg err'; $('status').textContent = e.message + ' ';

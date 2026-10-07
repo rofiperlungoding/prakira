@@ -7,6 +7,7 @@ import { rateLimiter, ttlCache } from './lib/limits.mjs';
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
 const page = fs.readFileSync(new URL('./public/index.html', import.meta.url));
+const about = fs.readFileSync(new URL('./public/about.html', import.meta.url));
 
 // ponytail: 'unsafe-inline' because the page is one file with inline script and style. Model text is only ever
 // inserted with textContent. Split the page into files and drop 'unsafe-inline' if it grows.
@@ -44,6 +45,7 @@ http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   try {
     if (u.pathname === '/') return send(res, 200, page, 'text/html; charset=utf-8', { 'cache-control': 'no-cache' });
+    if (u.pathname === '/about') return send(res, 200, about, 'text/html; charset=utf-8', { 'cache-control': 'no-cache' });
     if (u.pathname === '/healthz') return send(res, 200, { ok: true });
     if (u.pathname === '/api/geocode') {
       const wait = geoLimit(client(req));

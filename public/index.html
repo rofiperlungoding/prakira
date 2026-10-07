@@ -31,6 +31,7 @@
   .hz { display:flex; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:8px; margin-bottom:6px; font-size:.92rem; }
   .s0 { background:var(--s0); } .s1 { background:var(--s1); } .s2 { background:var(--s2); } .s3 { background:var(--s3); } .s4 { background:var(--s4); } .s5 { background:var(--s5); }
   .claim { border-left:4px solid var(--ok); padding:4px 0 4px 12px; margin:14px 0; }
+  .claim.notice { border-left-color: var(--mut); }
   .claim .ev { color:var(--mut); font-size:.92rem; }
   .tag { display:inline-block; font-size:.75rem; padding:1px 8px; border-radius:999px; border:1px solid var(--bd); margin-right:6px; color:var(--mut); }
   .ok { color:var(--ok); font-weight:600; }
@@ -115,7 +116,7 @@ function render(d) {
 
   const card = el('div', 'card');
   card.appendChild(el('h2', '', 'Your briefing'));
-  if (!d.claims.length) {
+  if (!d.claims.length && !(d.notices || []).length) {
     card.appendChild(el('p', 'bad', 'No verified advice could be produced' + (d.error ? ' (' + d.error + ')' : '') + '. The hazard levels above are still correct.'));
   }
   const byId = Object.fromEntries(d.facts.map((f) => [f.id, f]));
@@ -125,6 +126,14 @@ function render(d) {
     const ev = el('div', 'ev', c.evidence + ' ');
     ev.appendChild(el('span', 'tag', c.level));
     for (const id of c.fact_ids) ev.appendChild(el('span', 'tag', byId[id] ? `${byId[id].metric}, ${byId[id].day}` : id));
+    div.appendChild(ev);
+    card.appendChild(div);
+  }
+  for (const n of d.notices || []) {
+    const div = el('div', 'claim notice');
+    div.appendChild(el('strong', '', n.evidence));
+    const ev = el('div', 'ev', n.advice + ' ');
+    ev.appendChild(el('span', 'tag', 'standard notice'));
     div.appendChild(ev);
     card.appendChild(div);
   }

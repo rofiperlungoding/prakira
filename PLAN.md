@@ -90,7 +90,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 17 of 17 pass (after M1) | Verified 2026-10-07 |
+| Tests | `npm test`: 21 of 21 pass (after M2) | Verified 2026-10-07 |
 | UI | Works over the API. **Never opened in a browser.** Plain styling; to be redesigned (M7). | Unverified visually |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
@@ -110,6 +110,7 @@ climate-brief/
   lib/facts.mjs         Open-Meteo fetch, fact table, hazard bands
   lib/llm.mjs           Mistral call (JSON mode), prompt. Default model open-mistral-nemo
   lib/verify.mjs        Claim verifier and the PROFILES allow-list
+  lib/notice.mjs        Standard notices for serious hazards the model skipped
   lib/brief.mjs         Orchestration and retry (max 3 attempts, 3 s apart)
   lib/verify.test.mjs   Unit tests for the verifier
   lib/facts.test.mjs    Unit tests for heat index, bands and fact building
@@ -184,7 +185,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
   - *Accept:* unit tests cover three official NWS chart cells, every band boundary on both sides, UV rounding, and the new rain class. `npm test` passes. README lists each source with URL and check date.
   - *Fallback if the NWS adjustment terms take too long:* use the plain Rothfusz regression at or above 80 °F and air temperature below that, and state it.
 
-- [ ] **M2. Hazard coverage (2 h).** After verification, for each fact with a level of moderate concern or worse (define the threshold per hazard in one table) that no verified claim cites first, add a **standard notice** built from a fixed template ("Heat index reaches 41 °C tomorrow (danger). Follow your local heat guidance."). Label it in the response as `kind: "notice"` so the UI can show it differently from model advice. No second model call.
+- [x] **M2. Hazard coverage (2 h).** Done 2026-10-07 (`lib/notice.mjs`; response field `notices`; thresholds in `SERIOUS` in `lib/facts.mjs`: heat extreme caution, rain heavy, air unhealthy for sensitive groups, UV extra protection). After verification, for each fact with a level of moderate concern or worse (define the threshold per hazard in one table) that no verified claim cites first, add a **standard notice** built from a fixed template ("Heat index reaches 41 °C tomorrow (danger). Follow your local heat guidance."). Label it in the response as `kind: "notice"` so the UI can show it differently from model advice. No second model call.
   - *Accept:* eval reports hazard coverage of 100% with notices counted, and separately the share covered by model claims alone. Unit test for the notice builder in both languages.
 
 - [ ] **M3. Constrain the advice text (1.5 h).** Prompt: short sentences, common words, no clock times, no temperatures, no doses, no brand names, no diagnosis, one action per claim. Verifier: reject a claim whose `advice` contains any digit.
@@ -252,6 +253,10 @@ Both runs 2026-10-07, MVP code, 20 locations, model `open-mistral-nemo`, English
 | Verifier catch rate on deliberately corrupted claims | 99.5% (one gap, since fixed) | 100% |
 
 Limits of these numbers: the code changed between the two runs; the bands had the errors listed in section 6; 20 hand-picked, mostly hot locations; two runs; the same verifier filters and scores; no human review yet. **Do not publish these as final results.** They are superseded once M1 to M3 are done.
+
+**Run 3, 2026-10-07, after M1 and M2 (code after commit 682634e), English, 20 locations, 0 failed:** model claims passing verification 97 of 99 (98.0%); serious facts 95; covered by a verified model claim 66.3%; covered with standard notices 100% (by construction); verifier catch rate 100%. Not comparable with runs 1 and 2: heat is now the NWS heat index and "serious" has per-hazard thresholds.
+
+Finding from run 3: the model covers only about two thirds of serious facts, so hot, polluted cities get many notices (Jakarta: 5; Bangkok: 6). M3 must list the serious facts in the prompt and ask for one claim each, and M7 must group notices by hazard so they do not swamp the briefing.
 
 Add later runs here with date, commit hash, language, and what changed.
 
@@ -370,7 +375,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 
 - **2026-10-07 (session 1).** Repo scaffolded; MVP built; 12 tests pass; two eval runs; first literature scan (27 references, titles only).
 - **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. Next action at that point: M0, then M1.
-- **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). **Next action: M2 (coverage notices), then M3 (proportionate, digit-free advice), M5, M4.**
+- **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). Next action at that point: M2.
+- **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). **Next action: M3 (proportionate, digit-free advice; list serious facts in the prompt), then M5, M4.**
 
 **Open questions for the owner**
 

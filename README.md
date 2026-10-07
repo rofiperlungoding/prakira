@@ -1,6 +1,8 @@
-# Climate Brief
+# Prakira
 
 ForgeHacks 2026, track: AI + Climate.
+
+> **Work in progress (2026-10-07).** This README describes the first working version. The evaluation numbers below are preliminary and will be replaced: a re-check found errors in the hazard bands (see `PLAN.md`, section 6). The current plan is in `PLAN.md`; the literature review is in `docs/climate-novelty-literature.md`.
 
 A 3-day heat, rain, air-quality and UV briefing for a household, in English or Bahasa Indonesia. The language model writes the advice. Fixed rules set the hazard levels. A verifier checks every claim against the forecast numbers before the user sees it.
 

@@ -90,7 +90,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 21 of 21 pass (after M2) | Verified 2026-10-07 |
+| Tests | `npm test`: 25 of 25 pass (after M3) | Verified 2026-10-07 |
 | UI | Works over the API. **Never opened in a browser.** Plain styling; to be redesigned (M7). | Unverified visually |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
@@ -188,7 +188,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 - [x] **M2. Hazard coverage (2 h).** Done 2026-10-07 (`lib/notice.mjs`; response field `notices`; thresholds in `SERIOUS` in `lib/facts.mjs`: heat extreme caution, rain heavy, air unhealthy for sensitive groups, UV extra protection). After verification, for each fact with a level of moderate concern or worse (define the threshold per hazard in one table) that no verified claim cites first, add a **standard notice** built from a fixed template ("Heat index reaches 41 °C tomorrow (danger). Follow your local heat guidance."). Label it in the response as `kind: "notice"` so the UI can show it differently from model advice. No second model call.
   - *Accept:* eval reports hazard coverage of 100% with notices counted, and separately the share covered by model claims alone. Unit test for the notice builder in both languages.
 
-- [ ] **M3. Constrain the advice text (1.5 h).** Prompt: short sentences, common words, no clock times, no temperatures, no doses, no brand names, no diagnosis, one action per claim. Verifier: reject a claim whose `advice` contains any digit.
+- [x] **M3. Constrain the advice text (1.5 h).** Done 2026-10-07; what was built is in section 7a. Prompt: short sentences, common words, no clock times, no temperatures, no doses, no brand names, no diagnosis, one action per claim. Verifier: reject a claim whose `advice` contains any digit.
   - *Accept:* unit tests; one eval run before and after, both recorded in section 8. If the raw pass rate falls below 80%, relax to "digits allowed only if they match a cited fact" and record that decision.
 
 - [ ] **M4. Climate context (2.5 h).** For the location, fetch daily `temperature_2m_max` for 1991-01-01 to 2020-12-31 from the Open-Meteo archive once, compute the mean over the 7-day window centred on each forecast date, cache in memory by rounded coordinates. Add `temperature_2m_max` to the forecast request. Create facts `normal-N` (value, °C) and `anomaly-N` (forecast minus normal, rounded to whole degrees, level `n/a`). Optional layer: on failure add a warning and continue.
@@ -219,6 +219,15 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 - [ ] **M10. Demo video (2.5 h).** 2:30 to 3:30; never over 4:00. Script in section 10. Record a clean successful run as a backup clip before the final recording. Upload, then open the link logged-out.
 
 - [ ] **M11. Devpost text and submission (1.5 h).** Draft in `docs/devpost-draft.md` first. Include the disclosure from section 11. Submit by 18:00 WIB on 10 Oct, then open the public project page logged-out and click every link. Make no risky change after submitting.
+
+### 7a. What M2 and M3 built (read before touching the model path)
+
+- **Serious facts are chosen by rules, per household** (`thresholds(profile)` and `isSerious` in `lib/facts.mjs`). Base: heat extreme caution, rain heavy, air unhealthy for sensitive groups, UV extra protection. A profile lowers the threshold for its own hazard only: older adult, young child, pregnant, outdoor worker or no air conditioning lowers heat to caution; respiratory condition lowers air to moderate; flood-prone home lowers rain to moderate; outdoor worker or young child lowers UV to protection needed. **These adjustments are this project's judgement from the wording of the NWS and EPA categories, not an official rule. Say so wherever they are described.**
+- **Quiet mode:** if nothing is serious for the household, there is no model call and no advice (`quiet: true`). This is deliberate, to avoid over-warning (LeClerc 2015).
+- **The prompt** tells the model exactly which fact ids each claim must start with, one claim per hazard, covering all serious days of that hazard.
+- **The verifier** now also rejects: a claim that mixes hazards; a claim whose first fact is not serious for the household; advice containing any digit; advice that says to stay indoors or inside below the levels danger, extreme danger, unhealthy, very unhealthy, hazardous, extreme (keyword heuristic, English and Indonesian only). It reads a decimal comma as a decimal point, because Indonesian text writes "37,6".
+- **Notices:** one per hazard, describing the worst uncovered day and citing all uncovered days of that hazard.
+- The model sometimes wraps its JSON object in a one-element array; `askModel` unwraps it.
 
 ### Stretch (only after M0 to M11 are done)
 
@@ -257,6 +266,20 @@ Limits of these numbers: the code changed between the two runs; the bands had th
 **Run 3, 2026-10-07, after M1 and M2 (code after commit 682634e), English, 20 locations, 0 failed:** model claims passing verification 97 of 99 (98.0%); serious facts 95; covered by a verified model claim 66.3%; covered with standard notices 100% (by construction); verifier catch rate 100%. Not comparable with runs 1 and 2: heat is now the NWS heat index and "serious" has per-hazard thresholds.
 
 Finding from run 3: the model covers only about two thirds of serious facts, so hot, polluted cities get many notices (Jakarta: 5; Bangkok: 6). M3 must list the serious facts in the prompt and ask for one claim each, and M7 must group notices by hazard so they do not swamp the briefing.
+
+**Runs 4 and 5, 2026-10-07, after M3 (code after commit b93adde), 20 locations each, 0 failed, 1 quiet location (Madrid):**
+
+| Metric | Run 4, English | Run 5, Indonesian |
+|---|---|---|
+| Model claims passing verification | 37 of 44 (84.1%) | 40 of 42 (95.2%) |
+| Serious facts covered by a verified model claim | 78.0% | 89.0% |
+| Covered with standard notices | 100% (by construction) | 100% (by construction) |
+| Verifier catch rate on corrupted claims | 100% | 100% |
+| Rejection reasons | stay-indoors advice at "extreme caution" 4; advice with a number 1; wrong level 1; non-serious first fact 1 | non-serious first fact 1; mixed hazards 1 |
+
+How to read these: the pass rate fell from run 3 because the verifier is stricter (it now rejects disproportionate and numeric advice), not because the model got worse. Claims are now one per hazard, so there are about 42 per run instead of about 100. **Caveat: the prompt was tuned once after looking at results on these same 20 locations. There is no held-out set, so these numbers are optimistic.** M9 must add locations that were never used for tuning and report them separately.
+
+Intermediate runs during M3 development (not comparable, code was changing): Indonesian 57.1% before the decimal-comma fix (14 of 18 rejections were "37,6" read as two numbers), then 92.9%; English 79.5% before the prompt listed required fact ids.
 
 Add later runs here with date, commit hash, language, and what changed.
 
@@ -368,6 +391,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 | 2026-10-07 | Add climate context against the 1991 to 2020 normal | Makes it a climate tool, not a weather app; MacKay 2026 found AI heat messages rarely frame heat within climate change |
 | 2026-10-07 | Replace apparent temperature with a computed NWS heat index | Bands are defined for heat index; humidity-aware index recommended by Chandra 2025 |
 | 2026-10-07 | Fallback standard notices instead of a second model call | Guarantees coverage without more model risk or latency |
+| 2026-10-07 | Advice only for hazards that are serious for the household; quiet mode otherwise | A live check showed over-warning at low levels (stay indoors at AQI 58). Saying nothing is more honest than a weak warning. |
+| 2026-10-07 | Household profile changes thresholds by rule, not only the wording | Makes the personalisation deterministic and testable; it is project judgement, disclosed as such. |
 | 2026-10-07 | Name: Prakira; public repo `rofiperlungoding/prakira` | Owner asked for something catchy; from Indonesian *prakiraan* (forecast). No trademark or name-collision check was done. |
 | 2026-10-07 | Host on the owner's own server at `prakira.rofihosted.space` | Owner's choice; free; Node already there. Single point of failure during judging, so a backup clip and a fallback host are planned. |
 
@@ -376,7 +401,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 1).** Repo scaffolded; MVP built; 12 tests pass; two eval runs; first literature scan (27 references, titles only).
 - **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. Next action at that point: M0, then M1.
 - **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). Next action at that point: M2.
-- **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). **Next action: M3 (proportionate, digit-free advice; list serious facts in the prompt), then M5, M4.**
+- **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). Next action at that point: M3.
+- **2026-10-07 (session 3, continued).** M3 done (section 7a): per-household serious thresholds, quiet mode, stricter verifier, prompt with required fact ids, grouped notices, decimal-comma handling. 25 tests pass. Eval runs 4 (English) and 5 (Indonesian) recorded in section 8. UI still not opened in a browser. **Next action: M5 (compound-day flag), then M4 (climate context against the 1991 to 2020 normal).**
 
 **Open questions for the owner**
 

@@ -116,7 +116,9 @@ function render(d) {
 
   const card = el('div', 'card');
   card.appendChild(el('h2', '', 'Your briefing'));
-  if (!d.claims.length && !(d.notices || []).length) {
+  if (d.quiet) {
+    card.appendChild(el('p', '', 'No serious hazards for this household in the next three days. No special action is needed.'));
+  } else if (!d.claims.length && !(d.notices || []).length) {
     card.appendChild(el('p', 'bad', 'No verified advice could be produced' + (d.error ? ' (' + d.error + ')' : '') + '. The hazard levels above are still correct.'));
   }
   const byId = Object.fromEntries(d.facts.map((f) => [f.id, f]));

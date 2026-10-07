@@ -1,13 +1,13 @@
 // Groundedness eval over fixed locations. Live APIs, so results vary by day; the report records the date.
 // Metrics:
 //  - raw pass rate: share of model claims that pass verification (how often the model is wrong)
-//  - coverage: share of serious facts (per-hazard thresholds) that a verified model claim cites first;
+//  - coverage: share of serious facts (per-hazard, per-household thresholds) cited by a verified model claim;
 //    standard notices fill the rest, so coverage with notices is 100% by construction
 //  - verifier catch rate: corrupted copies of verified claims (wrong number, wrong level) that get rejected
 import fs from 'node:fs';
 import { makeBrief } from '../lib/brief.mjs';
 import { verifyClaim } from '../lib/verify.mjs';
-import { isSerious } from '../lib/notice.mjs';
+import { thresholds, isSerious } from '../lib/facts.mjs';
 
 const PLACES = [
   ['Jakarta', -6.2, 106.8], ['Surabaya', -7.25, 112.75], ['Bandung', -6.92, 107.61], ['Medan', 3.59, 98.67], ['Makassar', -5.15, 119.43],
@@ -31,19 +31,20 @@ for (const [i, [name, lat, lon]] of PLACES.slice(0, limit).entries()) {
     console.log(name, 'ERROR', e.message);
     continue;
   }
-  const hi = b.facts.filter(isSerious);
-  const covered = hi.filter((f) => b.claims.some((c) => c.fact_ids[0] === f.id));
+  const th = thresholds(profile);
+  const hi = b.facts.filter((f) => isSerious(f, th));
+  const covered = hi.filter((f) => b.claims.some((c) => c.fact_ids.includes(f.id)));
   let corrupt = 0, caught = 0;
   for (const c of b.claims) {
     const bad = [{ ...c, level: 'danger-zz' }];
     // Only corrupt a number when one exists, and only when +7 is not another cited value.
     const m = c.evidence.match(/\d+(?:\.\d+)?/);
     if (m) bad.push({ ...c, evidence: c.evidence.replace(m[0], String(Number(m[0]) + 7.37)) });
-    for (const x of bad) { corrupt++; if (!verifyClaim(x, b.facts).ok) caught++; }
+    for (const x of bad) { corrupt++; if (!verifyClaim(x, b.facts, th).ok) caught++; }
   }
-  const row = { name, profile, attempts: b.attempts, error: b.error, total: b.total, verified: b.claims.length, rejected: b.rejected.map((r) => r.reason), hiFacts: hi.length, hiCovered: covered.length, notices: b.notices.length, corrupt, caught };
+  const row = { name, profile, attempts: b.attempts, error: b.error, total: b.total, verified: b.claims.length, rejected: b.rejected.map((r) => r.reason), quiet: b.quiet, hiFacts: hi.length, hiCovered: covered.length, notices: b.notices.length, noticeFacts: b.notices.reduce((n, x) => n + x.fact_ids.length, 0), corrupt, caught };
   rows.push(row);
-  console.log(name.padEnd(10), `verified ${row.verified}/${row.total}`, `model coverage ${row.hiCovered}/${row.hiFacts} (+${row.notices} notices)`, row.error ?? '');
+  console.log(name.padEnd(10), `verified ${row.verified}/${row.total}`, `model coverage ${row.hiCovered}/${row.hiFacts} (+${row.notices} notices)`, b.quiet ? '(quiet: no model call)' : '', row.error ?? '');
   await sleep(1500);
 }
 
@@ -51,9 +52,9 @@ const ok = rows.filter((r) => !r.error);
 const sum = (k) => ok.reduce((s, r) => s + r[k], 0);
 const pct = (a, b) => (b ? ((100 * a) / b).toFixed(1) + '%' : 'n/a');
 const summary = {
-  date: new Date().toISOString(), locations: rows.length, failedLocations: rows.length - ok.length,
+  date: new Date().toISOString(), locations: rows.length, failedLocations: rows.length - ok.length, quietLocations: ok.filter((r) => r.quiet).length,
   rawPassRate: pct(sum('verified'), sum('total')), claimsTotal: sum('total'), claimsVerified: sum('verified'),
-  lang, seriousFacts: sum('hiFacts'), coveredByModel: pct(sum('hiCovered'), sum('hiFacts')), coveredWithNotices: pct(sum('hiCovered') + sum('notices'), sum('hiFacts')), verifierCatchRate: pct(sum('caught'), sum('corrupt')),
+  lang, seriousFacts: sum('hiFacts'), coveredByModel: pct(sum('hiCovered'), sum('hiFacts')), coveredWithNotices: pct(sum('hiCovered') + sum('noticeFacts'), sum('hiFacts')), verifierCatchRate: pct(sum('caught'), sum('corrupt')),
 };
 console.log('\n', summary);
 fs.mkdirSync(new URL('./out/', import.meta.url), { recursive: true });

@@ -97,7 +97,15 @@ http.createServer(async (req, res) => {
       const lat = u.searchParams.has('lat') ? Number(u.searchParams.get('lat')) : NaN;
       const lon = u.searchParams.has('lon') ? Number(u.searchParams.get('lon')) : NaN;
       if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) return send(res, 400, { error: 'invalid coordinates' });
-      return send(res, 200, await getOutlook(lat, lon));
+      // The outlook is an optional layer. When its source is unavailable (most often the free daily limit),
+      // that is an expected state for the page to show, not a server error.
+      try {
+        return send(res, 200, { available: true, ...(await getOutlook(lat, lon)) });
+      } catch (e) {
+        console.error(new Date().toISOString(), u.pathname, e.message);
+        const limit = /HTTP 429/.test(e.message);
+        return send(res, 200, { available: false, reason: limit ? 'the climate data provider has reached its free daily limit; try again tomorrow' : e.message });
+      }
     }
     send(res, 404, { error: 'not found' });
   } catch (e) {

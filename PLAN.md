@@ -90,7 +90,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 35 of 35 pass (after M9) | Verified 2026-10-07 |
+| Tests | `npm test`: 41 of 41 pass (session 5) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
@@ -115,6 +115,10 @@ climate-brief/
   lib/llm.mjs           Mistral call (JSON mode), prompt. Default model open-mistral-nemo
   lib/verify.mjs        Claim verifier and the PROFILES allow-list
   lib/notice.mjs        Standard notices for serious hazards the model skipped; compound-day notice
+  lib/trace.mjs         Real steps with durations, for the live process display
+  lib/outlook.mjs       Long-range outlook from three climate models
+  lib/store.mjs         Disk cache (folder data/, gitignored) for normals and outlooks
+  eval/places.mjs       Tuned and held-out location lists
   lib/climate.mjs       Climate context: forecast maximum against the 1991 to 2020 week average
   scripts/ui-check.cjs  Headless browser check and screenshots (needs an existing Playwright install)
   docs/screenshots/     Screenshots from the last UI check
@@ -324,6 +328,22 @@ Reading these: held-out and tuned figures are close in English (82.8% against 84
 
 Runs that are **not** final and must not be quoted: two English tuned runs at 77.3% and 75.0% made while the readability prompt change was being worked out (the first had example numbers in the prompt that the model copied), and one set of four runs before the stricter verifier and the Indonesian day words (English held-out 88.5%, Indonesian tuned 93.0%, Indonesian held-out 89.7%). Before the readability change the English tuned set read at a median grade of 8.4 with 47.6% at or below grade 8.
 
+**Runs 11 to 14, 2026-10-07 23:09 to 23:15 UTC (8 October, about 06:10 WIB), code after commit 6e73944 plus the day-binding rule. These supersede runs 7 to 10 as the published figures.**
+
+What changed: the verifier now requires each number to match the value for the nearest day word in its sentence. Reason: a live result showed "224 today, 219 tomorrow, 216 the day after" marked verified when the data said 219, 216, 224.
+
+| Metric | 11: English, tuned | 12: English, held-out | 13: Indonesian, tuned | 14: Indonesian, held-out |
+|---|---|---|---|---|
+| Model claims passing verification | 31 of 43 (72.1%) | 23 of 28 (82.1%) | 34 of 43 (79.1%) | 24 of 27 (88.9%) |
+| Serious facts covered by a verified model claim | 70.3% of 118 | 78.2% of 78 | 80.5% of 118 | 87.2% of 78 |
+| Covered with standard notices | 100% | 100% | 100% | 100% |
+| Verifier catch rate on corrupted claims | 100% | 100% | 100% | 100% |
+| Reading grade (English): median; at or below grade 8 | 3.5; 100% | 3.5; 100% | not computed | not computed |
+
+Rejections (29): stay-indoors at too low a level 8; level mismatch 5; unknown fact id 4; number on the wrong day 4 (one per run); missing evidence 3; mixed hazards 2; number in advice 1; number not in data 1; cited value not stated 1.
+
+Reading: the new rule accounts for only 4 of 29 rejections, so most of the drop from runs 7 to 10 is run-to-run noise (the model is sampled at temperature 0.2). The English tuned set has given between 72% and 84% over five runs; the prompt and verifier also changed between some of those runs, so this is not a clean repeat measurement. **Any single figure is good to about plus or minus ten points. Do not present small differences as findings.** Whether the four "wrong day" rejections were true errors was not checked: the eval report keeps only the reason for a rejected claim, not its text.
+
 Add later runs here with date, commit hash, language, and what changed.
 
 ---
@@ -457,6 +477,16 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 4, continued).** Two owner requests. (1) **Match cut from loading to results**, with the View Transitions API (`document.startViewTransition`): the loader's sun shares the name `prk-sun` with a small sun (`.sunmark`, a clone of the nav logo) beside the "Next 72 hours" heading; the step chips share `prk-grid` with the strip; the note shares `prk-body` with the briefing list. Browsers without the API and reduced-motion users get the plain swap. Verified: the API is present in headless Chromium and no errors occur; **the motion itself was not seen, only still frames, so the owner must judge it by eye.** (2) **About page** at `/about` (`public/about.html`, English only, served by `server.mjs`): why the tool exists, six research findings each with what the tool does because of it, what it is not, who made it, references with DOI links. Every finding on it comes from an abstract that was read (see the literature review); "LeClerc and Joslyn" and "Lindell and Perry" author pairs are from general knowledge, not from the retrieved records. It names the builder as "Rofi, a student in Indonesia": the owner should confirm or change that wording, and can add a personal paragraph on what prompted the idea (none was invented). The deploy script in the server repo now copies the whole `public/` folder. Redeployed. **Next action: M9.**
 - **2026-10-07 (session 4, continued).** M9 done. Final eval runs 7 to 10 recorded in section 8. A read-through of 22 claims found a verifier gap (a claim could cite three days and state two values) and a recurring Indonesian wording error ("besok hari" for the day after tomorrow); both fixed; 35 tests pass. `docs/manual-review.md`, `docs/architecture.svg` and a rewritten README added. The evidence cards on the page now show the final figures (83 to 97%, held-out). Redeployed. **Open: a human review of the advice; two questionable actions described in `docs/manual-review.md` are a design limit. Next action: M10 (video script and recording, needs the owner), M11 (Devpost text in `docs/devpost-draft.md`, then the owner submits).**
 - **2026-10-08 (session 4, continued).** M9 commit pushed and deployed; a live check through the public URL returned 3 of 3 verified claims in Indonesian with "Lusa" used correctly. `docs/devpost-draft.md` written (M11, first half): every Devpost section, with the held-out figures and the disclosure. **Left for the owner: rewrite "Inspiration" in their own words if they want a personal reason there, record the video (M10, script in section 10; the script predates the landing page, so show the hero, the loading scene, the audit link, the audit panel and the About page), add the video link, and submit.** Next action for an assistant: help with the video script on request; re-check all links after submission.
+- **2026-10-08 (session 5).** The owner stopped the "try to fool it" and baseline ideas (the half-written `eval/baseline.mjs` was deleted) and asked for useful basics plus a transparent, visible process. Approved plan: `C:\Users\Rofi\.claude\plans\eh-jangan-deh-yg-jolly-truffle.md`. Built:
+  - **Visible process.** `lib/trace.mjs`; `makeBrief({ onStep })`; `/api/brief` answers as a server-sent-event stream when asked (`accept: text/event-stream`), one event per real step, and every response carries `trace`. The page shows the six steps live and keeps them as a process line whose segments open the matching part of the audit trail. Verified locally and through the public URL: events arrive one by one, so the Cloudflare tunnel does not buffer them. The old timer-driven chips are gone.
+  - **Peak time** for heat and UV (`peak` on those facts; not for air, whose index is a rolling average).
+  - **Share and copy**, and `generatedAt` ("forecast read at").
+  - **Use my location** (rounded to 2 decimals) and **remembered choices** in `localStorage` only; no request is made on page load. Browser language picks Indonesian on a first visit.
+  - **Long-range outlook**, `lib/outlook.mjs` and `GET /api/outlook`: days a year at or above 35 °C (30 °C fallback, or "rare") in 2011 to 2020 against 2041 to 2050, median and range of three CMIP6 HighResMIP models. **Never yet seen with data on the page:** the provider's daily limit was exhausted when it was built. Unit-tested; the API format was confirmed with a live call earlier the same day.
+  - **Quota incident.** The evaluation fetched a 30-year archive per location per run and used up Open-Meteo's free daily limit, which removed the climate row from the live site until the reset at 00:00 UTC. Fixes: disk cache for normals and outlooks (`lib/store.mjs`, folder `data/`, gitignored), the eval passes `climate: false`, the outlook uses two decades not six, and an unavailable optional layer is reported in plain words. **Do not run evals or load tests that touch the archive or climate APIs.**
+  - **Verifier bug found on a live result and fixed:** numbers on the wrong days were accepted. See runs 11 to 14 in section 8. The fix is a nearest-day-word heuristic. **Open design question for the owner:** have the evidence sentence built from data and let the model write only the action, which removes this class of error entirely but changes the product's story ("the AI never writes a number").
+  - 41 tests pass. Headless checks: geolocation granted and denied, reload restores choices with zero briefing requests, forget clears storage, process segments open the audit, no console errors.
+  - **Next action:** after the quota reset, check the outlook card and the climate row on the live site with real data; then the owner records the video and submits.
 
 **Open questions for the owner**
 

@@ -37,7 +37,9 @@ You pick a place and say who lives there (older adult, young child, outdoor work
 - **A 72-hour strip:** heat index, rain, air quality and UV for three days, each with a level set by published rules (US National Weather Service, US EPA, WHO).
 - **A climate row:** how each day compares with the local 1991 to 2020 average for the same week.
 - **A short briefing:** one action per serious hazard, written for that household.
+- **A visible process:** while you wait, the page shows each real step as the server performs it (read the forecast, set levels by rule, AI writes, check every claim), with its duration. Afterwards the steps stay as one line above the result.
 - **An audit trail:** select any action and the numbers it relies on light up. A panel lists every AI claim that was rejected and why.
+- **Everyday basics:** the hour when heat and UV peak, "use my location", choices remembered in your browser only, share to WhatsApp, and a long-range card: hot days a year in 2011 to 2020 against 2041 to 2050 from three climate models.
 
 If nothing is serious for your household, it says so and gives no advice. If the AI skips a serious hazard, a fixed notice fills the gap.
 
@@ -51,27 +53,27 @@ Five layers, and only one of them is a language model:
 4. **Verifier:** a claim is kept only if every number matches a cited forecast value, every cited day is stated, the level equals the rule-based level, the action contains no digits, and it does not say "stay indoors" at a level too low to justify it.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
-The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 35 unit tests run offline.
+The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 41 unit tests run offline.
 
 ## Results
 
-Live evaluation on 7 October 2026. "Held-out" means 15 cities never used while adjusting the system.
+Live evaluation on 8 October 2026. "Held-out" means 15 cities never used while adjusting the system.
 
 | | English, held-out | Indonesian, held-out |
 |---|---|---|
-| AI claims that pass verification | 24 of 29 (82.8%) | 28 of 29 (96.6%) |
-| Serious hazards covered by the AI alone | 80.5% | 96.3% |
+| AI claims that pass verification | 23 of 28 (82.1%) | 24 of 27 (88.9%) |
+| Serious hazards covered by the AI alone | 78.2% | 87.2% |
 | Serious hazards covered with notices | 100% | 100% |
 | Deliberately corrupted claims caught | 100% | 100% |
-| Reading grade (median; at grade 8 or below) | 3.7; 100% | not computed |
+| Reading grade (median; at grade 8 or below) | 3.5; 100% | not computed |
 
-These are small samples and one run each, so the figures can move by several points. Coverage with notices is 100% by design. The full record, including runs on the 20 development cities and earlier runs made with bugs since fixed, is in the repository.
+These are small samples and one run each, and repeated runs have differed by ten points or more. Coverage with notices is 100% by design. The full record, including runs on the 20 development cities and earlier runs made with bugs since fixed, is in the repository.
 
 ## Challenges we ran into
 
 - **Our own first version got the science wrong.** It applied heat-index categories to a different temperature measure and used the wrong cut points. Re-checking against the NWS source caught it, and the unit tests now reproduce the two examples NWS publishes.
 - **Over-warning.** An early version told a London household to stay indoors at an air quality index of 58. We made the system advise only on hazards that are serious for the household, and reject "stay indoors" advice at low levels.
-- **The verifier had gaps we only found by reading its output.** Indonesian decimal commas ("37,6") were read as two numbers. Later, a claim could cite three days and state only two values. Both are fixed and tested.
+- **The verifier had gaps we only found by reading its output.** Indonesian decimal commas ("37,6") were read as two numbers. A claim could cite three days and state only two values. Worst, a sentence could carry the right numbers on the wrong days ("224 today" when 224 was the day after) and still be marked verified; we saw it on a live result. All three are fixed and tested, and the last one cost several points of pass rate, which we report.
 - **Readability traded against accuracy.** One prompt change took the reading grade from 8.4 to about 3.5, and the model's raw pass rate moved around while we worked on it.
 - **Free-tier limits.** The larger models were not available on our key, so the system had to work with a small one.
 
@@ -94,7 +96,7 @@ Verification is only as good as what it checks. Ours covers numbers and levels. 
 ## What's next
 
 - A review of the advice by people, including a health professional.
-- Tie each number to its day in the verifier, and resolve conflicts between hazards (bad air against heat in a home without air conditioning).
+- Replace the day-matching heuristic in the verifier with evidence built directly from the data, and resolve conflicts between hazards (bad air against heat in a home without air conditioning).
 - A long-range card from climate projections: how many very hot days to expect in the 2040s compared with the recent past.
 - More languages, each with its own verification tests.
 

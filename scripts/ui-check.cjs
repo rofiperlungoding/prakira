@@ -38,7 +38,8 @@ const CASES = [
     }
     await page.click('#out summary');
     await page.screenshot({ path: `${out}/${name}-3-audit-open.png`, fullPage: true });
-    console.log(`${name}: overflow=${overflow} lang=${htmlLang} cells=${await page.locator('.cell').count()} items=${await page.locator('.item').count()} litCellsOnHover=${lit}`);
+    const n = (sel) => page.locator(sel).count();
+    console.log(`${name}: overflow=${overflow} lang=${htmlLang} cells=${await n('.cell')} items=${await n('.item')} litCellsOnHover=${lit} processSegments=${await n('.pline .seg')} peakLines=${await n('.cell .pk')} shareButtons=${await n('.tools .btn')}`);
     await page.close();
   }
   console.log('console errors:', errors.length ? errors : 'none');

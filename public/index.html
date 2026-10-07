@@ -42,10 +42,10 @@
   nav { background:#fff; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:18px; }
   .logo { font-family:var(--head); display:flex; align-items:center; gap:9px; font-weight:500; font-size:1.3rem; letter-spacing:-.02em; text-decoration:none; }
   .logo svg { width:30px; height:30px; display:block; }
-  .links { display:flex; gap:22px; margin:0 auto; font-size:.95rem; }
+  .links { display:flex; gap:20px; margin:0 auto; font-size:.95rem; white-space:nowrap; }
   .links a { text-decoration:none; color:var(--mut); }
   .links a:hover { color:var(--ink); }
-  .seg { display:inline-flex; border:1.5px solid var(--ink); border-radius:6px; overflow:hidden; }
+  .seg { display:inline-flex; flex:none; border:1.5px solid var(--ink); border-radius:6px; overflow:hidden; }
   .seg button { border:0; background:transparent; padding:6px 11px; font:600 .85rem var(--sans); cursor:pointer; }
   .seg button[aria-pressed="true"] { background:var(--ink); color:#fff; }
   nav .btn { padding:8px 14px; font-size:.86rem; }
@@ -196,22 +196,16 @@
   .loader .ln.l2 { animation-delay:.25s; } .loader .ln.l3 { animation-delay:.5s; }
   .loader .drop { animation:fall 1.6s linear infinite; opacity:0; }
   .loader .drop.d2 { animation-delay:.5s; } .loader .drop.d3 { animation-delay:1s; }
-  .lsteps { list-style:none; margin:6px 0 0; padding:0; display:flex; flex-wrap:wrap; justify-content:center; gap:8px 10px; }
-  .lsteps li { display:flex; align-items:center; gap:7px; padding:7px 13px; border-radius:999px; background:var(--soft); color:var(--mut); font-size:.92rem; animation:step 8s infinite; }
-  .lsteps li::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; opacity:.45; }
-  .lsteps li:nth-child(2) { animation-delay:2s; } .lsteps li:nth-child(3) { animation-delay:4s; } .lsteps li:nth-child(4) { animation-delay:6s; }
   .lnote { margin:8px 0 0; font-size:.88rem; color:var(--mut); }
   @keyframes rise { from { transform:translateY(26px); } to { transform:translateY(0); } }
   @keyframes spin { to { transform:rotate(360deg); } }
   @keyframes drift { from { transform:translateX(-10px); } to { transform:translateX(14px); } }
   @keyframes draw { from { stroke-dashoffset:160; } to { stroke-dashoffset:0; } }
   @keyframes fall { 0% { transform:translateY(-6px); opacity:0; } 20% { opacity:.9; } 100% { transform:translateY(26px); opacity:0; } }
-  @keyframes step { 0%, 24% { background:var(--lime); color:var(--ink); transform:scale(1.04); } 25%, 100% { background:var(--soft); color:var(--mut); transform:none; } }
 
   /* Match cut: shared names pair an element of the loading scene with one of the results. */
   .loader svg, .sunmark { view-transition-name:prk-sun; }
-  .lsteps, #out .strip { view-transition-name:prk-grid; }
-  .lnote, #out .items { view-transition-name:prk-body; }
+  .psteps, #out .pline { view-transition-name:prk-grid; }
   ::view-transition-group(prk-sun), ::view-transition-group(prk-grid), ::view-transition-group(prk-body) { animation-duration:.65s; animation-timing-function:cubic-bezier(.2,.8,.2,1); }
   ::view-transition-old(prk-grid), ::view-transition-new(prk-grid), ::view-transition-old(prk-body), ::view-transition-new(prk-body) { height:100%; object-fit:fill; }
   ::view-transition-old(root), ::view-transition-new(root) { animation-duration:.35s; }
@@ -221,6 +215,52 @@
   /* Results arrive one after another. "backwards" so the audit-link dimming still works afterwards. */
   #out .cell, #out .item, #out .quiet { animation:pop .45s cubic-bezier(.2,.8,.2,1) backwards; }
   @keyframes pop { from { opacity:0; transform:translateY(10px) scale(.98); } }
+
+  /* The process: real steps, live while waiting, kept as one line above the result */
+  .psteps { list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px; width:min(100%, 520px); }
+  .psteps li { display:grid; grid-template-columns:18px auto 1fr; align-items:center; gap:10px; padding:8px 14px; border-radius:10px; background:var(--soft); color:var(--mut); font-size:.95rem; }
+  .psteps li b { font-weight:500; }
+  .psteps .sdet { text-align:right; font-size:.88rem; }
+  .psteps .dot { width:10px; height:10px; border-radius:50%; background:currentColor; opacity:.35; justify-self:center; }
+  .psteps li.run { background:var(--lime); color:var(--ink); }
+  .psteps li.run .dot { opacity:1; animation:pulse 1s ease-in-out infinite; }
+  .psteps li.done { color:var(--ink); background:#fff; box-shadow:inset 0 0 0 1.5px var(--rule); }
+  .psteps li.done .dot { opacity:1; background:var(--ok); }
+  .psteps li.fail { color:var(--bad); background:#fff; box-shadow:inset 0 0 0 1.5px var(--rule); }
+  .psteps li.fail .dot { opacity:1; }
+  @keyframes pulse { 50% { transform:scale(1.6); opacity:.5; } }
+  .pline { display:flex; flex-wrap:wrap; gap:6px; }
+  .seg { display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:1.5px solid var(--rule); background:#fff; border-radius:10px; padding:8px 12px; cursor:pointer; text-align:left; flex:1 1 130px; position:relative; }
+  .seg:hover { border-color:var(--ink); }
+  .seg b { font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:7px; }
+  .seg b::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--ok); }
+  .seg span { font-size:.84rem; color:var(--mut); }
+  .seg.fail b::before { background:var(--bad); } .seg.fail span { color:var(--bad); }
+  .seg.skip b::before { background:var(--rule); } .seg.skip { background:var(--soft); }
+  .audit [data-au] { border-radius:8px; padding:6px 8px; margin:-6px -8px; transition:background .3s; }
+  .audit .hot { background:var(--hero); }
+
+  /* Status line used by every control */
+  .act { display:block; min-height:1.3em; margin-top:8px; font-size:.92rem; color:var(--mut); }
+  .act:empty { display:none; }
+  .act.run::before { content:""; display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:var(--ink); animation:pulse 1s ease-in-out infinite; }
+  .act.ok { color:var(--ok); } .act.bad { color:var(--bad); }
+  .where { display:flex; gap:8px; } .where #q { flex:1; }
+  .where .btn { white-space:nowrap; }
+  .privacy { margin:8px 0 0; font-size:.85rem; color:var(--mut); }
+  .linkbtn { border:0; background:none; padding:0; font:inherit; color:inherit; text-decoration:underline; cursor:pointer; }
+  .tools { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:16px; }
+  .tools .btn { padding:9px 14px; font-size:.9rem; }
+  .tools .act { margin:0; }
+  .pk { opacity:1; font-weight:500; }
+
+  /* Long-range outlook */
+  .olead { margin:0 0 10px; font-weight:500; }
+  .orow { display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+  .ocol { background:#fff; border:1.5px solid var(--rule); border-radius:12px; padding:14px 18px; display:grid; min-width:150px; }
+  .ocol b { font:500 2.6rem/1 var(--head); letter-spacing:-.03em; }
+  .ocol span { font-weight:500; margin-top:6px; } .ocol small { color:var(--mut); font-size:.85rem; }
+  .oarrow { font-size:1.6rem; color:var(--mut); }
 
   /* Doodles */
   .doodle { position:absolute; pointer-events:none; color:var(--ink); }
@@ -242,7 +282,7 @@
   @keyframes twinkle { 0%, 100% { transform:scale(1) rotate(0); opacity:1; } 50% { transform:scale(.82) rotate(12deg); opacity:.7; } }
   @keyframes bob { 0%, 100% { transform:rotate(-7deg) translateY(0); } 50% { transform:rotate(-5deg) translateY(-8px); } }
 
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .cell, .item { transition:none; } .loader *, .lsteps li, .sticker, .d-spark, #out .cell, #out .item, #out .quiet { animation:none !important; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation:none !important; } .d-under path { stroke-dashoffset:0; animation:none; } .loader .ln { stroke-dasharray:none; } }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior:auto; } .cell, .item { transition:none; } .loader *, .psteps .dot, .sticker, .d-spark, #out .cell, #out .item, #out .quiet { animation:none !important; } ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation:none !important; } .d-under path { stroke-dashoffset:0; animation:none; } .loader .ln { stroke-dasharray:none; } }
   @media (max-width:900px) {
     .links { display:none; } nav { justify-content:space-between; }
     .hero .wrap { grid-template-columns:1fr; min-height:0; padding-top:30px; }
@@ -251,6 +291,7 @@
     .band { padding:54px 0; } .d-start { right:-120px; }
   }
   @media (max-width:520px) {
+    .where { flex-direction:column; } .psteps li { grid-template-columns:18px 1fr; } .psteps .sdet { grid-column:2; text-align:left; }
     .wrap { padding:0 14px; } nav .btn { display:none; } .panel { padding:16px; }
     .strip { grid-template-columns:46px repeat(3, minmax(0, 1fr)); gap:4px; }
     .strip .rh { font-size:.74rem; }
@@ -344,7 +385,8 @@
     <div class="setup">
       <div>
         <label class="label" for="q" data-t="where"></label>
-        <input id="q" type="text" autocomplete="off" spellcheck="false">
+        <div class="where"><input id="q" type="text" autocomplete="off" spellcheck="false"><button class="btn ghost" id="locate" type="button" data-t="locate"></button></div>
+        <span class="act" id="searchAct" role="status"></span>
         <div id="sugg"></div>
         <p id="picked" aria-live="polite"></p>
       </div>
@@ -354,6 +396,7 @@
       </div>
       <div><button class="btn" id="go" type="button" disabled data-t="go"></button></div>
       <p class="msg" id="status" role="status" aria-live="polite"></p>
+      <p class="privacy"><span data-t="locNote"></span> <span data-t="remembered"></span> <button class="linkbtn" id="forget" type="button" data-t="forget"></button></p>
     </div>
     <div id="out"></div>
   </div>
@@ -378,7 +421,7 @@
   <h2 class="big center" data-t="evH"></h2>
   <p class="lede center" data-t="evP"></p>
   <div class="stats">
-    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">83–97%</div><p data-t="ev1p"></p></div>
+    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">82–89%</div><p data-t="ev1p"></p></div>
     <div class="stat b"><h3 data-t="ev2"></h3><div class="n">100%</div><p data-t="ev2p"></p></div>
     <div class="stat c"><h3 data-t="ev3"></h3><div class="n">100%</div><p data-t="ev3p"></p></div>
   </div>
@@ -406,8 +449,6 @@
       <path class="drop" d="M40 62v6" stroke="#5b9bd5" stroke-width="3.5"/><path class="drop d2" d="M50 62v6" stroke="#5b9bd5" stroke-width="3.5"/><path class="drop d3" d="M60 62v6" stroke="#5b9bd5" stroke-width="3.5"/></g>
     <g class="cloud b"><path d="M142 32a7 7 0 017-7 9 9 0 0118 2 6 6 0 01-1 12h-18a7 7 0 01-6-7z" fill="#fff" stroke-width="3.5"/></g>
   </svg>
-  <ol class="lsteps"><li data-t="ld1"></li><li data-t="ld2"></li><li data-t="ld3"></li><li data-t="ld4"></li></ol>
-  <p class="lnote" data-t="ldNote"></p>
 </div></template>
 
 <footer><div class="wrap">
@@ -428,7 +469,7 @@ const T = {
     mC2: 'Wear a well-fitting mask outside.', mC2e: 'US AQI peaks at 204 today.',
     artEv1: 'US AQI peaks at', artEv2: 'today and',
     meetH: 'Advice with receipts', meetP: 'AI can write helpful advice. It can also state a wrong number with full confidence. Prakira lets the model write, then checks every claim against the forecast. Select any action to see the exact numbers behind it.',
-    m1q: 'What exactly is checked?', m1a: 'Every number in the evidence line must match the forecast value it cites, and the stated level must equal the level set by published rules. A claim that fails is removed and listed, with the reason, in the audit trail.',
+    m1q: 'What exactly is checked?', m1a: 'Every number in the evidence line must match the forecast value for the day it is written next to, and the stated level must equal the level set by published rules. A claim that fails is removed and listed, with the reason, in the audit trail.',
     m2q: 'What is not checked?', m2a: 'The wording of the action itself is written by a language model. Prakira blocks actions that contain numbers, and blocks "stay indoors" advice when the level is too low to justify it, but it cannot prove an action is the best one.',
     m3q: 'What if the AI misses something serious?', m3a: 'Then a standard notice appears instead: fixed text, built from the data. A serious hazard is never silently left out.',
     m4q: 'What if nothing is serious?', m4a: 'Then Prakira says so and gives no advice. Warning people when they do not need it teaches them to ignore warnings.',
@@ -441,7 +482,29 @@ const T = {
     where: 'Where', who: 'Who lives there', go: 'Generate briefing', placeholder: 'City, for example Jakarta', examples: 'Try:',
     selected: 'Selected:', searching: 'Search failed. Try again.', none: 'No place found.',
     loading: 'Working on your briefing…', retry: 'Try again',
-    ld1: 'Reading the forecast', ld2: 'Setting levels by rule', ld3: 'AI writes the actions', ld4: 'Checking every number', ldNote: 'This usually takes 3 to 10 seconds.',
+    myPlace: 'Your location', locate: 'Use my location', locAsk: 'Asking your browser for your location…', locOk: 'Location found, rounded to about 1 km.',
+    locDenied: 'Location permission was denied. Type a city instead.', locNone: 'Your location could not be determined.', locTimeout: 'Finding your location took too long.', locUnsupported: 'This browser cannot share a location.',
+    locNote: 'Your place is sent to this server and to Open-Meteo to fetch the forecast, and is not stored on the server.', remembered: 'Your place, household and language are remembered in this browser only.', forget: 'Forget my choices', forgotten: 'Choices cleared from this browser.',
+    searchRun: 'Searching…', found: (n) => `${n} place${n === 1 ? '' : 's'} found`,
+    process: 'Process', skipped: 'not needed', secs: (x) => `${x} s`, tryN: (n) => `try ${n}`, noResult: 'The server sent no result.',
+    steps: { forecast: 'Read the forecast', climate: 'Compare with the 30-year normal', rules: 'Set levels by rule', model: 'AI writes the actions', verify: 'Check every claim', notices: 'Fill any gap', cache: 'Saved briefing' },
+    short: { forecast: 'Forecast', climate: 'Normal', rules: 'Rules', model: 'AI', verify: 'Checker', notices: 'Notices' },
+    sd: {
+      forecast: (e) => (e.state === 'fail' ? `failed: ${e.error}` : `${e.values} values${e.air ? '' : ', no air data'}`),
+      climate: (e) => (e.state === 'fail' ? 'unavailable right now' : `${e.days} days compared`),
+      rules: (e) => `${e.serious} serious of ${e.levelled}`,
+      model: (e) => (e.state === 'fail' ? `failed: ${e.error}` : `wrote ${e.claims}${e.attempt > 1 ? `, try ${e.attempt}` : ''}`),
+      verify: (e) => `kept ${e.kept}, removed ${e.removed}`,
+      notices: (e) => `${e.notices} added${e.compound ? ', compound day' : ''}`,
+      cache: (e) => `read at ${e.at}, shown again without a new request`,
+    },
+    auHouse: 'Your household sets which levels count as serious. These adjustments are this project\'s judgement from the wording of the official categories, not an official rule.',
+    peaks: (h) => `peaks about ${h}`, readAt: (h) => `forecast read at ${h}`,
+    share: 'Share on WhatsApp', copy: 'Copy text', copied: 'Copied.', copyFail: 'Could not copy. Select the text and copy it by hand.', shareFoot: 'Checked against forecast data. Not an official warning, not medical advice.',
+    outlookH: 'Looking further ahead', outRun: 'Reading three climate models…', outFail: (m) => `Outlook unavailable: ${m}`,
+    outLine: (th) => `Days a year at or above ${th} °C (daily high)`, outPast: (y) => `${y[0]} to ${y[1]}`, outRange: (a, b) => `models: ${a} to ${b}`,
+    outRare: (th) => `Days at or above ${th} °C stay rare here in both 2011 to 2020 and 2041 to 2050: under one a year in every model.`,
+    outNote: 'Median of three climate models (CMIP6 HighResMIP, bias-corrected against ERA5-Land) on a high-emissions pathway close to RCP8.5. Model output, not measurement, and air temperature, not heat index. The models differ: read the range, not one number.',
     d1: 'checked, not guessed', d2: 'start here',
     strip: 'Next 72 hours', briefing: 'Your briefing', audit: 'Audit trail',
     rows: { heat: 'Heat', rain: 'Rain', air: 'Air', uv: 'UV', ctx: 'Climate' },
@@ -469,10 +532,10 @@ const T = {
     pp1: 'Forecast and climate data', pp2: 'Rules set the levels', pp3: 'AI writes the actions', pp4: 'Verifier checks each claim', pp5: 'Your briefing',
     ppSrc: 'open data', ppRule: 'fixed rules', ppAi: 'not trusted', ppYou: 'with receipts',
     evH: 'Measured, not promised', evP: 'Tested on 35 cities across climates. The headline figures are from 15 cities the system was never tuned on.',
-    ev1: 'AI claims that pass', ev1p: 'Share of the model\'s claims that survive verification on cities it was never tuned on: 83% in English, 97% in Indonesian. The rest are removed before you see them.',
-    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as a verified action or as a standard notice. The AI alone covers 80 to 96%.',
+    ev1: 'AI claims that pass', ev1p: 'Share of the model\'s claims that survive verification on cities it was never tuned on: 82% in English, 89% in Indonesian. The rest are removed before you see them.',
+    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as a verified action or as a standard notice. The AI alone covers 78 to 87%.',
     ev3: 'Wrong numbers caught', ev3p: 'When numbers and levels in verified claims are deliberately corrupted, the verifier rejects all of them.',
-    evFine: 'Results from 7 October 2026: one run per language on 15 held-out cities (29 claims each) and one on 20 tuned cities (44 claims each). These are small samples and one run each, so the figures can move by several points. Coverage is 100% by design, because notices fill every gap. English claims read at a median school grade of 3 to 4. The advice was read by an AI assistant, not yet by a person or a clinician. Method, code and limits are public.',
+    evFine: 'Results from 8 October 2026: one run per language on 15 held-out cities (27 or 28 claims each). On the 20 cities used for development the pass rates were 72% and 79%. These are small samples and one run each; repeated runs have differed by ten points or more. Coverage is 100% by design, because notices fill every gap. English claims read at a median school grade of 3 to 4. The advice was read by an AI assistant, not yet by a person or a clinician. Method, code and limits are public.',
     faqH: 'More questions?',
     f1q: 'Is this an official warning?', f1a: 'No. Prakira is a companion to your national meteorological service, such as BMKG in Indonesia. In an emergency, follow official instructions.',
     f2q: 'Is this medical advice?', f2a: 'No. It suggests everyday protective actions. It does not diagnose and it has not been reviewed by clinicians.',
@@ -506,7 +569,29 @@ const T = {
     where: 'Lokasi', who: 'Siapa yang tinggal di sana', go: 'Buat ringkasan', placeholder: 'Kota, misalnya Jakarta', examples: 'Coba:',
     selected: 'Dipilih:', searching: 'Pencarian gagal. Coba lagi.', none: 'Tempat tidak ditemukan.',
     loading: 'Menyiapkan ringkasan Anda…', retry: 'Coba lagi',
-    ld1: 'Membaca prakiraan', ld2: 'Menetapkan tingkat dengan aturan', ld3: 'AI menulis tindakan', ld4: 'Mengecek setiap angka', ldNote: 'Biasanya butuh 3 sampai 10 detik.',
+    myPlace: 'Lokasi Anda', locate: 'Pakai lokasi saya', locAsk: 'Meminta lokasi Anda ke browser…', locOk: 'Lokasi ditemukan, dibulatkan ke sekitar 1 km.',
+    locDenied: 'Izin lokasi ditolak. Ketik nama kota saja.', locNone: 'Lokasi Anda tidak dapat ditentukan.', locTimeout: 'Pencarian lokasi terlalu lama.', locUnsupported: 'Browser ini tidak dapat membagikan lokasi.',
+    locNote: 'Tempat Anda dikirim ke server ini dan ke Open-Meteo untuk mengambil prakiraan, dan tidak disimpan di server.', remembered: 'Tempat, isi rumah, dan bahasa Anda hanya diingat di browser ini.', forget: 'Lupakan pilihan saya', forgotten: 'Pilihan dihapus dari browser ini.',
+    searchRun: 'Mencari…', found: (n) => `${n} tempat ditemukan`,
+    process: 'Proses', skipped: 'tidak diperlukan', secs: (x) => `${x} dtk`, tryN: (n) => `percobaan ${n}`, noResult: 'Server tidak mengirim hasil.',
+    steps: { forecast: 'Membaca prakiraan', climate: 'Membandingkan dengan normal 30 tahun', rules: 'Menetapkan tingkat dengan aturan', model: 'AI menulis tindakan', verify: 'Mengecek setiap klaim', notices: 'Mengisi celah', cache: 'Ringkasan tersimpan' },
+    short: { forecast: 'Prakiraan', climate: 'Normal', rules: 'Aturan', model: 'AI', verify: 'Pengecek', notices: 'Pemberitahuan' },
+    sd: {
+      forecast: (e) => (e.state === 'fail' ? `gagal: ${e.error}` : `${e.values} nilai${e.air ? '' : ', tanpa data udara'}`),
+      climate: (e) => (e.state === 'fail' ? 'sedang tidak tersedia' : `${e.days} hari dibandingkan`),
+      rules: (e) => `${e.serious} serius dari ${e.levelled}`,
+      model: (e) => (e.state === 'fail' ? `gagal: ${e.error}` : `menulis ${e.claims}${e.attempt > 1 ? `, percobaan ${e.attempt}` : ''}`),
+      verify: (e) => `lolos ${e.kept}, dibuang ${e.removed}`,
+      notices: (e) => `${e.notices} ditambahkan${e.compound ? ', hari gabungan' : ''}`,
+      cache: (e) => `dibaca pukul ${e.at}, ditampilkan lagi tanpa permintaan baru`,
+    },
+    auHouse: 'Isi rumah Anda menentukan tingkat mana yang dianggap serius. Penyesuaian ini adalah penilaian proyek ini dari kata-kata kategori resmi, bukan aturan resmi.',
+    peaks: (h) => `puncak sekitar ${h}`, readAt: (h) => `prakiraan dibaca pukul ${h}`,
+    share: 'Bagikan ke WhatsApp', copy: 'Salin teks', copied: 'Tersalin.', copyFail: 'Tidak dapat menyalin. Pilih teksnya dan salin secara manual.', shareFoot: 'Dicek terhadap data prakiraan. Bukan peringatan resmi, bukan nasihat medis.',
+    outlookH: 'Melihat lebih jauh ke depan', outRun: 'Membaca tiga model iklim…', outFail: (m) => `Proyeksi tidak tersedia: ${m}`,
+    outLine: (th) => `Hari per tahun dengan suhu maksimum ${th} °C atau lebih`, outPast: (y) => `${y[0]} sampai ${y[1]}`, outRange: (a, b) => `model: ${a} sampai ${b}`,
+    outRare: (th) => `Hari dengan suhu ${th} °C atau lebih tetap jarang di sini pada 2011 sampai 2020 maupun 2041 sampai 2050: kurang dari satu per tahun di setiap model.`,
+    outNote: 'Median tiga model iklim (CMIP6 HighResMIP, dikoreksi bias terhadap ERA5-Land) pada jalur emisi tinggi yang mendekati RCP8.5. Ini keluaran model, bukan pengukuran, dan suhu udara, bukan indeks panas. Model saling berbeda: baca rentangnya, bukan satu angka.',
     d1: 'dicek, bukan ditebak', d2: 'mulai di sini',
     strip: '72 jam ke depan', briefing: 'Ringkasan Anda', audit: 'Jejak audit',
     rows: { heat: 'Panas', rain: 'Hujan', air: 'Udara', uv: 'UV', ctx: 'Iklim' },
@@ -539,10 +624,10 @@ const T = {
     pp1: 'Data prakiraan dan iklim', pp2: 'Aturan menetapkan tingkat', pp3: 'AI menulis tindakan', pp4: 'Verifikator mengecek tiap klaim', pp5: 'Ringkasan Anda',
     ppSrc: 'data terbuka', ppRule: 'aturan tetap', ppAi: 'tidak dipercaya', ppYou: 'dengan bukti',
     evH: 'Diukur, bukan dijanjikan', evP: 'Diuji pada 35 kota di berbagai iklim. Angka utama berasal dari 15 kota yang tidak pernah dipakai untuk menyetel sistem.',
-    ev1: 'Klaim AI yang lolos', ev1p: 'Bagian klaim model yang lolos verifikasi pada kota yang tidak pernah dipakai untuk penyetelan: 83% dalam bahasa Inggris, 97% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya.',
-    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan terverifikasi atau pemberitahuan standar. AI sendiri mencakup 80 sampai 96%.',
+    ev1: 'Klaim AI yang lolos', ev1p: 'Bagian klaim model yang lolos verifikasi pada kota yang tidak pernah dipakai untuk penyetelan: 82% dalam bahasa Inggris, 89% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya.',
+    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan terverifikasi atau pemberitahuan standar. AI sendiri mencakup 78 sampai 87%.',
     ev3: 'Angka salah tertangkap', ev3p: 'Saat angka dan tingkat pada klaim terverifikasi sengaja dirusak, verifikator menolak semuanya.',
-    evFine: 'Hasil 7 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (29 klaim masing-masing) dan satu pada 20 kota penyetelan (44 klaim masing-masing). Sampelnya kecil dan hanya satu pengujian, jadi angkanya bisa bergeser beberapa poin. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Klaim bahasa Inggris terbaca pada median kelas 3 sampai 4. Sarannya dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Metode, kode, dan batasannya terbuka.',
+    evFine: 'Hasil 8 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (27 atau 28 klaim masing-masing). Pada 20 kota yang dipakai saat pengembangan, tingkat lolosnya 72% dan 79%. Sampelnya kecil dan hanya satu pengujian; pengujian berulang pernah berbeda sepuluh poin atau lebih. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Klaim bahasa Inggris terbaca pada median kelas 3 sampai 4. Sarannya dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Metode, kode, dan batasannya terbuka.',
     faqH: 'Masih ada pertanyaan?',
     f1q: 'Apakah ini peringatan resmi?', f1a: 'Bukan. Prakira adalah pendamping bagi badan meteorologi nasional Anda, seperti BMKG di Indonesia. Dalam keadaan darurat, ikuti arahan resmi.',
     f2q: 'Apakah ini nasihat medis?', f2a: 'Bukan. Prakira menyarankan tindakan perlindungan sehari-hari. Prakira tidak mendiagnosis dan belum ditinjau oleh tenaga medis.',
@@ -565,9 +650,13 @@ const OFFICIAL = { Indonesia: ['BMKG', 'https://www.bmkg.go.id/'] };
 const WMO = ['WMO Severe Weather Information Centre', 'https://severeweather.wmo.int/'];
 
 const $ = (id) => document.getElementById(id);
-const state = { lang: 'en', place: null, data: null };
+const STORE = 'prakira.choices.v1';
+const STEP_IDS = ['forecast', 'climate', 'rules', 'model', 'verify', 'notices'];
+const state = { lang: 'en', place: null, profile: [], data: null };
 const t = () => T[state.lang];
 const fmt = (v) => (state.lang === 'id' ? String(v).replace('.', ',') : String(v));
+const clock = (iso) => new Date(iso).toLocaleTimeString(state.lang === 'id' ? 'id-ID' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+const hour = (hhmm) => (state.lang === 'id' ? hhmm.replace(':', '.') : hhmm);
 
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -575,18 +664,35 @@ function el(tag, cls, text) {
   if (text != null) e.textContent = text;
   return e;
 }
-const placeName = (p) => [p.name, p.admin, p.country].filter(Boolean).join(', ');
+const placeName = (p) => (p.mine ? t().myPlace : [p.name, p.admin, p.country].filter(Boolean).join(', '));
+const chosen = () => [...document.querySelectorAll('#profile input:checked')].map((i) => i.value);
+
+// One status line per control: what is happening now, or what just happened. Never on a timer.
+function act(id, kind, text) {
+  const n = $(id);
+  n.className = 'act' + (kind ? ' ' + kind : '');
+  n.textContent = text || '';
+}
+
+// Choices are kept in this browser only (localStorage), never on the server.
+function remember() {
+  try { localStorage.setItem(STORE, JSON.stringify({ lang: state.lang, place: state.place, profile: chosen() })); } catch { /* storage blocked: nothing to do */ }
+}
+function recall() {
+  try { return JSON.parse(localStorage.getItem(STORE)); } catch { return null; }
+}
 
 function renderStatic() {
   document.documentElement.lang = state.lang;
   for (const n of document.querySelectorAll('[data-t]')) n.textContent = t()[n.dataset.t];
   for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === state.lang));
   $('q').placeholder = t().placeholder;
-  const checked = new Set([...document.querySelectorAll('#profile input:checked')].map((i) => i.value));
+  const checked = new Set(document.querySelector('#profile input') ? chosen() : state.profile);
   $('profile').textContent = '';
   for (const [k, v] of Object.entries(t().profiles)) {
     const l = el('label');
     const i = el('input'); i.type = 'checkbox'; i.value = k; i.checked = checked.has(k);
+    i.addEventListener('change', remember);
     l.append(i, document.createTextNode(v));
     $('profile').appendChild(l);
   }
@@ -599,6 +705,7 @@ function pick(p) {
   $('picked').textContent = `${t().selected} ${placeName(p)}`;
   $('go').disabled = false;
   showExamples();
+  remember();
 }
 function showExamples() {
   const s = $('sugg'); s.textContent = ''; delete s.dataset.live;
@@ -613,15 +720,40 @@ $('q').addEventListener('input', () => {
   timer = setTimeout(async () => {
     const q = $('q').value.trim();
     const s = $('sugg');
-    if (q.length < 2) { showExamples(); return; }
+    if (q.length < 2) { act('searchAct', '', ''); showExamples(); return; }
+    act('searchAct', 'run', t().searchRun);
     try {
       const r = await (await fetch('/api/geocode?q=' + encodeURIComponent(q))).json();
       s.textContent = ''; s.dataset.live = '1';
-      if (!r.length) { s.appendChild(el('span', 'msg', t().none)); return; }
-      for (const p of r) { const b = el('button', 'pill', placeName(p)); b.type = 'button'; b.onclick = () => { $('q').value = p.name; pick(p); }; s.appendChild(b); }
-    } catch { s.textContent = ''; s.appendChild(el('span', 'msg err', t().searching)); }
+      if (!Array.isArray(r) || !r.length) { act('searchAct', '', t().none); return; }
+      act('searchAct', 'ok', t().found(r.length));
+      for (const p of r) { const b = el('button', 'pill', placeName(p)); b.type = 'button'; b.onclick = () => { $('q').value = p.name; act('searchAct', '', ''); pick(p); }; s.appendChild(b); }
+    } catch { s.textContent = ''; act('searchAct', 'bad', t().searching); }
   }, 300);
 });
+
+$('locate').onclick = () => {
+  if (!navigator.geolocation) { act('searchAct', 'bad', t().locUnsupported); return; }
+  act('searchAct', 'run', t().locAsk);
+  navigator.geolocation.getCurrentPosition((pos) => {
+    // Two decimals is about 1 km: enough for a forecast grid cell, and less precise than the device reports.
+    const round = (x) => Math.round(x * 100) / 100;
+    $('q').value = '';
+    pick({ mine: true, name: '', admin: '', country: '', lat: round(pos.coords.latitude), lon: round(pos.coords.longitude) });
+    act('searchAct', 'ok', t().locOk);
+  }, (err) => {
+    act('searchAct', 'bad', err.code === 1 ? t().locDenied : err.code === 3 ? t().locTimeout : t().locNone);
+  }, { timeout: 10000, maximumAge: 600000 });
+};
+
+$('forget').onclick = () => {
+  try { localStorage.removeItem(STORE); } catch { /* storage blocked */ }
+  state.place = null; state.profile = [];
+  for (const i of document.querySelectorAll('#profile input')) i.checked = false;
+  $('picked').textContent = ''; $('q').value = ''; $('go').disabled = true;
+  showExamples();
+  act('searchAct', 'ok', t().forgotten);
+};
 
 function tone(f) { return TONES[f.hazard][f.severity] ?? 0; }
 
@@ -670,6 +802,8 @@ function strip(d) {
       const top = el('div'); top.appendChild(n);
       if (row === 'rain') { if (byId[`rainprob-${i}`]) top.appendChild(el('div', 'sub2', L.chance(byId[`rainprob-${i}`].value))); }
       else top.appendChild(el('div', 'sub2', L.units[row]));
+      // When the peak falls, from hourly data. Set by rule; the model never writes clock times.
+      if (f.peak) top.appendChild(el('div', 'sub2 pk', L.peaks(hour(f.peak))));
       c.append(top, el('div', 'lvl', L.level(f.level)));
       if (compound.has(f.id)) { const m = el('span', 'cmp', L.cmp); m.title = L.compound; c.appendChild(m); }
       c.setAttribute('aria-label', `${L.rows[row]}, ${L.day[f.day]}: ${fmt(f.value)} ${f.unit}, ${L.level(f.level)}`);
@@ -711,17 +845,130 @@ function item(kind, headline, body, badge, ids) {
   return a;
 }
 
+/* ---- The process: what the server did for this briefing, shown live and kept afterwards ---- */
+
+// One line of detail for a finished step, built only from what the server reported.
+function stepDetail(e) {
+  const L = t();
+  const text = e.id === 'cache' ? L.sd.cache({ at: clock(e.readAt) }) : L.sd[e.id](e);
+  return e.ms >= 100 ? `${text} · ${L.secs(fmt((e.ms / 1000).toFixed(1)))}` : text;
+}
+function stepList() {
+  const ol = el('ol', 'psteps');
+  for (const id of STEP_IDS) {
+    const li = el('li', 'wait'); li.dataset.step = id;
+    li.append(el('span', 'dot'), el('b', '', t().steps[id]), el('span', 'sdet'));
+    ol.appendChild(li);
+  }
+  return ol;
+}
+function onStep(e) {
+  const out = $('out');
+  if (e.id === 'cache') {
+    for (const li of out.querySelectorAll('.psteps li')) li.className = 'done';
+    const note = out.querySelector('.lnote'); if (note) note.textContent = `${t().steps.cache}: ${stepDetail(e)}`;
+    return;
+  }
+  const li = out.querySelector(`.psteps li[data-step="${e.id}"]`);
+  if (!li) return;
+  li.className = e.state === 'start' ? 'run' : e.state;
+  li.querySelector('.sdet').textContent = e.state === 'start' ? (e.attempt > 1 ? t().tryN(e.attempt) : '') : stepDetail(e);
+}
+
+// The same steps as one compact line above the result. Each segment opens its part of the audit trail.
+function processLine(d) {
+  const L = t();
+  const last = new Map();
+  for (const e of d.trace || []) last.set(e.id, e); // a retried step keeps its final outcome
+  const wrap = el('div', 'pline');
+  wrap.setAttribute('role', 'group'); wrap.setAttribute('aria-label', L.process);
+  STEP_IDS.forEach((id) => {
+    const e = last.get(id);
+    const b = el('button', 'seg ' + (e ? e.state : 'skip'));
+    b.type = 'button';
+    b.append(el('b', '', L.short[id]), el('span', '', e ? stepDetail(e) : L.skipped));
+    b.onclick = (ev) => { ev.stopPropagation(); openAudit(id); };
+    wrap.appendChild(b);
+  });
+  return wrap;
+}
+function openAudit(id) {
+  const det = $('out').querySelector('details');
+  if (!det) return;
+  det.open = true;
+  const target = det.querySelector(`[data-au="${id}"]`) || det;
+  for (const n of det.querySelectorAll('.hot')) n.classList.remove('hot');
+  target.classList.add('hot');
+  target.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+
+/* ---- Share and copy ---- */
+
+function briefingText(d) {
+  const L = t();
+  const dates = [...new Set(d.facts.map((f) => f.date))];
+  const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+  const lines = [`Prakira · ${placeName(state.place)}`, cap(L.readAt(clock(d.generatedAt))), ''];
+  for (const date of dates) {
+    const fs = d.facts.filter((f) => f.date === date && f.level !== 'n/a');
+    lines.push(`${L.day[fs[0].day]} (${L.weekday(fs[0].weekday)}): ` + fs.map((f) => `${L.rows[f.hazard === 'air' ? 'air' : f.hazard]} ${fmt(f.value)}${f.unit ? ' ' + f.unit : ''} (${L.level(f.level)})`).join(', '));
+  }
+  lines.push('');
+  if (d.quiet) lines.push(L.quiet);
+  for (const c of d.claims) lines.push(`• ${c.advice}`, `  ${c.evidence}`);
+  if (d.compound) lines.push(`• ${d.compound.evidence} ${d.compound.advice}`);
+  for (const n of d.notices || []) lines.push(`• ${n.evidence} ${n.advice}`);
+  lines.push('', L.shareFoot, location.origin);
+  return lines.join('\n');
+}
+
+/* ---- Long-range outlook: loaded after the briefing, from its own endpoint ---- */
+
+async function loadOutlook(place) {
+  const L = t();
+  const box = $('out').querySelector('.outlook');
+  if (!box) return;
+  const status = box.querySelector('.act');
+  status.className = 'act run'; status.textContent = L.outRun;
+  try {
+    const r = await fetch(`/api/outlook?lat=${place.lat}&lon=${place.lon}`);
+    const o = await r.json();
+    if (!r.ok) throw new Error(o.error || 'request failed');
+    if (state.place !== place || !box.isConnected) return; // the user moved on
+    if (!o.available) throw new Error(o.reason);
+    status.className = 'act'; status.textContent = '';
+    if (o.rare) { box.appendChild(el('p', 'olead', L.outRare(o.threshold))); }
+    else {
+      box.appendChild(el('p', 'olead', L.outLine(o.threshold)));
+      const row = el('div', 'orow');
+      for (const [k, arrow] of [['past', false], ['future', true]]) {
+        if (arrow) row.appendChild(el('span', 'oarrow', '→'));
+        const c = el('div', 'ocol');
+        c.append(el('b', '', String(o[k].median)), el('span', '', L.outPast(o.periods[k])), el('small', '', L.outRange(o[k].min, o[k].max)));
+        row.appendChild(c);
+      }
+      box.appendChild(row);
+    }
+    box.appendChild(el('p', 'note', L.outNote));
+  } catch (e) {
+    if (box.isConnected) { status.className = 'act bad'; status.textContent = L.outFail(e.message); }
+  }
+}
+
 function render(d) {
   const L = t();
   const out = $('out'); out.textContent = ''; out.className = '';
   out.onclick = () => light([]);
-  for (const w of d.warnings || []) out.appendChild(el('p', 'msg err', w));
+  for (const w of d.warnings || []) out.appendChild(el('p', 'note', w));
 
-  const s1 = el('section');
-  const h = el('h2');
+  const s0 = el('section', 'proc');
+  const h0 = el('h2');
   const sun = document.querySelector('.logo svg').cloneNode(true); sun.setAttribute('class', 'sunmark');
-  h.append(sun, document.createTextNode(`${L.strip} · ${placeName(state.place)}`));
-  s1.appendChild(h);
+  h0.append(sun, document.createTextNode(`${L.process} · ${L.readAt(clock(d.generatedAt))}`));
+  s0.append(h0, processLine(d));
+  out.appendChild(s0);
+
+  const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
   s1.appendChild(strip(d));
   if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote));
   out.appendChild(s1);
@@ -735,18 +982,40 @@ function render(d) {
   if (!d.quiet && !d.claims.length && !(d.notices || []).length) list.appendChild(el('p', 'msg err', L.failed + (d.error ? ` (${d.error})` : '')));
   s2.appendChild(list);
   if (!d.quiet) s2.appendChild(el('p', 'note', L.tapNote));
+  const tools = el('div', 'tools');
+  const wa = el('a', 'btn ghost', L.share);
+  wa.href = 'https://wa.me/?text=' + encodeURIComponent(briefingText(d)); wa.target = '_blank'; wa.rel = 'noopener';
+  const cp = el('button', 'btn ghost', L.copy); cp.type = 'button';
+  const said = el('span', 'act'); said.id = 'copyAct'; said.setAttribute('role', 'status');
+  cp.onclick = async (e) => {
+    e.stopPropagation();
+    try { await navigator.clipboard.writeText(briefingText(d)); act('copyAct', 'ok', L.copied); } catch { act('copyAct', 'bad', L.copyFail); }
+  };
+  tools.append(wa, cp, said);
+  s2.appendChild(tools);
   out.appendChild(s2);
+
+  const s4 = el('section', 'outlook');
+  s4.append(el('h2', '', L.outlookH), el('span', 'act'));
+  out.appendChild(s4);
 
   const s3 = el('section'); s3.appendChild(el('h2', '', L.audit));
   const det = el('details');
-  const sum = el('summary');
-  sum.appendChild(el('strong', '', d.quiet ? L.quietAudit : L.passed(d.claims.length, d.total)));
-  det.appendChild(sum);
+  det.appendChild(el('summary', '', d.quiet ? L.quietAudit : L.passed(d.claims.length, d.total)));
   const body = el('div', 'audit');
-  const block = (title, lines, cls) => { const b = el('div'); b.appendChild(el('h4', '', title)); const u = el('ul'); for (const x of lines) u.appendChild(el('li', cls, x)); b.appendChild(u); body.appendChild(b); };
-  if (!d.quiet) block(L.aRejected, d.rejected.length ? d.rejected.map((r) => `${r.reason} — “${r.claim && r.claim.advice ? r.claim.advice : ''}”`) : [L.aNone], 'rej');
-  block(L.aHow, L.how(d.model, d.attempts));
-  block(L.aSources, L.sources);
+  const block = (id, title, lines, cls) => {
+    const b = el('div'); b.dataset.au = id;
+    b.appendChild(el('h4', '', title));
+    const u = el('ul'); for (const x of lines) u.appendChild(el('li', cls, x)); b.appendChild(u);
+    body.appendChild(b);
+  };
+  const [hRules, hModel, hNotice] = L.how(d.model, d.attempts);
+  block('forecast', L.steps.forecast, [L.readAt(clock(d.generatedAt)).replace(/^./, (x) => x.toUpperCase()), L.sources[0]]);
+  block('climate', L.steps.climate, [L.ctxNote]);
+  block('rules', L.steps.rules, [hRules, L.sources[1], L.auHouse]);
+  block('model', L.steps.model, [hModel, L.sources[2]]);
+  if (!d.quiet) block('verify', L.steps.verify, d.rejected.length ? d.rejected.map((r) => `${r.reason} — “${r.claim && r.claim.advice ? r.claim.advice : ''}”`) : [L.aNone], 'rej');
+  block('notices', L.steps.notices, [hNotice]);
   const off = el('div'); off.appendChild(el('h4', '', L.aOfficial));
   const p = el('p'); p.style.margin = '0'; p.appendChild(document.createTextNode(L.official + ' '));
   const [name, url] = OFFICIAL[state.place.country] || WMO;
@@ -755,32 +1024,58 @@ function render(d) {
   det.appendChild(body); s3.appendChild(det); out.appendChild(s3);
 }
 
-function skeleton() {
+// The waiting view: the sun, and the real steps, each filled in when the server reports it.
+function waiting() {
   const out = $('out'); out.textContent = ''; out.className = '';
   const node = $('loaderT').content.cloneNode(true);
-  for (const n of node.querySelectorAll('[data-t]')) n.textContent = t()[n.dataset.t];
+  node.querySelector('.loader').append(stepList(), el('p', 'lnote'));
   out.appendChild(node);
 }
 function stagger() {
   [...$('out').querySelectorAll('.cell, .item, .quiet')].forEach((n, i) => { n.style.animationDelay = 250 + Math.min(i * 40, 900) + 'ms'; });
 }
 
+// Reads the server's event stream: one "step" event per real step, then the "result".
+async function briefStream(body) {
+  const r = await fetch('/api/brief', { method: 'POST', headers: { 'content-type': 'application/json', accept: 'text/event-stream' }, body: JSON.stringify(body) });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || `HTTP ${r.status}`); }
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  let buf = '';
+  let result = null;
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buf += dec.decode(value, { stream: true });
+    let i;
+    while ((i = buf.indexOf('\n\n')) >= 0) {
+      const blk = buf.slice(0, i); buf = buf.slice(i + 2);
+      const ev = (blk.match(/^event: (.*)$/m) || [])[1];
+      const data = JSON.parse((blk.match(/^data: (.*)$/m) || [])[1] || 'null');
+      if (ev === 'step') onStep(data);
+      else if (ev === 'result') result = data;
+      else if (ev === 'failed') throw new Error(data.error);
+    }
+  }
+  if (!result) throw new Error(t().noResult);
+  return result;
+}
+
 async function generate() {
   if (!state.place) return;
+  const place = state.place;
   $('go').disabled = true; $('status').className = 'msg'; $('status').textContent = t().loading;
-  skeleton();
+  waiting();
   try {
-    const r = await fetch('/api/brief', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-      lat: state.place.lat, lon: state.place.lon, lang: state.lang,
-      profile: [...document.querySelectorAll('#profile input:checked')].map((i) => i.value) }) });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'Request failed');
+    const d = await briefStream({ lat: place.lat, lon: place.lon, lang: state.lang, profile: chosen() });
     state.data = d;
     const show = () => { render(d); stagger(); $('status').textContent = ''; };
     const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (document.startViewTransition && !calm) await document.startViewTransition(show).updateCallbackDone; else show();
+    loadOutlook(place);
   } catch (e) {
-    $('out').textContent = ''; state.data = null;
+    state.data = null;
+    const run = $('out').querySelector('.psteps li.run'); if (run) run.className = 'fail';
     $('status').className = 'msg err'; $('status').textContent = e.message + ' ';
     const b = el('button', 'pill', t().retry); b.type = 'button'; b.onclick = generate; $('status').appendChild(b);
   }
@@ -790,12 +1085,20 @@ $('go').onclick = generate;
 for (const b of document.querySelectorAll('[data-lang]')) {
   b.onclick = () => {
     if (state.lang === b.dataset.lang) return;
-    state.lang = b.dataset.lang; renderStatic();
-    if (state.data) generate(); // model text must be rewritten in the new language
+    state.lang = b.dataset.lang; renderStatic(); remember();
+    if (state.data) generate(); // model text must be rewritten in the new language; the steps show it happening
   };
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') light([]); });
+
+// First paint: restore what this browser remembers. The briefing itself is not requested until asked for.
+const saved = recall();
+if (saved && (saved.lang === 'en' || saved.lang === 'id')) state.lang = saved.lang;
+else if ((navigator.language || '').toLowerCase().startsWith('id')) state.lang = 'id';
+if (saved && Array.isArray(saved.profile)) state.profile = saved.profile;
+if (saved && saved.place && Number.isFinite(saved.place.lat) && Number.isFinite(saved.place.lon)) state.place = saved.place;
 renderStatic();
+if (state.place) { $('go').disabled = false; if (!state.place.mine) $('q').value = state.place.name || ''; }
 </script>
 </body>
 </html>

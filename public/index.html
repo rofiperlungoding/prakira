@@ -378,7 +378,7 @@
   <h2 class="big center" data-t="evH"></h2>
   <p class="lede center" data-t="evP"></p>
   <div class="stats">
-    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">84–95%</div><p data-t="ev1p"></p></div>
+    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">83–97%</div><p data-t="ev1p"></p></div>
     <div class="stat b"><h3 data-t="ev2"></h3><div class="n">100%</div><p data-t="ev2p"></p></div>
     <div class="stat c"><h3 data-t="ev3"></h3><div class="n">100%</div><p data-t="ev3p"></p></div>
   </div>
@@ -468,11 +468,11 @@ const T = {
     pr6: 'You get the actions, the numbers behind them, and a list of what was rejected.',
     pp1: 'Forecast and climate data', pp2: 'Rules set the levels', pp3: 'AI writes the actions', pp4: 'Verifier checks each claim', pp5: 'Your briefing',
     ppSrc: 'open data', ppRule: 'fixed rules', ppAi: 'not trusted', ppYou: 'with receipts',
-    evH: 'Measured, not promised', evP: 'Prakira is tested on 20 cities across climates. These are the latest runs.',
-    ev1: 'AI claims that pass', ev1p: 'Share of the model\'s claims that survive verification: 84% in English, 95% in Indonesian. The rest are removed before you see them.',
-    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as a verified action or as a standard notice. The AI alone covers 78 to 89%.',
+    evH: 'Measured, not promised', evP: 'Tested on 35 cities across climates. The headline figures are from 15 cities the system was never tuned on.',
+    ev1: 'AI claims that pass', ev1p: 'Share of the model\'s claims that survive verification on cities it was never tuned on: 83% in English, 97% in Indonesian. The rest are removed before you see them.',
+    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as a verified action or as a standard notice. The AI alone covers 80 to 96%.',
     ev3: 'Wrong numbers caught', ev3p: 'When numbers and levels in verified claims are deliberately corrupted, the verifier rejects all of them.',
-    evFine: 'Preliminary results from 7 October 2026: one run per language, 20 hand-picked cities, about 42 claims per run. The prompt was tuned on these same cities, so the first figure is optimistic. Coverage is 100% by design, because notices fill every gap. No human has yet reviewed the quality of the advice. Method and code are public.',
+    evFine: 'Results from 7 October 2026: one run per language on 15 held-out cities (29 claims each) and one on 20 tuned cities (44 claims each). These are small samples and one run each, so the figures can move by several points. Coverage is 100% by design, because notices fill every gap. English claims read at a median school grade of 3 to 4. The advice was read by an AI assistant, not yet by a person or a clinician. Method, code and limits are public.',
     faqH: 'More questions?',
     f1q: 'Is this an official warning?', f1a: 'No. Prakira is a companion to your national meteorological service, such as BMKG in Indonesia. In an emergency, follow official instructions.',
     f2q: 'Is this medical advice?', f2a: 'No. It suggests everyday protective actions. It does not diagnose and it has not been reviewed by clinicians.',
@@ -538,11 +538,11 @@ const T = {
     pr6: 'Anda menerima tindakan, angka di baliknya, dan daftar yang ditolak.',
     pp1: 'Data prakiraan dan iklim', pp2: 'Aturan menetapkan tingkat', pp3: 'AI menulis tindakan', pp4: 'Verifikator mengecek tiap klaim', pp5: 'Ringkasan Anda',
     ppSrc: 'data terbuka', ppRule: 'aturan tetap', ppAi: 'tidak dipercaya', ppYou: 'dengan bukti',
-    evH: 'Diukur, bukan dijanjikan', evP: 'Prakira diuji pada 20 kota di berbagai iklim. Ini hasil pengujian terakhir.',
-    ev1: 'Klaim AI yang lolos', ev1p: 'Bagian klaim model yang lolos verifikasi: 84% dalam bahasa Inggris, 95% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya.',
-    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan terverifikasi atau pemberitahuan standar. AI sendiri mencakup 78 sampai 89%.',
+    evH: 'Diukur, bukan dijanjikan', evP: 'Diuji pada 35 kota di berbagai iklim. Angka utama berasal dari 15 kota yang tidak pernah dipakai untuk menyetel sistem.',
+    ev1: 'Klaim AI yang lolos', ev1p: 'Bagian klaim model yang lolos verifikasi pada kota yang tidak pernah dipakai untuk penyetelan: 83% dalam bahasa Inggris, 97% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya.',
+    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan terverifikasi atau pemberitahuan standar. AI sendiri mencakup 80 sampai 96%.',
     ev3: 'Angka salah tertangkap', ev3p: 'Saat angka dan tingkat pada klaim terverifikasi sengaja dirusak, verifikator menolak semuanya.',
-    evFine: 'Hasil awal 7 Oktober 2026: satu pengujian per bahasa, 20 kota pilihan, sekitar 42 klaim per pengujian. Prompt disetel pada kota-kota yang sama, jadi angka pertama cenderung optimistis. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Belum ada manusia yang menilai mutu sarannya. Metode dan kode terbuka.',
+    evFine: 'Hasil 7 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (29 klaim masing-masing) dan satu pada 20 kota penyetelan (44 klaim masing-masing). Sampelnya kecil dan hanya satu pengujian, jadi angkanya bisa bergeser beberapa poin. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Klaim bahasa Inggris terbaca pada median kelas 3 sampai 4. Sarannya dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Metode, kode, dan batasannya terbuka.',
     faqH: 'Masih ada pertanyaan?',
     f1q: 'Apakah ini peringatan resmi?', f1a: 'Bukan. Prakira adalah pendamping bagi badan meteorologi nasional Anda, seperti BMKG di Indonesia. Dalam keadaan darurat, ikuti arahan resmi.',
     f2q: 'Apakah ini nasihat medis?', f2a: 'Bukan. Prakira menyarankan tindakan perlindungan sehari-hari. Prakira tidak mendiagnosis dan belum ditinjau oleh tenaga medis.',

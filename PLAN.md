@@ -90,14 +90,15 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 34 of 34 pass (after M6) | Verified 2026-10-07 |
+| Tests | `npm test`: 35 of 35 pass (after M9) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
 | Climate context, compound flag, coverage fallback | Built (M2, M4, M5) | Verified 2026-10-07 |
 | Readability metric | Built (M6); first result 60% at or below grade 8 | Verified 2026-10-07 |
 | Deployment | Live at https://prakira.rofihosted.space since 2026-10-07 (M8). The deployed code is commit `46b5cb2`; redeploy after any later change. | Verified 2026-10-07 |
-| Video, diagram, Devpost text | Not started | |
+| Diagram, README, review notes | Done (M9) | Verified 2026-10-07 |
+| Video, Devpost text | Not started | |
 
 Runtime: Node 20 or newer (dev machine: Node 25, Windows 11). Zero npm dependencies. Plain ES modules, no build step. Keep it that way unless a task says otherwise.
 
@@ -217,7 +218,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
   - *Accept:* `/healthz` returns 200 on the public URL; a briefing for Jakarta loads from a phone on mobile data; the key appears in no response; a burst of 20 requests is rate-limited; the server's other services still report healthy.
   - **Risk:** judging runs 10 to 12 October and the demo depends on one self-hosted machine. Mitigations: the recorded backup clip (M10), local-run instructions in the README, the server's existing monitoring. If the server proves unstable on 9 October, fall back to a free Node host (Render or Railway) and keep the first URL as a mirror.
 
-- [ ] **M9. Evidence and writing (4 h).**
+- [x] **M9. Evidence and writing (4 h).** Done 2026-10-07, with two departures from the task text, both stated in the README: one final run per set and language (four runs) instead of three runs of the tuned set; and the 12-briefing review was a read-through by the AI assistant, not by a person (`docs/manual-review.md`). A human review is still open.
   - Three full eval runs in English and one in Indonesian; record all in section 8 and the README, with dates and commit hashes. Report every run, not the best one.
   - Manual review of 12 briefings (6 English, 6 Indonesian, at least 4 with vulnerable profiles): mark each action as sensible, vague, or wrong or unsafe. Report the counts. Save the reviewed outputs in `docs/manual-review.md`.
   - README: what it is, live URL, three-command local run, how to run tests and eval, architecture diagram, sources for every band, results, limits, literature summary with link, provenance and AI-assistance disclosure, data attribution.
@@ -303,6 +304,25 @@ Intermediate runs during M3 development (not comparable, code was changing): Ind
 Reading: the held-out pass rate (86.2%) is close to the tuned-set English run (84.1%), so the tuned-set figure does not look inflated by tuning. This is one run of 29 claims: the uncertainty is large. Readability misses the grade 8 target for 40% of claims. The syllable count is a heuristic, and the text includes terms such as "US AQI" and "UV index" that the formula scores poorly.
 
 The eval now takes a third argument: `npm run eval -- 15 en heldout` or `npm run eval -- 20 id tuned`. Each run writes its own file in `eval/out/` (gitignored), including the text of every verified claim, which M9's manual review can use.
+
+**Final runs 7 to 10, 2026-10-07 about 15:53 to 16:01 UTC (code after commit ef18e3e plus the changes below; the commit that contains them is the one that adds this paragraph). 0 failed locations in all four.**
+
+Changes since run 6: one readability change to the prompt (short sentences, one per day; plain short words), Indonesian day words in the fact table, and a stricter verifier (every cited day's value must be stated).
+
+| Metric | 7: English, tuned (20) | 8: English, held-out (15) | 9: Indonesian, tuned (20) | 10: Indonesian, held-out (15) |
+|---|---|---|---|---|
+| Model claims passing verification | 37 of 44 (84.1%) | 24 of 29 (82.8%) | 40 of 44 (90.9%) | 28 of 29 (96.6%) |
+| Serious facts covered by a verified model claim | 82.5% of 120 | 80.5% of 82 | 90.8% of 120 | 96.3% of 82 |
+| Covered with standard notices | 100% | 100% | 100% | 100% |
+| Verifier catch rate on corrupted claims | 100% | 100% | 100% | 100% |
+| Reading grade (English only): median; share at or below grade 8 | 3.4; 97.3% | 3.7; 100% | not computed | not computed |
+| Quiet locations | 1 | 2 | 1 | 2 |
+
+Rejection reasons across the four runs (17 rejections): stay-indoors advice at too low a level 8; stated level not matching the rule-based level 3; a cited value not stated 2; first fact not serious for the household 2; missing evidence 1; mixed hazards 1.
+
+Reading these: held-out and tuned figures are close in English (82.8% against 84.1%), and held-out is higher in Indonesian, so the tuned figures do not look inflated. Each run is small (29 or 44 claims) and was done once: a difference of a few points means nothing. Coverage with notices is 100% by construction. The catch rate tests only two kinds of corruption (a shifted number, a wrong level).
+
+Runs that are **not** final and must not be quoted: two English tuned runs at 77.3% and 75.0% made while the readability prompt change was being worked out (the first had example numbers in the prompt that the model copied), and one set of four runs before the stricter verifier and the Indonesian day words (English held-out 88.5%, Indonesian tuned 93.0%, Indonesian held-out 89.7%). Before the readability change the English tuned set read at a median grade of 8.4 with 47.6% at or below grade 8.
 
 Add later runs here with date, commit hash, language, and what changed.
 
@@ -435,6 +455,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 4, continued).** M6 done. Held-out location set added to the eval (15 places) and run once in English (section 8, run 6). 34 tests pass. Fixed a bug the owner spotted in the hero phone mockup: a hero style rule (`.hero small`) coloured the mockup's level labels grey, so "very unhealthy" was dark text on red; the rule is now scoped and the labels are white. Redeployed. **Next action: M9 (three tuned-set runs and one held-out run per language, manual review of 12 briefings from the saved eval files, README with logo and diagram, update the evidence cards in the page with final numbers), then M10 (video), M11 (Devpost).**
 - **2026-10-07 (session 4, continued).** The owner found the grey loading skeleton dull and asked for animation or tidy doodles. Added, all in `public/index.html`: (1) a loading scene in a `<template id="loaderT">`: the logo's sun rises over three lines while clouds drift, with four step chips that light up in turn. **The chips cycle on a timer; they do not track real progress.** (2) Results appear one after another (`stagger()`; animation fill mode is "backwards" so the audit-link dimming still works). (3) Doodles: a squiggle under the hero headline, a handwritten "checked, not guessed" note with an arrow to the mockup, a sparkle, a "start here" arrow beside the tool heading (font Caveat, Google Fonts, SIL Open Font Licence), a gentle float on the sticker, and a hover lift on the hazard icons. All motion is off under `prefers-reduced-motion`. Headless check passes with no console errors. Redeployed. **Next action: M9.**
 - **2026-10-07 (session 4, continued).** Two owner requests. (1) **Match cut from loading to results**, with the View Transitions API (`document.startViewTransition`): the loader's sun shares the name `prk-sun` with a small sun (`.sunmark`, a clone of the nav logo) beside the "Next 72 hours" heading; the step chips share `prk-grid` with the strip; the note shares `prk-body` with the briefing list. Browsers without the API and reduced-motion users get the plain swap. Verified: the API is present in headless Chromium and no errors occur; **the motion itself was not seen, only still frames, so the owner must judge it by eye.** (2) **About page** at `/about` (`public/about.html`, English only, served by `server.mjs`): why the tool exists, six research findings each with what the tool does because of it, what it is not, who made it, references with DOI links. Every finding on it comes from an abstract that was read (see the literature review); "LeClerc and Joslyn" and "Lindell and Perry" author pairs are from general knowledge, not from the retrieved records. It names the builder as "Rofi, a student in Indonesia": the owner should confirm or change that wording, and can add a personal paragraph on what prompted the idea (none was invented). The deploy script in the server repo now copies the whole `public/` folder. Redeployed. **Next action: M9.**
+- **2026-10-07 (session 4, continued).** M9 done. Final eval runs 7 to 10 recorded in section 8. A read-through of 22 claims found a verifier gap (a claim could cite three days and state two values) and a recurring Indonesian wording error ("besok hari" for the day after tomorrow); both fixed; 35 tests pass. `docs/manual-review.md`, `docs/architecture.svg` and a rewritten README added. The evidence cards on the page now show the final figures (83 to 97%, held-out). Redeployed. **Open: a human review of the advice; two questionable actions described in `docs/manual-review.md` are a design limit. Next action: M10 (video script and recording, needs the owner), M11 (Devpost text in `docs/devpost-draft.md`, then the owner submits).**
 
 **Open questions for the owner**
 

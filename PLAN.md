@@ -88,12 +88,12 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 
 | Item | State | Status |
 |---|---|---|
-| Repo | `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`, local commits only. **No remote, not pushed.** | Verified 2026-10-07 |
+| Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 12 of 12 pass | Verified 2026-10-07 |
+| Tests | `npm test`: 17 of 17 pass (after M1) | Verified 2026-10-07 |
 | UI | Works over the API. **Never opened in a browser.** Plain styling; to be redesigned (M7). | Unverified visually |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
-| Science of the bands | **Contains known errors** (section 6). Must be fixed before any number is published. | Verified as wrong or doubtful |
+| Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
 | Climate context, compound flag, readability, coverage fallback | Not built | |
 | Deployment, video, diagram, Devpost text | Not started | |
 
@@ -111,7 +111,8 @@ climate-brief/
   lib/llm.mjs           Mistral call (JSON mode), prompt. Default model open-mistral-nemo
   lib/verify.mjs        Claim verifier and the PROFILES allow-list
   lib/brief.mjs         Orchestration and retry (max 3 attempts, 3 s apart)
-  lib/verify.test.mjs   node:test unit tests
+  lib/verify.test.mjs   Unit tests for the verifier
+  lib/facts.test.mjs    Unit tests for heat index, bands and fact building
   eval/run.mjs          Live eval over 20 fixed locations; writes eval/out/report.json (gitignored)
   docs/climate-novelty-literature.md   Literature review v0.2
   README.md             Public description (must be updated in M9; currently describes the MVP)
@@ -153,6 +154,18 @@ These were found on re-checking the MVP. Fix them in M1 before publishing any re
 
 Every band must have, in a code comment and in the README: the source name, the URL, and the date it was checked.
 
+### 6a. Outcome of M1 (2026-10-07)
+
+| # | Result | Status |
+|---|---|---|
+| S1, S2 | Heat is now the daily peak of the hourly NWS heat index (simple formula averaged with temperature, Rothfusz regression at 80 °F and above, both NWS adjustments). Categories on whole °F: <80 low, 80 to 89 caution, 90 to 102 extreme caution, 103 to 124 danger, 125+ extreme danger. Tests reproduce both NWS published examples. | Verified from the two NWS pages |
+| S3 | Rain classes rewritten (<1, to 20, to 50, to 100, to 150, above), with an "extreme" class. The BMKG page redirected and the table was **not** confirmed from a primary source; only the 150 mm threshold was corroborated by news reports. Stated as unverified in code and README. | **Unverified** |
+| S4 | UV is rounded first. The WHO page checked gives three action tiers (0 to 2, 3 to 7, 8+), so the code uses those three instead of the five named categories, which could not be confirmed from a primary page. | Verified (three tiers) |
+| S5 | Open-Meteo documents that `us_aqi` already uses the EPA averaging periods. The daily maximum of that index is shown and described as such. EPA category table confirmed. | Verified |
+| S6 | CAMS model resolution (about 11 km Europe, 45 km global) recorded in the README. Still to be shown in the UI audit panel (M7). | Partly done |
+
+Observed in a live check after M1: for London at AQI 58 ("moderate") the model advised staying indoors and using an air purifier. That is over-warning. M3 must make the advice proportionate to the level (no protective action beyond "no special action needed" for the lowest two levels), and the manual review in M9 must count over-warnings.
+
 ---
 
 ## 7. Work plan
@@ -161,9 +174,9 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 
 ### Must-have (M)
 
-- [ ] **M0. Push to a public GitHub repo (20 min).** Do this first so the commit history shows work inside the event window. Check `git log --all -p -- .env` is empty before pushing. Repo name: `prakira` under `rofiperlungoding` (decided 2026-10-07). *Accept:* repo opens in a logged-out browser.
+- [x] **M0. Push to a public GitHub repo (20 min).** Done 2026-10-07: https://github.com/rofiperlungoding/prakira (public). Do this first so the commit history shows work inside the event window. Check `git log --all -p -- .env` is empty before pushing. Repo name: `prakira` under `rofiperlungoding` (decided 2026-10-07). *Accept:* repo opens in a logged-out browser.
 
-- [ ] **M1. Science fixes S1 to S6 (3 h).**
+- [x] **M1. Science fixes S1 to S6 (3 h).** Done 2026-10-07; outcome in section 6a.
   - Add `temperature_2m` and `relative_humidity_2m` hourly to the forecast request; compute NWS heat index per hour; daily maximum becomes fact `heat-N` with metric "peak heat index".
   - Correct heat, rain, UV bands from primary sources; record URLs in comments.
   - Keep `apparent_temperature_max` out of the fact table, or keep it as a context-only fact. Do not classify it.
@@ -355,7 +368,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 **Session log**
 
 - **2026-10-07 (session 1).** Repo scaffolded; MVP built; 12 tests pass; two eval runs; first literature scan (27 references, titles only).
-- **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. **Next action: M0, then M1.**
+- **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. Next action at that point: M0, then M1.
+- **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. **Next action: M2 (coverage notices), then M3 (proportionate, digit-free advice), M5, M4.**
 
 **Open questions for the owner**
 

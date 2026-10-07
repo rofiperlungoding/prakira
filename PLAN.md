@@ -90,13 +90,14 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 29 of 29 pass (after M5) | Verified 2026-10-07 |
+| Tests | `npm test`: 31 of 31 pass (after M8) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
 | Climate context, compound flag, coverage fallback | Built (M2, M4, M5) | Verified 2026-10-07 |
 | Readability metric | Not built (M6) | |
-| Deployment, video, diagram, Devpost text | Not started | |
+| Deployment | Live at https://prakira.rofihosted.space since 2026-10-07 (M8). The deployed code is commit `46b5cb2`; redeploy after any later change. | Verified 2026-10-07 |
+| Video, diagram, Devpost text | Not started | |
 
 Runtime: Node 20 or newer (dev machine: Node 25, Windows 11). Zero npm dependencies. Plain ES modules, no build step. Keep it that way unless a task says otherwise.
 
@@ -116,6 +117,7 @@ climate-brief/
   scripts/ui-check.cjs  Headless browser check and screenshots (needs an existing Playwright install)
   docs/screenshots/     Screenshots from the last UI check
   lib/brief.mjs         Orchestration and retry (max 3 attempts, 3 s apart)
+  lib/limits.mjs        In-memory rate limiter and response cache for the public deployment
   lib/verify.test.mjs   Unit tests for the verifier
   lib/facts.test.mjs    Unit tests for heat index, bands and fact building
   eval/run.mjs          Live eval over 20 fixed locations; writes eval/out/report.json (gitignored)
@@ -207,7 +209,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 
 - [x] **M7. Interface redesign (5 h).** Done 2026-10-07 (`public/index.html`, single file, no framework). Checklist result is at the end of section 9. Polish left over: in the quiet case the audit text still says "0 attempts"; on a 375 px screen the compound badge sits close to the heat number; long Indonesian level names wrap to three lines in a phone cell.
 
-- [ ] **M8. Deploy to the owner's own server (2.5 h).** Hosting decision (2026-10-07): the owner's self-hosted Linux server behind a Cloudflare Tunnel. Target URL: `https://prakira.rofihosted.space`. **Server-side steps and cautions are in `DEPLOY.local.md` (not in git, on the owner's machine) and in the server's own repository docs. Read them first; that server is live and used by other people.**
+- [x] **M8. Deploy to the owner's own server (2.5 h).** Done 2026-10-07: live at https://prakira.rofihosted.space. Verified through the public URL: `/healthz` 200; a briefing returned verified claims; the key value is absent from the page and from API responses; the 11th uncached briefing from one address got HTTP 429; the server's other sites answered as before. **Not verified: loading from a phone on mobile data, other browsers, stability over days.** Redeploy steps are in `DEPLOY.local.md` (one script, restarts only this service). Original task text follows. Hosting decision (2026-10-07): the owner's self-hosted Linux server behind a Cloudflare Tunnel. Target URL: `https://prakira.rofihosted.space`. **Server-side steps and cautions are in `DEPLOY.local.md` (not in git, on the owner's machine) and in the server's own repository docs. Read them first; that server is live and used by other people.**
   - Code changes needed here first: bind `127.0.0.1` (host from env); add `GET /healthz`; configurable port; take the client address from the `CF-Connecting-IP` header for rate limiting; add an in-memory per-IP limit (for example 10 briefings per 10 minutes) and a short response cache keyed by rounded coordinates, profile and language; cap the normals cache at about 50 locations; send basic security headers (`X-Content-Type-Options`, `Referrer-Policy: same-origin`, a Content-Security-Policy that allows only self and the font host).
   - The Mistral key is created on the server in an env file, never committed and never printed.
   - *Accept:* `/healthz` returns 200 on the public URL; a briefing for Jakarta loads from a phone on mobile data; the key appears in no response; a burst of 20 requests is rate-limited; the server's other services still report healthy.
@@ -408,9 +410,10 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). Next action at that point: M3.
 - **2026-10-07 (session 3, continued).** M3 done (section 7a): per-household serious thresholds, quiet mode, stricter verifier, prompt with required fact ids, grouped notices, decimal-comma handling. 25 tests pass. Eval runs 4 (English) and 5 (Indonesian) recorded in section 8. UI still not opened in a browser. Next action at that point: M5, M4.
 - **2026-10-07 (session 3, continued).** UI checked in a headless browser (the owner asked for this): works in both languages and both colour schemes; gaps listed in section 4. M5 and M4 done; 29 tests pass. `scripts/ui-check.cjs` added for repeatable UI checks (on the owner's PC Playwright is at `C:/Users/Rofi/Documents/Codes/CatCoder/CatCoder/node_modules/playwright`). No eval was re-run after M4 and M5: they do not touch the model path. Next action at that point: M7.
-- **2026-10-07 (session 3, continued).** M7 done: interface rebuilt to the section 9 spec; fonts Fraunces, IBM Plex Mono, IBM Plex Sans from Google Fonts with system fallbacks (M8's Content-Security-Policy must allow `fonts.googleapis.com` and `fonts.gstatic.com`). Colour steps per hazard are set in `TONES` in the page script so that one colour means a similar degree of concern across hazards. `scripts/ui-check.cjs` updated for the new page and now also tests the audit link. **Next action: M8 (deploy; tell the owner before the tunnel restart), then M6, M9.**
+- **2026-10-07 (session 3, continued).** M7 done: interface rebuilt to the section 9 spec; fonts Fraunces, IBM Plex Mono, IBM Plex Sans from Google Fonts with system fallbacks (M8's Content-Security-Policy must allow `fonts.googleapis.com` and `fonts.gstatic.com`). Colour steps per hazard are set in `TONES` in the page script so that one colour means a similar degree of concern across hazards. `scripts/ui-check.cjs` updated for the new page and now also tests the audit link. Next action at that point: M8.
+- **2026-10-07 (session 3, continued).** M8 done with the owner's approval for the three server steps. Server hardened first (`/healthz`, localhost bind, rate limits of 10 briefings and 120 searches per 10 minutes per address, 10-minute response cache, security headers, Content-Security-Policy). 31 tests pass. Deployed to the owner's server and verified as listed under M8. Cloudflare injects an analytics script that the Content-Security-Policy blocks: one harmless console error on the public page. **Next action: M6 (readability metric in the eval), then M9 (final eval with held-out locations, manual review, README, diagram), M10 (video), M11 (Devpost). The owner should open the public URL on a phone and report anything odd.**
 
 **Open questions for the owner**
 
 1. Please open the Devpost rules page by hand and confirm the five items in section 1.
-2. Before M8: confirm a quiet time for the server change (see `DEPLOY.local.md`).
+2. Please open https://prakira.rofihosted.space on a phone (mobile data) and say whether it works and reads well.

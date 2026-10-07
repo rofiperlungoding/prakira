@@ -2,6 +2,8 @@
 
 ForgeHacks 2026, track: AI + Climate.
 
+**Live demo: https://prakira.rofihosted.space** (self-hosted; limited to 10 briefings per 10 minutes per visitor).
+
 > **Work in progress (2026-10-07).** This README describes the first working version. The evaluation numbers below are preliminary and will be replaced: a re-check found errors in the hazard bands (see `PLAN.md`, section 6). The current plan is in `PLAN.md`; the literature review is in `docs/climate-novelty-literature.md`.
 
 A 3-day heat, rain, air-quality and UV briefing for a household, in English or Bahasa Indonesia. The language model writes the advice. Fixed rules set the hazard levels. A verifier checks every claim against the forecast numbers before the user sees it.
@@ -28,7 +30,7 @@ Air-quality values are model forecasts (CAMS, about 11 km in Europe and 45 km el
 
 ```
 npm start          # needs .env with MISTRAL_API_KEY; serves http://localhost:3000
-npm test           # 29 unit tests, no network
+npm test           # 31 unit tests, no network
 npm run eval       # live groundedness eval over 20 locations (needs network and key)
 ```
 

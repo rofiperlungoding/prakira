@@ -6,9 +6,10 @@
 <title>Prakira: climate briefings with receipts</title>
 <meta name="description" content="What the next 72 hours mean for your household. Every number checked against the forecast.">
 <meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2064%2064%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22%23b7f07c%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23101a13%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M21%2017v32%22%20stroke-width%3D%226%22%2F%3E%3Ccircle%20cx%3D%2233%22%20cy%3D%2229%22%20r%3D%2212%22%20stroke-width%3D%226%22%2F%3E%3Cpath%20d%3D%22M27.5%2029.5l4%204%207-8.5%22%20stroke-width%3D%224%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --paper:#fbfbf6; --card:#ffffff; --ink:#101a13; --mut:#434d46; --rule:#e2e5da; --soft:#f3f4ec; --focus:#0b5fff;
@@ -16,9 +17,9 @@
     --ok:#17603f; --ok-bg:#dff3e3;
     /* One sequential severity scale, ordered by lightness so it still reads in greyscale. */
     --t0:#e9efe4; --t1:#f6e9b3; --t2:#f4c487; --t3:#ea9169; --t4:#b8443f; --t4-ink:#fff;
-    --sans:"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --sans:"DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --mono:var(--sans);
-    --head:"Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+    --head:"Outfit", "DM Sans", system-ui, sans-serif;
   }
   * { box-sizing:border-box; }
   html { -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
@@ -27,7 +28,7 @@
   button, input { font:inherit; color:inherit; }
   a { color:inherit; }
   .wrap { max-width:1120px; margin:0 auto; padding:0 20px; }
-  h1, h2, h3 { font-family:var(--head); font-weight:600; letter-spacing:-.025em; line-height:1.12; margin:0; }
+  h1, h2, h3 { font-family:var(--head); font-weight:500; letter-spacing:-.02em; line-height:1.12; margin:0; }
   h2.big { font-size:clamp(1.7rem, 3.4vw, 2.5rem); }
   .center { text-align:center; }
   .lede { color:var(--mut); margin:10px auto 0; max-width:56ch; }
@@ -39,8 +40,8 @@
   /* Nav */
   .top { background:var(--hero); padding-top:14px; }
   nav { background:#fff; border-radius:10px; padding:10px 14px; display:flex; align-items:center; gap:18px; }
-  .logo { font-family:var(--head); display:flex; align-items:center; gap:9px; font-weight:700; font-size:1.12rem; letter-spacing:-.02em; text-decoration:none; }
-  .logo i { width:26px; height:26px; border-radius:7px; background:var(--lime); display:grid; place-items:center; }
+  .logo { font-family:var(--head); display:flex; align-items:center; gap:9px; font-weight:500; font-size:1.3rem; letter-spacing:-.02em; text-decoration:none; }
+  .logo svg { width:30px; height:30px; display:block; }
   .links { display:flex; gap:22px; margin:0 auto; font-size:.95rem; }
   .links a { text-decoration:none; color:var(--mut); }
   .links a:hover { color:var(--ink); }
@@ -59,23 +60,23 @@
   .stage { position:relative; height:520px; }
   .phone { position:absolute; right:-10px; top:36px; width:320px; height:600px; background:#fff; border:9px solid var(--ink); border-radius:44px; transform:rotate(13deg); box-shadow:0 30px 60px -30px rgba(16,26,19,.45); padding:34px 14px 14px; overflow:hidden; }
   .phone::before { content:""; position:absolute; top:10px; left:50%; width:86px; height:18px; margin-left:-43px; background:var(--ink); border-radius:12px; }
-  .phone .ph { font:700 1.05rem var(--head); letter-spacing:-.02em; margin-bottom:4px; }
+  .phone .ph { font:500 1.15rem var(--head); letter-spacing:-.02em; margin-bottom:4px; }
   .phone .pl { font:600 .68rem var(--sans); color:var(--mut); margin:10px 0 5px; }
   .mini { display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; }
-  .mini div { border-radius:6px; padding:7px 7px 6px; font:700 .95rem/1.2 var(--sans); min-width:0; }
+  .mini div { border-radius:6px; padding:7px 7px 6px; font:600 1.02rem/1.2 var(--head); min-width:0; }
   .mini div small { display:block; font:500 .56rem/1.25 var(--sans); margin-top:3px; }
   .pc { border:1px solid var(--rule); border-left:3px solid var(--ok); border-radius:8px; padding:9px 10px; margin-top:9px; font-size:.72rem; line-height:1.4; color:var(--mut); }
   .pc b { display:block; font-size:.82rem; font-weight:600; margin-bottom:3px; color:var(--ink); }
   .pc span { display:inline-block; margin-top:6px; font:600 .6rem var(--sans); color:var(--ok); background:var(--ok-bg); border-radius:99px; padding:2px 6px; }
   .sticker { z-index:2; position:absolute; left:6%; top:120px; width:170px; height:170px; background:var(--lime); border-radius:6px; transform:rotate(-7deg); padding:16px; display:flex; flex-direction:column; justify-content:space-between; box-shadow:0 18px 30px -18px rgba(16,26,19,.5); }
-  .sticker b { font-size:1.28rem; line-height:1.1; font-weight:600; letter-spacing:-.02em; }
+  .sticker b { font:500 1.35rem/1.1 var(--head); letter-spacing:-.01em; }
   .ex { position:absolute; right:14px; bottom:8px; font:500 .66rem var(--sans); color:var(--mut); }
 
   /* Meet */
   .two { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
   .art { background:var(--soft); border-radius:14px; padding:28px; min-height:360px; display:grid; align-content:center; gap:14px; }
   .art .row { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
-  .art .c { border-radius:8px; padding:12px; font:700 1.25rem var(--sans); background:var(--t0); opacity:.38; }
+  .art .c { border-radius:8px; padding:12px; font:600 1.35rem var(--head); background:var(--t0); opacity:.38; }
   .art .c.on { opacity:1; box-shadow:0 0 0 2px var(--ink); }
   .art .c small { display:block; font:500 .78rem var(--sans); margin-top:4px; }
   .art .card { background:#fff; border:1.5px solid var(--ink); border-left:5px solid var(--ok); border-radius:10px; padding:14px 16px; }
@@ -129,7 +130,7 @@
   .cell.t1 { background:var(--t1); } .cell.t2 { background:var(--t2); } .cell.t3 { background:var(--t3); } .cell.t4 { background:var(--t4); color:var(--t4-ink); }
   .cell.na { background:transparent; border:1px dashed var(--rule); cursor:default; color:var(--mut); font-size:.8rem; }
   .cell.ctx { background:#fff; border:1px solid var(--rule); cursor:default; }
-  .num { font:700 1.5rem/1.1 var(--sans); letter-spacing:-.02em; }
+  .num { font:600 1.65rem/1.1 var(--head); letter-spacing:-.01em; }
   .num small { font:500 .8rem var(--sans); margin-left:2px; opacity:.85; }
   .lvl { font-size:.84rem; line-height:1.25; font-weight:600; margin-top:6px; }
   .sub2 { font:400 .8rem var(--sans); opacity:.9; }
@@ -146,13 +147,13 @@
   .item.notice, .item.compound { border-left-color:#9aa39c; background:var(--soft); }
   .item.lit { border-color:var(--ink); border-left-color:var(--ok); }
   .item.notice.lit, .item.compound.lit { border-left-color:#9aa39c; }
-  .item h3 { font-size:1.2rem; font-weight:600; letter-spacing:-.015em; line-height:1.3; margin:0 0 6px; }
+  .item h3 { font-size:1.28rem; font-weight:500; letter-spacing:-.01em; line-height:1.3; margin:0 0 6px; }
   .item.notice h3, .item.compound h3 { font-size:1rem; font-weight:500; }
   .item p { margin:0; color:var(--mut); font-size:1rem; }
   .item p b { font:600 .95em var(--sans); color:var(--ink); background:var(--soft); border:1px solid var(--rule); border-radius:4px; padding:0 4px; white-space:nowrap; }
   .badge { display:inline-block; margin-top:10px; font:600 .8rem var(--sans); padding:3px 9px; border-radius:999px; border:1px solid var(--rule); color:var(--mut); background:#fff; }
   .badge.ok { background:var(--ok-bg); border-color:transparent; color:var(--ok); }
-  .quiet { background:var(--hero); border-radius:10px; padding:20px; font-size:1.15rem; font-weight:500; letter-spacing:-.01em; }
+  .quiet { background:var(--hero); border-radius:10px; padding:20px; font:500 1.25rem/1.35 var(--head); }
   #out details { background:#fff; border:1.5px solid var(--rule); border-radius:10px; }
   #out summary { padding:13px 16px; cursor:pointer; font-weight:600; color:var(--ok); }
   .audit { padding:0 16px 16px; display:grid; gap:14px; font-size:.95rem; }
@@ -177,7 +178,7 @@
   .stat { border-radius:6px; padding:24px; text-align:center; }
   .stat.a { background:var(--mint); } .stat.b { background:var(--lime); } .stat.c { background:var(--lilac); }
   .stat h3 { font-size:1.15rem; }
-  .stat .n { font:700 3.2rem/1 var(--head); letter-spacing:-.04em; margin:22px 0 8px; }
+  .stat .n { font:500 3.4rem/1 var(--head); letter-spacing:-.04em; margin:22px 0 8px; }
   .stat p { margin:0; font-size:.95rem; color:#223027; }
   .fine { font-size:.88rem; color:var(--mut); margin:18px auto 0; max-width:80ch; }
 
@@ -196,7 +197,7 @@
     .wrap { padding:0 14px; } nav .btn { display:none; } .panel { padding:16px; }
     .strip { grid-template-columns:46px repeat(3, minmax(0, 1fr)); gap:4px; }
     .strip .rh { font-size:.74rem; }
-    .cell { padding:7px 6px 6px; min-height:88px; } .num { font-size:1.15rem; } .lvl { font-size:.74rem; } .sub2 { font-size:.7rem; }
+    .cell { padding:7px 6px 6px; min-height:88px; } .num { font-size:1.25rem; } .lvl { font-size:.74rem; } .sub2 { font-size:.7rem; }
     .cell .cmp { position:static; align-self:flex-start; margin-top:3px; }
     .item h3 { font-size:1.08rem; } .stage { height:360px; } .hz h3 { font-size:1.2rem; }
   }
@@ -206,7 +207,7 @@
 
 <div class="top"><div class="wrap">
   <nav aria-label="Main">
-    <a class="logo" href="#top"><i aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></i>Prakira</a>
+    <a class="logo" href="#top"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#b7f07c"/><g fill="none" stroke="#101a13" stroke-linecap="round" stroke-linejoin="round"><path d="M21 17v32" stroke-width="6"/><circle cx="33" cy="29" r="12" stroke-width="6"/><path d="M27.5 29.5l4 4 7-8.5" stroke-width="4"/></g></svg>Prakira</a>
     <div class="links">
       <a href="#meet" data-t="nav1"></a><a href="#hazards" data-t="nav2"></a><a href="#process" data-t="nav3"></a><a href="#evidence" data-t="nav4"></a><a href="#faq" data-t="nav5"></a>
     </div>
@@ -335,7 +336,7 @@
 </div></section>
 
 <footer><div class="wrap">
-  <span><b style="color:var(--ink)">Prakira</b> · <span data-t="foot1"></span></span>
+  <span><b style="color:var(--ink);font-family:var(--head);font-weight:500;font-size:1.05rem">Prakira</b> · <span data-t="foot1"></span></span>
   <span><span data-t="foot2"></span> <a href="https://open-meteo.com/" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), CAMS · <a href="https://github.com/rofiperlungoding/prakira" rel="noopener" data-t="method"></a></span>
 </div></footer>
 

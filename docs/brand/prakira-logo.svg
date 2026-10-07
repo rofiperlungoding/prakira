@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 64" role="img" aria-label="Prakira">
+  <!-- Lockup: mark and wordmark. The wordmark is live text in Outfit (Google Fonts, SIL Open Font Licence);
+       without that font installed it falls back to a system sans. Convert the text to outlines before printing. -->
+  <rect width="64" height="64" rx="16" fill="#b7f07c"/>
+  <g fill="none" stroke="#101a13" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 17v32" stroke-width="6"/>
+    <circle cx="33" cy="29" r="12" stroke-width="6"/>
+    <path d="M27.5 29.5l4 4 7-8.5" stroke-width="4"/>
+  </g>
+  <text x="82" y="46" font-family="Outfit, 'DM Sans', system-ui, sans-serif" font-size="44" font-weight="500" letter-spacing="-1" fill="#101a13">Prakira</text>
+</svg>

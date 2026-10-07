@@ -90,7 +90,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 41 of 41 pass (session 5) | Verified 2026-10-07 |
+| Tests | `npm test`: 33 of 33 pass (after the design change; tests for the removed rules were deleted) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
@@ -344,6 +344,17 @@ Rejections (29): stay-indoors at too low a level 8; level mismatch 5; unknown fa
 
 Reading: the new rule accounts for only 4 of 29 rejections, so most of the drop from runs 7 to 10 is run-to-run noise (the model is sampled at temperature 0.2). The English tuned set has given between 72% and 84% over five runs; the prompt and verifier also changed between some of those runs, so this is not a clean repeat measurement. **Any single figure is good to about plus or minus ten points. Do not present small differences as findings.** Whether the four "wrong day" rejections were true errors was not checked: the eval report keeps only the reason for a rejected claim, not its text.
 
+**Runs 15 to 18, 2026-10-07 23:22 to 23:26 UTC (8 October, about 06:25 WIB), first runs of the "AI writes only the action" design (code after commit 282f91d; the commit that adds this paragraph contains the design). These are the published figures. They measure a different thing from runs 1 to 14 and must not be compared with them.**
+
+| Metric | 15: English, tuned | 16: English, held-out | 17: Indonesian, tuned | 18: Indonesian, held-out |
+|---|---|---|---|---|
+| AI actions kept by the screen | 42 of 43 (97.7%) | 26 of 27 (96.3%) | 42 of 44 (95.5%) | 26 of 27 (96.3%) |
+| Serious facts covered by a kept AI action | 99.2% of 118 | 92.3% of 78 | 97.5% of 118 | 92.3% of 78 |
+| Covered with standard notices | 100% | 100% | 100% | 100% |
+| Reading grade of the action (English): median; at or below grade 8 | 4.8; 97.6% | 4.8; 96.2% | not computed | not computed |
+
+Removed actions (5): stay-indoors at too low a level 3; hazard not serious for the household 1; second action for the same hazard 1. The catch-rate metric was dropped: the model writes no numbers, so there is nothing of that kind to catch. "Kept" means the action passed the screening rules and nothing more; do not call it accuracy or quality.
+
 Add later runs here with date, commit hash, language, and what changed.
 
 ---
@@ -456,6 +467,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 | 2026-10-07 | Fallback standard notices instead of a second model call | Guarantees coverage without more model risk or latency |
 | 2026-10-07 | Advice only for hazards that are serious for the household; quiet mode otherwise | A live check showed over-warning at low levels (stay indoors at AQI 58). Saying nothing is more honest than a weak warning. |
 | 2026-10-07 | Household profile changes thresholds by rule, not only the wording | Makes the personalisation deterministic and testable; it is project judgement, disclosed as such. |
+| 2026-10-08 | The AI writes only the action; numbers, levels and evidence come from the data | A live result showed a "verified" sentence with real numbers on the wrong days. Checking model-written numbers can fail; not letting the model write them cannot. |
 | 2026-10-07 | Name: Prakira; public repo `rofiperlungoding/prakira` | Owner asked for something catchy; from Indonesian *prakiraan* (forecast). No trademark or name-collision check was done. |
 | 2026-10-07 | Host on the owner's own server at `prakira.rofihosted.space` | Owner's choice; free; Node already there. Single point of failure during judging, so a backup clip and a fallback host are planned. |
 
@@ -487,6 +499,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
   - **Verifier bug found on a live result and fixed:** numbers on the wrong days were accepted. See runs 11 to 14 in section 8. The fix is a nearest-day-word heuristic. **Open design question for the owner:** have the evidence sentence built from data and let the model write only the action, which removes this class of error entirely but changes the product's story ("the AI never writes a number").
   - 41 tests pass. Headless checks: geolocation granted and denied, reload restores choices with zero briefing requests, forget clears storage, process segments open the audit, no console errors.
   - **Next action:** after the quota reset, check the outlook card and the climate row on the live site with real data; then the owner records the video and submits.
+- **2026-10-08 (session 5, continued).** The owner approved the design change proposed after the wrong-day bug: **the model writes only `{hazard, advice}`; `fact_ids`, `level` and the evidence sentence are built from the data** (`verifyAll` in `lib/verify.mjs`, `evidenceFor` in `lib/notice.mjs`, prompt in `lib/llm.mjs`). The day-word heuristic added earlier the same day was deleted. Anything else the model writes is ignored (unit-tested). 33 tests pass. Sections 5 and 7a of this plan describe the older verifier rules and are superseded by this entry and by the README. Page, About, README, Devpost draft, review notes and the architecture diagram now tell the new story ("numbers from data, not from AI"); the third evidence card reads "Numbers written by the AI: 0". Runs 15 to 18 recorded in section 8. The owner also showed three research ideas built on ECMWF's AIFS model (energy digital twin, generative downscaling, physics guardrail); assessed as not buildable by the deadline and their cited claims unverified; one small piece was kept as a planned step (two forecast models side by side). Current plan: `C:\Users\Rofi\.claude\plans\eh-jangan-deh-yg-jolly-truffle.md`. **Next actions, in order: "Describe your home" (AI fills the form from one sentence; step 4b of that plan); after the Open-Meteo quota reset, check the climate row and the never-yet-seen outlook card on the live site (step 4); then two models side by side (step 5) if time allows.**
 
 **Open questions for the owner**
 

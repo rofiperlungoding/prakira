@@ -13,7 +13,7 @@ Prakira
 
 ## Tagline (short description)
 
-Climate briefings with receipts: what the next 72 hours of heat, rain, air and UV mean for your household, with every number checked against the forecast.
+Climate briefings with receipts: what the next 72 hours of heat, rain, air and UV mean for your household. The AI writes the actions; every number comes straight from the forecast.
 
 ## Links
 
@@ -28,7 +28,7 @@ Open forecast data is free and very good. It can tell you the heat index will re
 
 Research says this gap is real. Public warning systems send the same message to everyone, while people ask "how does this affect me right now?" and "what can I do?" (Ou et al., 2025). Weather-warning experts name tailored and multilingual warnings as the promising use of AI, and name accountability as the risk (Kox et al., 2025). And when researchers tested ChatGPT-4o on heat-health messages, most were accurate, but none met a grade 8 reading level and few placed heat in the context of climate change (MacKay et al., 2026).
 
-A language model can write personal advice in seconds. It can also state a number that was never in the forecast, in the same confident tone. For a safety tool that is the wrong trade. So the question behind Prakira was narrow: can an AI write the advice while fixed rules and a checker keep every number honest?
+A language model can write personal advice in seconds. It can also state a number that was never in the forecast, in the same confident tone. For a safety tool that is the wrong trade. So the question behind Prakira was narrow: can an AI write the advice without ever being trusted with a number?
 
 ## What it does
 
@@ -49,11 +49,11 @@ Five layers, and only one of them is a language model:
 
 1. **Data:** Open-Meteo forecast, the CAMS air-quality forecast, and an ERA5-based climate archive. No API key.
 2. **Rules:** code computes the NWS heat index from temperature and humidity, assigns every hazard level, and decides which levels are serious for the chosen household.
-3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one action per serious hazard and must cite the facts it uses.
-4. **Verifier:** a claim is kept only if every number matches a cited forecast value, every cited day is stated, the level equals the rule-based level, the action contains no digits, and it does not say "stay indoors" at a level too low to justify it.
+3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one short action per serious hazard, and nothing else. It is told not to write numbers.
+4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
-The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 41 unit tests run offline.
+The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 33 unit tests run offline.
 
 ## Results
 
@@ -61,31 +61,31 @@ Live evaluation on 8 October 2026. "Held-out" means 15 cities never used while a
 
 | | English, held-out | Indonesian, held-out |
 |---|---|---|
-| AI claims that pass verification | 23 of 28 (82.1%) | 24 of 27 (88.9%) |
-| Serious hazards covered by the AI alone | 78.2% | 87.2% |
+| AI actions kept by the screen | 26 of 27 (96.3%) | 26 of 27 (96.3%) |
+| Serious hazards covered by the AI alone | 92.3% | 92.3% |
 | Serious hazards covered with notices | 100% | 100% |
-| Deliberately corrupted claims caught | 100% | 100% |
-| Reading grade (median; at grade 8 or below) | 3.5; 100% | not computed |
+| Numbers written by the AI and shown to the user | 0 | 0 |
+| Reading grade of the action (median; at grade 8 or below) | 4.8; 96.2% | not computed |
 
-These are small samples and one run each, and repeated runs have differed by ten points or more. Coverage with notices is 100% by design. The full record, including runs on the 20 development cities and earlier runs made with bugs since fixed, is in the repository.
+"Kept" means the action passed the screening rules; it is not a rating of the advice. These are small samples and one run each. Coverage with notices and the zero in the fourth row are true by design. The full record, including the earlier design and runs made with bugs since fixed, is in the repository.
 
 ## Challenges we ran into
 
 - **Our own first version got the science wrong.** It applied heat-index categories to a different temperature measure and used the wrong cut points. Re-checking against the NWS source caught it, and the unit tests now reproduce the two examples NWS publishes.
 - **Over-warning.** An early version told a London household to stay indoors at an air quality index of 58. We made the system advise only on hazards that are serious for the household, and reject "stay indoors" advice at low levels.
-- **The verifier had gaps we only found by reading its output.** Indonesian decimal commas ("37,6") were read as two numbers. A claim could cite three days and state only two values. Worst, a sentence could carry the right numbers on the wrong days ("224 today" when 224 was the day after) and still be marked verified; we saw it on a live result. All three are fixed and tested, and the last one cost several points of pass rate, which we report.
+- **The verifier had gaps we only found by reading its output.** Indonesian decimal commas ("37,6") were read as two numbers. A claim could cite three days and state only two values. Worst, a sentence could carry the right numbers on the wrong days ("224 today" when 224 was the day after) and still be marked verified; we saw it on a live result, not in our evaluation. That was the turning point: we stopped trying to check the model's numbers and took the model out of the numbers altogether. It now writes only the action.
 - **Readability traded against accuracy.** One prompt change took the reading grade from 8.4 to about 3.5, and the model's raw pass rate moved around while we worked on it.
 - **Free-tier limits.** The larger models were not available on our key, so the system had to work with a small one.
 
 ## Accomplishments that we're proud of
 
-- The model is never trusted with a number or a level, and the interface shows what it got wrong.
+- The model never writes a number or a level. Every figure on the page comes from the forecast data, and the interface shows which of the model's actions were removed and why.
 - The evaluation includes cities the system was never tuned on, and reports the weak figures along with the strong ones.
 - It works in Bahasa Indonesia, with the verifier handling local number formatting.
 
 ## What we learned
 
-Verification is only as good as what it checks. Ours covers numbers and levels. It does not cover the judgement in an action: in a read-through of 22 claims, two actions were questionable even though every number was right (for example, suggesting morning activity on a day with a heat index of 47 °C). Saying that plainly is more useful than a clean-looking score.
+Checking an AI's output is weaker than not needing to. Our verifier passed a wrong sentence with a "verified" badge, and a stricter verifier would only have been a better guess. Removing the model from the numbers was simpler and stronger. What remains unchecked is the judgement in an action: in a read-through of 22 actions on the earlier design, two were questionable even though every number was right (for example, suggesting morning activity on a day with a heat index of 47 °C). Saying that plainly is more useful than a clean-looking score.
 
 ## What it is not
 
@@ -96,7 +96,7 @@ Verification is only as good as what it checks. Ours covers numbers and levels. 
 ## What's next
 
 - A review of the advice by people, including a health professional.
-- Replace the day-matching heuristic in the verifier with evidence built directly from the data, and resolve conflicts between hazards (bad air against heat in a home without air conditioning).
+- Resolve conflicts between hazards (bad air against heat in a home without air conditioning).
 - A long-range card from climate projections: how many very hot days to expect in the 2040s compared with the recent past.
 - More languages, each with its own verification tests.
 

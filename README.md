@@ -12,7 +12,7 @@ ForgeHacks 2026 · track: AI + Climate
 
 ## The idea in one paragraph
 
-Open forecast data can tell you that the heat index will reach 37 °C and the air quality index 204. It does not tell you what that means for an older adult, a toddler, or someone who works outdoors. A language model can write that advice, and it can also state a number that was never in the forecast. In Prakira, fixed published rules set every hazard level, the model only writes the actions, and a checker removes any claim whose numbers or level do not match the data. You see what passed, what was removed, and why.
+Open forecast data can tell you that the heat index will reach 37 °C and the air quality index 204. It does not tell you what that means for an older adult, a toddler, or someone who works outdoors. A language model can write that advice, and it can also state a number that was never in the forecast. In Prakira the model never writes a number. Fixed published rules set every hazard level, code builds the sentence that states the numbers, and the model writes only the action, which is screened before you see it. You see what was kept, what was removed, and why.
 
 ## How it works
 
@@ -20,14 +20,15 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 
 1. **Data.** Forecast, air quality and a 30-year climate archive from Open-Meteo (no API key).
 2. **Rules** (`lib/facts.mjs`, `lib/climate.mjs`). Compute the heat index, hazard levels, the difference from the 1991 to 2020 normal, and a flag for days when strong heat and polluted air coincide. The household you choose changes which levels count as serious.
-3. **Model** (`lib/llm.mjs`). Mistral `open-mistral-nemo` writes one short action per serious hazard and cites the facts it relies on. If nothing is serious, the model is not called and no advice is given.
-4. **Verifier** (`lib/verify.mjs`). Model output is untrusted. A claim is kept only if all of these hold:
-   - every cited fact exists and all belong to one hazard;
-   - the stated level equals the rule-based level;
-   - every number in the evidence matches a cited value, and every cited day's value is stated;
-   - the action contains no digits;
-   - the action does not say "stay indoors" at a level too low to justify it.
-5. **Notices** (`lib/notice.mjs`). Any serious hazard the model did not cover gets fixed-template text, so nothing serious is silently missing.
+3. **Model** (`lib/llm.mjs`). Mistral `open-mistral-nemo` writes one short action per serious hazard, and nothing else: `{"hazard", "advice"}`. It is told not to write numbers. If nothing is serious, the model is not called and no advice is given.
+4. **Screen and evidence** (`lib/verify.mjs`, `lib/notice.mjs`). Model output is untrusted. An action is kept only if:
+   - its hazard is serious for this household, and it is the first action for that hazard;
+   - it contains no digits;
+   - it does not say "stay indoors" at a level too low to justify it;
+   - it is not empty or overlong.
+
+   For each kept action, code attaches the facts, the rule-based level, and an evidence sentence built from the forecast values in day order ("The US AQI peaks at 219 today, 216 tomorrow and 224 the day after tomorrow."). Anything else the model writes, including numbers, levels or its own evidence, is ignored.
+5. **Notices** (`lib/notice.mjs`). Any serious hazard without a kept action gets fixed-template text, so nothing serious is silently missing.
 
 **The process is visible.** The server reports each of these steps as it happens (`lib/trace.mjs`, sent as an event stream), with measured durations and real counts. The page shows them live while you wait and keeps them as one line above the result; each segment opens its part of the audit trail.
 
@@ -47,38 +48,38 @@ The household adjustments (for example, an older adult lowers the heat threshold
 
 ## Evaluation
 
-All runs on 2026-10-08 with live data, after the verifier was last tightened. "Tuned" cities are the 20 the system was developed against; "held-out" cities are 15 that were never used while adjusting the prompt or the verifier.
+Runs on 8 October 2026 (WIB) with live data. "Tuned" cities are the 20 the system was developed against; "held-out" cities are 15 that were never used while adjusting the prompt or the rules.
 
 | Metric | English, tuned | English, held-out | Indonesian, tuned | Indonesian, held-out |
 |---|---|---|---|---|
-| Model claims that pass verification | 31 of 43 (72.1%) | 23 of 28 (82.1%) | 34 of 43 (79.1%) | 24 of 27 (88.9%) |
-| Serious hazards covered by a verified model claim | 70.3% | 78.2% | 80.5% | 87.2% |
+| AI actions kept by the screen | 42 of 43 (97.7%) | 26 of 27 (96.3%) | 42 of 44 (95.5%) | 26 of 27 (96.3%) |
+| Serious hazards covered by a kept AI action | 99.2% | 92.3% | 97.5% | 92.3% |
 | Serious hazards covered once notices are added | 100% | 100% | 100% | 100% |
-| Deliberately corrupted claims caught by the verifier | 100% | 100% | 100% | 100% |
-| Reading grade (Flesch-Kincaid): median; share at grade 8 or below | 3.5; 100% | 3.5; 100% | not computed | not computed |
+| Numbers written by the AI and shown to the user | 0 | 0 | 0 | 0 |
+| Reading grade of the action (Flesch-Kincaid): median; share at grade 8 or below | 4.8; 97.6% | 4.8; 96.2% | not computed | not computed |
 
 How to read this honestly:
 
-- **Small samples, one run each, and noisy.** 27 to 43 claims per run. The same English tuned set gave 84.1% the day before and 72.1% here, with only one of the extra rejections due to the new rule. Treat every figure as plus or minus ten points.
-- **Coverage with notices is 100% by construction.** It shows the fallback works, not that the model is complete.
-- **The catch rate covers two kinds of corruption only:** a shifted number and a wrong level.
-- **The reading grade** uses a syllable heuristic and is valid for English only. Before one prompt change it was a median of 8.4 with 47.6% at grade 8 or below.
-- **Why claims are rejected** (29 across the four runs): "stay indoors" at too low a level 8; stated level not matching the rule 5; a fact id that does not exist 4; a number written for the wrong day 4; missing evidence 3; mixed hazards 2; a number in the advice 1; a number not in the data 1; a cited value not stated 1.
-- **A bug the evaluation did not catch.** Until 8 October the verifier accepted a sentence whose numbers were all real but attached to the wrong days ("224 today, 219 tomorrow" when the data said 219 today and 224 the day after). It was found by looking at a live result, and the verifier now ties each number to the day it is written next to. Results from before that fix, including the 83% and 97% shown earlier, are in [`PLAN.md`](PLAN.md), section 8.
+- **"Kept" is a narrow test.** It means the action passed the screening rules. It does not mean the action is good advice. The figures are high partly because the model now has very little it can get wrong.
+- **Small samples, one run each.** 27 to 44 actions per run. Earlier runs of this project differed by ten points between repeats.
+- **Coverage with notices is 100% by construction**, and "numbers written by the AI: 0" is true by construction as well: the code never displays model-written numbers.
+- **Removed actions** (5 across the four runs): "stay indoors" at too low a level 3; a hazard that is not serious for the household 1; a second action for the same hazard 1.
+- **The reading grade** uses a syllable heuristic, covers only the action, and is valid for English only.
 
-**Review of the advice itself:** 22 claims from 12 briefings were read by the AI assistant used to build the project, not by a person or a clinician. 20 actions read as sensible, 2 as questionable, 0 as clearly unsafe. Details and the two questionable cases are in [`docs/manual-review.md`](docs/manual-review.md). A human review has not been done.
+**Why the design changed.** Until 8 October the model also wrote the evidence sentence, and a verifier checked its numbers against the data. That verifier passed a sentence whose numbers were all real but attached to the wrong days ("224 today, 219 tomorrow" when the data said 219 today and 224 the day after), and showed it with a "verified" badge. It was found by looking at a live result, not by the evaluation. A stricter check fixed that case but relied on a heuristic, so the model was taken out of the numbers entirely. Figures from the earlier design (72% to 97% of claims passing, depending on the day and the rules in force) are in [`PLAN.md`](PLAN.md), section 8, and are not comparable with the table above.
+
+**Review of the advice itself (done on the earlier design):** 22 claims from 12 briefings were read by the AI assistant used to build the project, not by a person or a clinician. 20 actions read as sensible, 2 as questionable, 0 as clearly unsafe. Details and the two questionable cases are in [`docs/manual-review.md`](docs/manual-review.md). A human review has not been done.
 
 ## Limits
 
-- **The wording of each action is not verified.** Only its numbers, its level, the absence of digits, and one proportionality rule are checked. A poor or over-cautious action can pass.
-- **Numbers are tied to days by a heuristic.** Each number must match the value for the nearest day word in its sentence (English and Indonesian day words and weekday names). A sentence that names several days and then lists several numbers is rejected. An unusual sentence shape could still slip through.
+- **The wording of each action is not verified.** It is screened for digits and for one kind of over-warning. A poor, vague or over-cautious action can pass, and "96% kept" says nothing about that.
 - **Free data limits.** Open-Meteo counts a multi-decade request as many calls against a free daily limit. The 30-year normal and the long-range outlook are fetched once per place and cached on disk; when the limit is reached the page says so and the briefing still works.
 - **The long-range outlook is model output:** the median of three climate models on a high-emissions pathway, for daily maximum air temperature, in two 10-year windows. It is context, not a prediction for your home.
 - **One action per hazard.** Advice for one hazard can conflict with another (closing windows against bad air in a hot home without air conditioning). A compound-day notice flags the overlap but does not resolve it.
 - **Model forecasts, not sensors.** Air quality comes from CAMS at about 11 km in Europe and 45 km elsewhere.
 - **Not an official warning and not medical advice.** It is a companion to your national meteorological service.
 - **Free-tier services.** The model key and the data APIs are rate-limited; the demo can be slow or briefly unavailable. If the model fails, the page still shows the hazard levels and notices.
-- **Not proven new.** ClimApp and HEAT-SHIELD already give personalised forecast-based heat warnings without a language model, and research prototypes use language models for single-hazard advisories. We did not find this combination (multi-hazard, per-claim numeric verification with visible rejections, a public evaluation) in a search of one database. See [`docs/climate-novelty-literature.md`](docs/climate-novelty-literature.md).
+- **Not proven new.** ClimApp and HEAT-SHIELD already give personalised forecast-based heat warnings without a language model, and research prototypes use language models for single-hazard advisories. We did not find this combination (multi-hazard, an AI that writes only the action while code supplies every number, visible removals, a public evaluation) in a search of one database. See [`docs/climate-novelty-literature.md`](docs/climate-novelty-literature.md).
 
 ## Run it
 
@@ -91,7 +92,7 @@ npm start                                   # http://localhost:3000
 ```
 
 ```bash
-npm test                       # 41 unit tests, offline
+npm test                       # 33 unit tests, offline
 npm run eval -- 15 en heldout  # live evaluation: [count] [en|id] [tuned|heldout]
 ```
 
@@ -106,7 +107,7 @@ public/about.html     Why it exists and the research behind it
 lib/facts.mjs         Data fetch, heat index, hazard levels, household thresholds
 lib/climate.mjs       Difference from the 1991 to 2020 normal
 lib/llm.mjs           Prompt and model call
-lib/verify.mjs        Claim verifier
+lib/verify.mjs        Screens each AI action and builds the item shown; consistency check for built items
 lib/notice.mjs        Standard notices and the compound-day notice
 lib/trace.mjs         Records each real step with its duration, for the live process display
 lib/outlook.mjs       Long-range outlook from three climate models

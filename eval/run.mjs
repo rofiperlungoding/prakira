@@ -1,14 +1,14 @@
 // Groundedness eval over fixed locations. Live APIs, so results vary by day; the report records the date.
 // Usage: node eval/run.mjs [count] [en|id] [tuned|heldout]
 // Metrics:
-//  - raw pass rate: share of model claims that pass verification (how often the model is wrong)
+//  - raw pass rate: share of the model's actions that are kept (not rejected for digits, disproportionate
+//    "stay indoors" advice, a hazard that is not serious for the household, or a duplicate)
 //  - coverage: share of serious facts (per-hazard, per-household thresholds) cited by a verified model claim;
 //    standard notices fill the rest, so coverage with notices is 100% by construction
-//  - verifier catch rate: corrupted copies of verified claims (wrong number, wrong level) that get rejected
-//  - readability (English only): Flesch-Kincaid grade of each verified claim (action plus evidence)
+//  - readability (English only): Flesch-Kincaid grade of each kept action (the only text the model writes)
+// The model writes no numbers, so there is no number check to measure here; the unit tests cover the rules.
 import fs from 'node:fs';
 import { makeBrief } from '../lib/brief.mjs';
-import { verifyClaim } from '../lib/verify.mjs';
 import { thresholds, isSerious } from '../lib/facts.mjs';
 import { fleschKincaid } from '../lib/readability.mjs';
 import { SETS, PROFILES } from './places.mjs';
@@ -33,16 +33,8 @@ for (const [i, [name, lat, lon]] of PLACES.slice(0, limit).entries()) {
   const th = thresholds(profile);
   const hi = b.facts.filter((f) => isSerious(f, th));
   const covered = hi.filter((f) => b.claims.some((c) => c.fact_ids.includes(f.id)));
-  let corrupt = 0, caught = 0;
-  for (const c of b.claims) {
-    const bad = [{ ...c, level: 'danger-zz' }];
-    // Only corrupt a number when one exists, and only when +7 is not another cited value.
-    const m = c.evidence.match(/\d+(?:\.\d+)?/);
-    if (m) bad.push({ ...c, evidence: c.evidence.replace(m[0], String(Number(m[0]) + 7.37)) });
-    for (const x of bad) { corrupt++; if (!verifyClaim(x, b.facts, th).ok) caught++; }
-  }
-  const grades = lang === 'en' ? b.claims.map((c) => fleschKincaid(`${c.advice} ${c.evidence}`)).filter((g) => g != null) : [];
-  const row = { name, profile, attempts: b.attempts, error: b.error, total: b.total, verified: b.claims.length, rejected: b.rejected.map((r) => r.reason), quiet: b.quiet, hiFacts: hi.length, hiCovered: covered.length, notices: b.notices.length, noticeFacts: b.notices.reduce((n, x) => n + x.fact_ids.length, 0), corrupt, caught, grades, claims: b.claims.map((c) => ({ advice: c.advice, evidence: c.evidence, level: c.level })) };
+  const grades = lang === 'en' ? b.claims.map((c) => fleschKincaid(c.advice)).filter((g) => g != null) : [];
+  const row = { name, profile, attempts: b.attempts, error: b.error, total: b.total, verified: b.claims.length, rejected: b.rejected.map((r) => r.reason), quiet: b.quiet, hiFacts: hi.length, hiCovered: covered.length, notices: b.notices.length, noticeFacts: b.notices.reduce((n, x) => n + x.fact_ids.length, 0), grades, claims: b.claims.map((c) => ({ advice: c.advice, evidence: c.evidence, level: c.level })) };
   rows.push(row);
   console.log(name.padEnd(16), `verified ${row.verified}/${row.total}`, `model coverage ${row.hiCovered}/${row.hiFacts} (+${row.notices} notices)`, b.quiet ? '(quiet: no model call)' : '', row.error ?? '');
   await sleep(1500);
@@ -57,7 +49,7 @@ for (const r of ok) for (const x of r.rejected) { const k = x.replace(/\d+(\.\d+
 const summary = {
   date: new Date().toISOString(), set, lang, locations: rows.length, failedLocations: rows.length - ok.length, quietLocations: ok.filter((r) => r.quiet).length,
   rawPassRate: pct(sum('verified'), sum('total')), claimsTotal: sum('total'), claimsVerified: sum('verified'),
-  seriousFacts: sum('hiFacts'), coveredByModel: pct(sum('hiCovered'), sum('hiFacts')), coveredWithNotices: pct(sum('hiCovered') + sum('noticeFacts'), sum('hiFacts')), verifierCatchRate: pct(sum('caught'), sum('corrupt')),
+  seriousFacts: sum('hiFacts'), coveredByModel: pct(sum('hiCovered'), sum('hiFacts')), coveredWithNotices: pct(sum('hiCovered') + sum('noticeFacts'), sum('hiFacts')),
   readability: grades.length ? { claims: grades.length, medianGrade: Number(grades[Math.floor(grades.length / 2)].toFixed(1)), atOrBelowGrade8: pct(grades.filter((g) => g <= 8).length, grades.length) } : 'not computed (English only)',
   rejectionReasons: reasons,
 };

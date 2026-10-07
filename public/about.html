@@ -89,7 +89,7 @@
 <header class="hero"><div class="wrap">
   <span class="scribble">why this exists</span>
   <h1>Forecasts give numbers.<br>People need to know what to do.</h1>
-  <p>Prakira is a small tool that turns the next three days of heat, rain, air quality and UV into a few actions for one household, and shows the numbers behind every action. This page explains why it was made and which research shaped each choice.</p>
+  <p>Prakira is a small tool that turns the next three days of heat, rain, air quality and UV into a few actions for one household, and shows the numbers behind every action, taken straight from the data. This page explains why it was made and which research shaped each choice.</p>
 </div></header>
 
 <section class="band" id="why"><div class="wrap">
@@ -97,7 +97,7 @@
     <h2>The gap we kept running into</h2>
     <p>Open weather and air-quality data is now free and very good. A phone can tell you that the heat index will reach 37 °C and the air quality index 204. What it does not tell you is what that means for a grandmother, a toddler, or someone who works on a roof all day.</p>
     <p>Language models can write that kind of advice in seconds. They can also state a number that was never in the forecast, in the same confident tone. For a tool about safety, that is the wrong trade.</p>
-    <p>So the question behind Prakira was narrow: <b>can an AI write the advice while fixed rules and a checker keep every number honest?</b></p>
+    <p>So the question behind Prakira was narrow: <b>can an AI write the advice without ever being trusted with a number?</b></p>
   </div>
   <div class="facts">
     <div class="fact"><b>37.2 °C</b><span>Peak heat index forecast for Jakarta on 7 October 2026, the day this was built. Level: extreme caution.</span></div>
@@ -138,7 +138,7 @@
       <span class="who">Karimanzira (first author), 2025 · Algorithms</span>
       <h3>Hallucination is a named risk in hazard communication</h3>
       <p>Work on language models for flood communication names hallucination as a key risk, and reports that grounding the model in data cut factual inconsistency by more than 75%.</p>
-      <div class="so"><b>So Prakira</b>goes one step further for numbers: a claim is shown only if every number matches the forecast value it cites.</div>
+      <div class="so"><b>So Prakira</b>removes the risk for numbers: the AI writes only the action, and the sentence with the numbers is built from the forecast data.</div>
       <a href="https://doi.org/10.3390/a18110713" rel="noopener">doi.org/10.3390/a18110713</a>
     </article>
     <article class="paper e">
@@ -167,14 +167,14 @@
       <li><span><b>Not an official warning.</b> It is a companion to your national meteorological service.</span></li>
       <li><span><b>Not medical advice.</b> No clinician has reviewed it.</span></li>
       <li><span><b>Not a sensor.</b> The data are model forecasts for a grid cell several kilometres wide.</span></li>
-      <li><span><b>Not fully verified.</b> Numbers and levels are checked. The wording of each action is written by a language model and is not.</span></li>
+      <li><span><b>Not fully checked.</b> Numbers and levels come from the data, so they cannot be wrong in the way AI text can. The wording of each action is written by a language model; it is screened for numbers and over-warning, not judged for quality.</span></li>
     </ul>
   </div>
   <div class="box">
     <h3>What it does add</h3>
     <ul class="list yes">
       <li><span>Heat, rain, air and UV in one briefing for one household, with a flag when strong heat and polluted air fall on the same day.</span></li>
-      <li><span>A checker that removes any AI claim whose number or level does not match the data, and a list of what was removed.</span></li>
+      <li><span>An AI that writes only the action and never a number. The evidence under each action is built from the data, and actions that over-warn or contain a number are removed and listed.</span></li>
       <li><span>Fixed notices for any serious hazard the AI did not cover.</span></li>
       <li><span>A public evaluation with its weak points stated: pass rate, coverage, reading level, and locations the system was never tuned on.</span></li>
     </ul>

@@ -1,5 +1,7 @@
 # Read-through of 12 briefings
 
+> **Note added 8 October 2026.** This review was done on the earlier design, in which the AI also wrote the evidence sentence. Since then the AI writes only the action, and the evidence sentence is built from the forecast data. The evidence wording problems described below (wrong day words, one value used for two days) can no longer occur. The two questionable actions still can, because the action is still written by the AI.
+
 Date: 2026-10-07.
 
 **Who read them:** the AI coding assistant used to build the project (Claude). **No person and no clinician has reviewed this advice.** Treat this as a first screening, not as validation. A human review is still needed before any claim about the quality of the advice.

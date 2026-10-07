@@ -115,6 +115,7 @@ climate-brief/
   lib/facts.test.mjs    Unit tests for heat index, bands and fact building
   eval/run.mjs          Live eval over 20 fixed locations; writes eval/out/report.json (gitignored)
   docs/climate-novelty-literature.md   Literature review v0.2
+  AGENTS.md             Entry point for any AI assistant; points here
   README.md             Public description (must be updated in M9; currently describes the MVP)
   PLAN.md               This file
   .env                  MISTRAL_API_KEY (gitignored; never commit, print or log)
@@ -369,7 +370,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 
 - **2026-10-07 (session 1).** Repo scaffolded; MVP built; 12 tests pass; two eval runs; first literature scan (27 references, titles only).
 - **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. Next action at that point: M0, then M1.
-- **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. **Next action: M2 (coverage notices), then M3 (proportionate, digit-free advice), M5, M4.**
+- **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). **Next action: M2 (coverage notices), then M3 (proportionate, digit-free advice), M5, M4.**
 
 **Open questions for the owner**
 

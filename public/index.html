@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Climate Brief</title>
+<style>
+  :root { --bg:#f7f7f4; --fg:#1b1f1d; --mut:#5d6661; --card:#fff; --bd:#dcdfd9; --ok:#1a7f4b; --bad:#b3261e; --acc:#0b6b5c;
+          --s0:#d7efe0; --s1:#fff3c4; --s2:#ffd9a8; --s3:#ffb4a8; --s4:#e58a8a; --s5:#c96; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg:#121513; --fg:#e8ece9; --mut:#9aa59f; --card:#1b201d; --bd:#2f3732; --ok:#5fd18f; --bad:#ff8a80; --acc:#4fd1b8;
+          --s0:#1f4630; --s1:#4d4416; --s2:#5a3c17; --s3:#5e2a22; --s4:#6a2b2b; --s5:#6a3b1b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:1.6rem; margin:0 0 4px; }
+  .sub { color:var(--mut); margin:0 0 20px; }
+  .card { background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:16px; margin-bottom:16px; }
+  label { display:block; font-weight:600; margin-bottom:6px; }
+  input[type=text], select { width:100%; padding:10px; border:1px solid var(--bd); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  .row > * { flex:1 1 200px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
+  .chips label { font-weight:400; display:flex; gap:6px; align-items:center; margin:0; padding:6px 10px; border:1px solid var(--bd); border-radius:999px; cursor:pointer; }
+  button { padding:12px 20px; border:0; border-radius:8px; background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:wait; }
+  .sugg button { background:transparent; color:var(--fg); border:1px solid var(--bd); margin:6px 6px 0 0; font-weight:400; padding:6px 10px; }
+  .days { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+  .day h3 { margin:0 0 8px; font-size:1rem; }
+  .hz { display:flex; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:8px; margin-bottom:6px; font-size:.92rem; }
+  .s0 { background:var(--s0); } .s1 { background:var(--s1); } .s2 { background:var(--s2); } .s3 { background:var(--s3); } .s4 { background:var(--s4); } .s5 { background:var(--s5); }
+  .claim { border-left:4px solid var(--ok); padding:4px 0 4px 12px; margin:14px 0; }
+  .claim .ev { color:var(--mut); font-size:.92rem; }
+  .tag { display:inline-block; font-size:.75rem; padding:1px 8px; border-radius:999px; border:1px solid var(--bd); margin-right:6px; color:var(--mut); }
+  .ok { color:var(--ok); font-weight:600; }
+  .bad { color:var(--bad); }
+  details { margin-top:8px; color:var(--mut); font-size:.9rem; }
+  #err { color:var(--bad); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Climate Brief</h1>
+  <p class="sub">A 3-day heat, rain, air-quality and UV briefing for your household. Every claim is checked against the forecast numbers before you see it.</p>
+
+  <div class="card">
+    <label for="q">Where are you?</label>
+    <input id="q" type="text" placeholder="City, e.g. Jakarta" autocomplete="off">
+    <div id="sugg" class="sugg"></div>
+    <p id="picked" class="sub" style="margin:8px 0 0"></p>
+    <div class="row" style="margin-top:12px">
+      <div>
+        <label for="lang">Language</label>
+        <select id="lang"><option value="en">English</option><option value="id">Bahasa Indonesia</option></select>
+      </div>
+    </div>
+    <label style="margin-top:12px">Who needs to be protected?</label>
+    <div class="chips" id="profile"></div>
+    <p style="margin:16px 0 0"><button id="go" disabled>Generate briefing</button> <span id="status" class="sub"></span></p>
+    <p id="err"></p>
+  </div>
+
+  <div id="out"></div>
+</main>
+<script>
+const PROFILES = {
+  older_adult: 'Older adult', young_child: 'Young child', outdoor_worker: 'Outdoor worker', respiratory_condition: 'Asthma / lung condition',
+  pregnant: 'Pregnant', flood_prone_home: 'Flood-prone home', no_air_conditioning: 'No air conditioning'
+};
+const $ = (id) => document.getElementById(id);
+let place = null;
+
+$('profile').innerHTML = Object.entries(PROFILES).map(([k, v]) => `<label><input type="checkbox" value="${k}"> ${v}</label>`).join('');
+
+let t;
+$('q').addEventListener('input', () => {
+  clearTimeout(t);
+  t = setTimeout(async () => {
+    const q = $('q').value.trim();
+    if (q.length < 2) { $('sugg').textContent = ''; return; }
+    try {
+      const r = await (await fetch('/api/geocode?q=' + encodeURIComponent(q))).json();
+      $('sugg').textContent = '';
+      for (const p of r) {
+        const b = document.createElement('button');
+        b.textContent = [p.name, p.admin, p.country].filter(Boolean).join(', ');
+        b.onclick = () => { place = p; $('picked').textContent = 'Selected: ' + b.textContent; $('sugg').textContent = ''; $('go').disabled = false; };
+        $('sugg').appendChild(b);
+      }
+    } catch { $('sugg').textContent = 'Search failed. Try again.'; }
+  }, 300);
+});
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function render(d) {
+  const out = $('out'); out.textContent = '';
+  for (const w of d.warnings || []) out.appendChild(el('p', 'bad', w));
+  const days = [...new Set(d.facts.map((f) => f.date))];
+  const grid = el('div', 'days');
+  for (const date of days) {
+    const fs = d.facts.filter((f) => f.date === date);
+    const c = el('div', 'card day');
+    c.appendChild(el('h3', '', `${fs[0].weekday} (${fs[0].day})`));
+    for (const f of fs.filter((x) => x.level !== 'n/a')) {
+      const r = el('div', 'hz s' + Math.min(f.severity, 5));
+      r.appendChild(el('span', '', `${f.metric}: ${f.value}${f.unit ? ' ' + f.unit : ''}`));
+      r.appendChild(el('strong', '', f.level));
+      c.appendChild(r);
+    }
+    grid.appendChild(c);
+  }
+  out.appendChild(grid);
+
+  const card = el('div', 'card');
+  card.appendChild(el('h2', '', 'Your briefing'));
+  if (!d.claims.length) {
+    card.appendChild(el('p', 'bad', 'No verified advice could be produced' + (d.error ? ' (' + d.error + ')' : '') + '. The hazard levels above are still correct.'));
+  }
+  const byId = Object.fromEntries(d.facts.map((f) => [f.id, f]));
+  for (const c of d.claims) {
+    const div = el('div', 'claim');
+    div.appendChild(el('strong', '', c.advice));
+    const ev = el('div', 'ev', c.evidence + ' ');
+    ev.appendChild(el('span', 'tag', c.level));
+    for (const id of c.fact_ids) ev.appendChild(el('span', 'tag', byId[id] ? `${byId[id].metric}, ${byId[id].day}` : id));
+    div.appendChild(ev);
+    card.appendChild(div);
+  }
+  const v = el('p', 'sub');
+  v.appendChild(el('span', 'ok', `${d.claims.length} of ${d.total} claims passed verification`));
+  v.appendChild(document.createTextNode(` (model: ${d.model}, attempts: ${d.attempts}). Hazard levels are fixed rules, not model output. Not medical advice.`));
+  card.appendChild(v);
+  if (d.rejected.length) {
+    const det = el('details'); det.appendChild(el('summary', '', `${d.rejected.length} rejected claim(s)`));
+    for (const r of d.rejected) det.appendChild(el('div', 'bad', `${r.reason}: ${r.claim?.evidence ?? ''}`));
+    card.appendChild(det);
+  }
+  out.appendChild(card);
+}
+
+$('go').onclick = async () => {
+  $('err').textContent = ''; $('go').disabled = true; $('status').textContent = 'Fetching forecast and writing briefing...';
+  try {
+    const r = await fetch('/api/brief', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
+      lat: place.lat, lon: place.lon, lang: $('lang').value,
+      profile: [...document.querySelectorAll('#profile input:checked')].map((i) => i.value) }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Request failed');
+    render(d);
+  } catch (e) { $('err').textContent = 'Error: ' + e.message; }
+  $('go').disabled = false; $('status').textContent = '';
+};
+</script>
+</body>
+</html>

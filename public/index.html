@@ -256,6 +256,7 @@
   .tools .btn { padding:9px 14px; font-size:.9rem; }
   .tools .act { margin:0; }
   .pk { opacity:1; font-weight:500; }
+  .num.mod { font-size:1.15rem; }
 
   /* Long-range outlook */
   .olead { margin:0 0 10px; font-weight:500; }
@@ -500,11 +501,12 @@ const T = {
     descNote: 'The sentence is sent to the AI provider (Mistral) to be read. Prakira does not store it; leave out names. The AI can only tick the options below and suggest a place to search for. Nothing is generated until you press the button.',
     searchRun: 'Searching…', found: (n) => `${n} place${n === 1 ? '' : 's'} found`,
     process: 'Process', skipped: 'not needed', secs: (x) => `${x} s`, tryN: (n) => `try ${n}`, noResult: 'The server sent no result.',
-    steps: { forecast: 'Read the forecast', climate: 'Compare with the 30-year normal', rules: 'Set levels by rule', model: 'AI writes the actions', verify: 'Screen every action', notices: 'Fill any gap', cache: 'Saved briefing' },
-    short: { forecast: 'Forecast', climate: 'Normal', rules: 'Rules', model: 'AI', verify: 'Screen', notices: 'Notices' },
+    steps: { forecast: 'Read the forecast', climate: 'Compare with the 30-year normal', models: 'Compare two forecast models', rules: 'Set levels by rule', model: 'AI writes the actions', verify: 'Screen every action', notices: 'Fill any gap', cache: 'Saved briefing' },
+    short: { forecast: 'Forecast', climate: 'Normal', models: 'Two models', rules: 'Rules', model: 'AI', verify: 'Screen', notices: 'Notices' },
     sd: {
       forecast: (e) => (e.state === 'fail' ? `failed: ${e.error}` : `${e.values} values${e.air ? '' : ', no air data'}`),
       climate: (e) => (e.state === 'fail' ? 'unavailable right now' : `${e.days} days compared`),
+      models: (e) => (e.state === 'fail' ? 'unavailable right now' : `widest gap ${e.widest} °C`),
       rules: (e) => `${e.serious} serious of ${e.levelled}`,
       model: (e) => (e.state === 'fail' ? `failed: ${e.error}` : `wrote ${e.claims}${e.attempt > 1 ? `, try ${e.attempt}` : ''}`),
       verify: (e) => `kept ${e.kept}, removed ${e.removed}`,
@@ -520,7 +522,9 @@ const T = {
     outNote: 'Median of three climate models (CMIP6 HighResMIP, bias-corrected against ERA5-Land) on a high-emissions pathway close to RCP8.5. Model output, not measurement, and air temperature, not heat index. The models differ: read the range, not one number.',
     d1: 'numbers from data', d2: 'start here',
     strip: 'Next 72 hours', briefing: 'Your briefing', audit: 'Audit trail',
-    rows: { heat: 'Heat', rain: 'Rain', air: 'Air', uv: 'UV', ctx: 'Climate' },
+    rows: { heat: 'Heat', rain: 'Rain', air: 'Air', uv: 'UV', ctx: 'Climate', mod: 'Models' },
+    modLabel: { agree: 'agree', 'differ somewhat': 'differ somewhat', differ: 'differ' }, modGap: (d) => `up to ${d} °C apart`,
+    modNote: 'Models row: air temperature from two independent forecast models, ECMWF\'s physics model (IFS) and its AI model (AIFS), compared at the times both produce. A wide gap means the forecast is less certain; it does not say which model is right. The labels use this project\'s own cut points (1 and 3 °C).',
     units: { heat: 'heat index', air: 'US AQI', uv: 'UV index' },
     day: { today: 'Today', tomorrow: 'Tomorrow', 'the day after tomorrow': 'In 2 days' },
     weekday: (w) => w, level: (l) => l, chance: (p) => `${p}% chance`,
@@ -591,11 +595,12 @@ const T = {
     descNote: 'Kalimat ini dikirim ke penyedia AI (Mistral) untuk dibaca. Prakira tidak menyimpannya; jangan sertakan nama. AI hanya dapat mencentang pilihan di bawah dan mengusulkan tempat untuk dicari. Tidak ada yang dibuat sebelum Anda menekan tombol.',
     searchRun: 'Mencari…', found: (n) => `${n} tempat ditemukan`,
     process: 'Proses', skipped: 'tidak diperlukan', secs: (x) => `${x} dtk`, tryN: (n) => `percobaan ${n}`, noResult: 'Server tidak mengirim hasil.',
-    steps: { forecast: 'Membaca prakiraan', climate: 'Membandingkan dengan normal 30 tahun', rules: 'Menetapkan tingkat dengan aturan', model: 'AI menulis tindakan', verify: 'Menyaring setiap tindakan', notices: 'Mengisi celah', cache: 'Ringkasan tersimpan' },
-    short: { forecast: 'Prakiraan', climate: 'Normal', rules: 'Aturan', model: 'AI', verify: 'Penyaring', notices: 'Pemberitahuan' },
+    steps: { forecast: 'Membaca prakiraan', climate: 'Membandingkan dengan normal 30 tahun', models: 'Membandingkan dua model prakiraan', rules: 'Menetapkan tingkat dengan aturan', model: 'AI menulis tindakan', verify: 'Menyaring setiap tindakan', notices: 'Mengisi celah', cache: 'Ringkasan tersimpan' },
+    short: { forecast: 'Prakiraan', climate: 'Normal', models: 'Dua model', rules: 'Aturan', model: 'AI', verify: 'Penyaring', notices: 'Pemberitahuan' },
     sd: {
       forecast: (e) => (e.state === 'fail' ? `gagal: ${e.error}` : `${e.values} nilai${e.air ? '' : ', tanpa data udara'}`),
       climate: (e) => (e.state === 'fail' ? 'sedang tidak tersedia' : `${e.days} hari dibandingkan`),
+      models: (e) => (e.state === 'fail' ? 'sedang tidak tersedia' : `selisih terbesar ${String(e.widest).replace('.', ',')} °C`),
       rules: (e) => `${e.serious} serius dari ${e.levelled}`,
       model: (e) => (e.state === 'fail' ? `gagal: ${e.error}` : `menulis ${e.claims}${e.attempt > 1 ? `, percobaan ${e.attempt}` : ''}`),
       verify: (e) => `lolos ${e.kept}, dibuang ${e.removed}`,
@@ -611,7 +616,9 @@ const T = {
     outNote: 'Median tiga model iklim (CMIP6 HighResMIP, dikoreksi bias terhadap ERA5-Land) pada jalur emisi tinggi yang mendekati RCP8.5. Ini keluaran model, bukan pengukuran, dan suhu udara, bukan indeks panas. Model saling berbeda: baca rentangnya, bukan satu angka.',
     d1: 'angka dari data', d2: 'mulai di sini',
     strip: '72 jam ke depan', briefing: 'Ringkasan Anda', audit: 'Jejak audit',
-    rows: { heat: 'Panas', rain: 'Hujan', air: 'Udara', uv: 'UV', ctx: 'Iklim' },
+    rows: { heat: 'Panas', rain: 'Hujan', air: 'Udara', uv: 'UV', ctx: 'Iklim', mod: 'Model' },
+    modLabel: { agree: 'sepakat', 'differ somewhat': 'agak berbeda', differ: 'berbeda' }, modGap: (d) => `selisih hingga ${d} °C`,
+    modNote: 'Baris model: suhu udara dari dua model prakiraan yang independen, model fisika ECMWF (IFS) dan model AI-nya (AIFS), dibandingkan pada jam yang dihasilkan keduanya. Selisih yang lebar berarti prakiraan kurang pasti; itu tidak menunjukkan model mana yang benar. Labelnya memakai batas pilihan proyek ini (1 dan 3 °C).',
     units: { heat: 'indeks panas', air: 'US AQI', uv: 'indeks UV' },
     day: { today: 'Hari ini', tomorrow: 'Besok', 'the day after tomorrow': 'Lusa' },
     weekday: (w) => ({ Sunday: 'Minggu', Monday: 'Senin', Tuesday: 'Selasa', Wednesday: 'Rabu', Thursday: 'Kamis', Friday: 'Jumat', Saturday: 'Sabtu' }[w] || w),
@@ -668,7 +675,7 @@ const WMO = ['WMO Severe Weather Information Centre', 'https://severeweather.wmo
 
 const $ = (id) => document.getElementById(id);
 const STORE = 'prakira.choices.v1';
-const STEP_IDS = ['forecast', 'climate', 'rules', 'model', 'verify', 'notices'];
+const STEP_IDS = ['forecast', 'climate', 'models', 'rules', 'model', 'verify', 'notices'];
 const state = { lang: 'en', place: null, profile: [], data: null };
 const t = () => T[state.lang];
 const fmt = (v) => (state.lang === 'id' ? String(v).replace('.', ',') : String(v));
@@ -872,6 +879,19 @@ function strip(d) {
       g.appendChild(c);
     });
   }
+  if ((d.models || []).length) {
+    g.appendChild(el('div', 'rh', L.rows.mod));
+    dates.forEach((date) => {
+      const x = d.models.find((k) => k.date === date);
+      if (!x) { g.appendChild(el('div', 'cell na', L.nodata)); return; }
+      const c = el('div', 'cell ctx');
+      const top = el('div');
+      top.appendChild(el('div', 'num mod', L.modLabel[x.label]));
+      top.appendChild(el('div', 'sub2', L.modGap(fmt(x.diff))));
+      c.appendChild(top);
+      g.appendChild(c);
+    });
+  }
   return g;
 }
 
@@ -1016,6 +1036,7 @@ function render(d) {
   const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
   s1.appendChild(strip(d));
   if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote));
+  if ((d.models || []).length) s1.appendChild(el('p', 'note', L.modNote));
   out.appendChild(s1);
 
   const s2 = el('section'); s2.appendChild(el('h2', '', L.briefing));
@@ -1057,6 +1078,7 @@ function render(d) {
   const [hRules, hModel, hNotice] = L.how(d.model, d.attempts);
   block('forecast', L.steps.forecast, [L.readAt(clock(d.generatedAt)).replace(/^./, (x) => x.toUpperCase()), L.sources[0]]);
   block('climate', L.steps.climate, [L.ctxNote]);
+  block('models', L.steps.models, [L.modNote]);
   block('rules', L.steps.rules, [hRules, L.sources[1], L.auHouse]);
   block('model', L.steps.model, [hModel, L.sources[2]]);
   if (!d.quiet) block('verify', L.steps.verify, d.rejected.length ? d.rejected.map((r) => `${r.reason} — “${r.claim && r.claim.advice ? r.claim.advice : ''}”`) : [L.aNone], 'rej');

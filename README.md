@@ -34,6 +34,8 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 
 **Describe your home.** Instead of filling in the form, a visitor can write one sentence ("We live in Depok, my dad is 68 and has asthma, no AC"). The model proposes the place name and household options (`lib/intake.mjs`). Its answer is reduced on the server to the seven allowed options and a plain place name, which is only used to start the normal place search. The visitor still picks the place and presses the button.
 
+**Two forecast models, side by side.** For each day the page shows whether ECMWF's physics model (IFS) and its machine-learning model (AIFS) agree on air temperature, compared only at the 6-hourly steps AIFS natively produces (`lib/models.mjs`). A wide gap is shown as lower confidence. It does not say which model is right, the two are never blended, and the "agree / differ" cut points (1 and 3 °C) are this project's own.
+
 **Also in the tool:** the hour when heat and UV peak (from hourly data, set by rule); "use my location"; place, household and language remembered in the browser only; share to WhatsApp or copy as text; and a long-range card comparing hot days a year in 2011 to 2020 and 2041 to 2050 across three climate models.
 
 ## Sources for the hazard levels
@@ -77,6 +79,7 @@ How to read this honestly:
 - **The wording of each action is not verified.** It is screened for digits and for one kind of over-warning. A poor, vague or over-cautious action can pass, and "96% kept" says nothing about that.
 - **The description sentence goes to the model provider.** "Describe your home" sends what the visitor typed to Mistral. Prakira does not store or log it, and the page says so and asks visitors to leave out names. The form works without it.
 - **Free data limits.** Open-Meteo counts a multi-decade request as many calls against a free daily limit. The 30-year normal and the long-range outlook are fetched once per place and cached on disk; when the limit is reached the page says so and the briefing still works.
+- **The two-model row compares temperature only,** between two 0.25° models, and is separate from the forecast the hazard levels are computed from (Open-Meteo's default blend). In mountains or on coasts, two coarse grids can differ for reasons of terrain, not of weather.
 - **The long-range outlook is model output:** the median of three climate models on a high-emissions pathway, for daily maximum air temperature, in two 10-year windows. It is context, not a prediction for your home.
 - **One action per hazard.** Advice for one hazard can conflict with another (closing windows against bad air in a hot home without air conditioning). A compound-day notice flags the overlap but does not resolve it.
 - **Model forecasts, not sensors.** Air quality comes from CAMS at about 11 km in Europe and 45 km elsewhere.
@@ -95,7 +98,7 @@ npm start                                   # http://localhost:3000
 ```
 
 ```bash
-npm test                       # 36 unit tests, offline
+npm test                       # 40 unit tests, offline
 npm run eval -- 15 en heldout  # live evaluation: [count] [en|id] [tuned|heldout]
 ```
 
@@ -115,6 +118,7 @@ lib/verify.mjs        Screens each AI action and builds the item shown; consiste
 lib/notice.mjs        Standard notices and the compound-day notice
 lib/trace.mjs         Records each real step with its duration, for the live process display
 lib/outlook.mjs       Long-range outlook from three climate models
+lib/models.mjs        Agreement between a physics forecast model and an AI forecast model
 lib/store.mjs         Disk cache for normals and outlooks
 lib/readability.mjs   Reading grade, used by the evaluation
 lib/*.test.mjs        Unit tests

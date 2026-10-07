@@ -40,6 +40,7 @@ You pick a place and say who lives there (older adult, young child, outdoor work
 - **A visible process:** while you wait, the page shows each real step as the server performs it (read the forecast, set levels by rule, AI writes, check every claim), with its duration. Afterwards the steps stay as one line above the result.
 - **An audit trail:** select any action and the numbers it relies on light up. A panel lists every AI claim that was rejected and why.
 - **Describe your home:** write one sentence ("We live in Depok, my dad is 68 and has asthma, no AC") and the AI fills in the form for you. It can only tick the existing options and suggest a place to search for; you confirm before anything is generated.
+- **Two models, one honest answer:** each day shows whether ECMWF's physics model and its AI weather model (AIFS) agree on the temperature. When they differ, the page says the forecast is less certain.
 - **Everyday basics:** the hour when heat and UV peak, "use my location", choices remembered in your browser only, share to WhatsApp, and a long-range card: hot days a year in 2011 to 2020 against 2041 to 2050 from three climate models.
 
 If nothing is serious for your household, it says so and gives no advice. If the AI skips a serious hazard, a fixed notice fills the gap.
@@ -54,7 +55,7 @@ Five layers, and only one of them is a language model:
 4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
-The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 36 unit tests run offline.
+The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 40 unit tests run offline.
 
 ## Results
 
@@ -103,7 +104,7 @@ Checking an AI's output is weaker than not needing to. Our verifier passed a wro
 
 ## Built with
 
-Node.js, vanilla JavaScript, HTML and CSS, Open-Meteo, Copernicus Atmosphere Monitoring Service, Mistral API, Cloudflare Tunnel.
+Node.js, vanilla JavaScript, HTML and CSS, Open-Meteo (including ECMWF IFS and AIFS forecasts), Copernicus Atmosphere Monitoring Service, Mistral API, Cloudflare Tunnel.
 
 ## Disclosure
 

@@ -32,6 +32,8 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 
 **The process is visible.** The server reports each of these steps as it happens (`lib/trace.mjs`, sent as an event stream), with measured durations and real counts. The page shows them live while you wait and keeps them as one line above the result; each segment opens its part of the audit trail.
 
+**Describe your home.** Instead of filling in the form, a visitor can write one sentence ("We live in Depok, my dad is 68 and has asthma, no AC"). The model proposes the place name and household options (`lib/intake.mjs`). Its answer is reduced on the server to the seven allowed options and a plain place name, which is only used to start the normal place search. The visitor still picks the place and presses the button.
+
 **Also in the tool:** the hour when heat and UV peak (from hourly data, set by rule); "use my location"; place, household and language remembered in the browser only; share to WhatsApp or copy as text; and a long-range card comparing hot days a year in 2011 to 2020 and 2041 to 2050 across three climate models.
 
 ## Sources for the hazard levels
@@ -73,6 +75,7 @@ How to read this honestly:
 ## Limits
 
 - **The wording of each action is not verified.** It is screened for digits and for one kind of over-warning. A poor, vague or over-cautious action can pass, and "96% kept" says nothing about that.
+- **The description sentence goes to the model provider.** "Describe your home" sends what the visitor typed to Mistral. Prakira does not store or log it, and the page says so and asks visitors to leave out names. The form works without it.
 - **Free data limits.** Open-Meteo counts a multi-decade request as many calls against a free daily limit. The 30-year normal and the long-range outlook are fetched once per place and cached on disk; when the limit is reached the page says so and the briefing still works.
 - **The long-range outlook is model output:** the median of three climate models on a high-emissions pathway, for daily maximum air temperature, in two 10-year windows. It is context, not a prediction for your home.
 - **One action per hazard.** Advice for one hazard can conflict with another (closing windows against bad air in a hot home without air conditioning). A compound-day notice flags the overlap but does not resolve it.
@@ -92,7 +95,7 @@ npm start                                   # http://localhost:3000
 ```
 
 ```bash
-npm test                       # 33 unit tests, offline
+npm test                       # 36 unit tests, offline
 npm run eval -- 15 en heldout  # live evaluation: [count] [en|id] [tuned|heldout]
 ```
 
@@ -101,12 +104,13 @@ Environment variables: `MISTRAL_API_KEY` (required), `MISTRAL_MODEL` (default `o
 ## Repository map
 
 ```text
-server.mjs            HTTP server: /, /about, /healthz, /api/geocode, /api/brief (JSON or event stream), /api/outlook
+server.mjs            HTTP server: /, /about, /healthz, /api/geocode, /api/brief (JSON or event stream), /api/intake, /api/outlook
 public/index.html     Landing page and tool (vanilla JS; model text is inserted as text, never as HTML)
 public/about.html     Why it exists and the research behind it
 lib/facts.mjs         Data fetch, heat index, hazard levels, household thresholds
 lib/climate.mjs       Difference from the 1991 to 2020 normal
-lib/llm.mjs           Prompt and model call
+lib/llm.mjs           Prompt for the actions, and the one function that calls the model
+lib/intake.mjs        "Describe your home": reads one sentence into form choices
 lib/verify.mjs        Screens each AI action and builds the item shown; consistency check for built items
 lib/notice.mjs        Standard notices and the compound-day notice
 lib/trace.mjs         Records each real step with its duration, for the live process display

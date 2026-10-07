@@ -245,7 +245,10 @@
   .act:empty { display:none; }
   .act.run::before { content:""; display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:var(--ink); animation:pulse 1s ease-in-out infinite; }
   .act.ok { color:var(--ok); } .act.bad { color:var(--bad); }
-  .where { display:flex; gap:8px; } .where #q { flex:1; }
+  .where { display:flex; gap:8px; } .where #q, .where #desc { flex:1; }
+  #desc { padding:13px 15px; border:1.5px solid var(--rule); border-radius:8px; background:var(--soft); font-size:1.02rem; min-width:0; }
+  #desc:focus { border-color:var(--ink); background:#fff; outline:none; }
+  .describe { padding-bottom:16px; border-bottom:1px dashed var(--rule); }
   .where .btn { white-space:nowrap; }
   .privacy { margin:8px 0 0; font-size:.85rem; color:var(--mut); }
   .linkbtn { border:0; background:none; padding:0; font:inherit; color:inherit; text-decoration:underline; cursor:pointer; }
@@ -383,6 +386,12 @@
   <p class="lede center" data-t="toolP"></p>
   <div class="panel">
     <div class="setup">
+      <div class="describe">
+        <label class="label" for="desc" data-t="descLabel"></label>
+        <div class="where"><input id="desc" type="text" maxlength="300" autocomplete="off"><button class="btn ghost" id="fill" type="button" data-t="fill"></button></div>
+        <span class="act" id="descAct" role="status"></span>
+        <p class="privacy" data-t="descNote"></p>
+      </div>
       <div>
         <label class="label" for="q" data-t="where"></label>
         <div class="where"><input id="q" type="text" autocomplete="off" spellcheck="false"><button class="btn ghost" id="locate" type="button" data-t="locate"></button></div>
@@ -485,6 +494,10 @@ const T = {
     myPlace: 'Your location', locate: 'Use my location', locAsk: 'Asking your browser for your location…', locOk: 'Location found, rounded to about 1 km.',
     locDenied: 'Location permission was denied. Type a city instead.', locNone: 'Your location could not be determined.', locTimeout: 'Finding your location took too long.', locUnsupported: 'This browser cannot share a location.',
     locNote: 'Your place is sent to this server and to Open-Meteo to fetch the forecast, and is not stored on the server.', remembered: 'Your place, household and language are remembered in this browser only.', forget: 'Forget my choices', forgotten: 'Choices cleared from this browser.',
+    descLabel: 'Describe your home in one sentence (optional)', fill: 'Fill in for me', descPh: 'We live in Depok, my dad is 68 and has asthma, no AC',
+    descRun: 'The AI is reading your description…', descShort: 'Write a few words first.', descFail: (m) => `Could not read the description (${m}). Use the form below.`,
+    descTicked: (names) => `Ticked: ${names}.`, descNoProfile: 'No household details found in the sentence.', descPlace: (p) => `Searching for ${p}: pick your place below.`, descNoPlace: 'No place found in the sentence: type a city below.',
+    descNote: 'The sentence is sent to the AI provider (Mistral) to be read. Prakira does not store it; leave out names. The AI can only tick the options below and suggest a place to search for. Nothing is generated until you press the button.',
     searchRun: 'Searching…', found: (n) => `${n} place${n === 1 ? '' : 's'} found`,
     process: 'Process', skipped: 'not needed', secs: (x) => `${x} s`, tryN: (n) => `try ${n}`, noResult: 'The server sent no result.',
     steps: { forecast: 'Read the forecast', climate: 'Compare with the 30-year normal', rules: 'Set levels by rule', model: 'AI writes the actions', verify: 'Screen every action', notices: 'Fill any gap', cache: 'Saved briefing' },
@@ -572,6 +585,10 @@ const T = {
     myPlace: 'Lokasi Anda', locate: 'Pakai lokasi saya', locAsk: 'Meminta lokasi Anda ke browser…', locOk: 'Lokasi ditemukan, dibulatkan ke sekitar 1 km.',
     locDenied: 'Izin lokasi ditolak. Ketik nama kota saja.', locNone: 'Lokasi Anda tidak dapat ditentukan.', locTimeout: 'Pencarian lokasi terlalu lama.', locUnsupported: 'Browser ini tidak dapat membagikan lokasi.',
     locNote: 'Tempat Anda dikirim ke server ini dan ke Open-Meteo untuk mengambil prakiraan, dan tidak disimpan di server.', remembered: 'Tempat, isi rumah, dan bahasa Anda hanya diingat di browser ini.', forget: 'Lupakan pilihan saya', forgotten: 'Pilihan dihapus dari browser ini.',
+    descLabel: 'Ceritakan rumah Anda dalam satu kalimat (opsional)', fill: 'Isikan untuk saya', descPh: 'Kami tinggal di Depok, ayah saya 68 tahun dan asma, tanpa AC',
+    descRun: 'AI sedang membaca cerita Anda…', descShort: 'Tulis beberapa kata dulu.', descFail: (m) => `Cerita tidak dapat dibaca (${m}). Pakai formulir di bawah.`,
+    descTicked: (names) => `Dicentang: ${names}.`, descNoProfile: 'Tidak ada keterangan isi rumah di kalimat itu.', descPlace: (p) => `Mencari ${p}: pilih tempat Anda di bawah.`, descNoPlace: 'Tidak ada nama tempat di kalimat itu: ketik kota di bawah.',
+    descNote: 'Kalimat ini dikirim ke penyedia AI (Mistral) untuk dibaca. Prakira tidak menyimpannya; jangan sertakan nama. AI hanya dapat mencentang pilihan di bawah dan mengusulkan tempat untuk dicari. Tidak ada yang dibuat sebelum Anda menekan tombol.',
     searchRun: 'Mencari…', found: (n) => `${n} tempat ditemukan`,
     process: 'Proses', skipped: 'tidak diperlukan', secs: (x) => `${x} dtk`, tryN: (n) => `percobaan ${n}`, noResult: 'Server tidak mengirim hasil.',
     steps: { forecast: 'Membaca prakiraan', climate: 'Membandingkan dengan normal 30 tahun', rules: 'Menetapkan tingkat dengan aturan', model: 'AI menulis tindakan', verify: 'Menyaring setiap tindakan', notices: 'Mengisi celah', cache: 'Ringkasan tersimpan' },
@@ -687,6 +704,7 @@ function renderStatic() {
   for (const n of document.querySelectorAll('[data-t]')) n.textContent = t()[n.dataset.t];
   for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === state.lang));
   $('q').placeholder = t().placeholder;
+  $('desc').placeholder = t().descPh;
   const checked = new Set(document.querySelector('#profile input') ? chosen() : state.profile);
   $('profile').textContent = '';
   for (const [k, v] of Object.entries(t().profiles)) {
@@ -715,9 +733,7 @@ function showExamples() {
 }
 
 let timer;
-$('q').addEventListener('input', () => {
-  clearTimeout(timer);
-  timer = setTimeout(async () => {
+async function search() {
     const q = $('q').value.trim();
     const s = $('sugg');
     if (q.length < 2) { act('searchAct', '', ''); showExamples(); return; }
@@ -729,8 +745,37 @@ $('q').addEventListener('input', () => {
       act('searchAct', 'ok', t().found(r.length));
       for (const p of r) { const b = el('button', 'pill', placeName(p)); b.type = 'button'; b.onclick = () => { $('q').value = p.name; act('searchAct', '', ''); pick(p); }; s.appendChild(b); }
     } catch { s.textContent = ''; act('searchAct', 'bad', t().searching); }
-  }, 300);
-});
+}
+$('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 300); });
+
+// "Describe your home": the AI reads one sentence and proposes form choices. Its answer was already
+// reduced on the server to allowed options and a plain place name; here it only ticks chips and starts a
+// normal place search. The user still picks the place and presses the button.
+$('fill').onclick = async () => {
+  const L = t();
+  const text = $('desc').value.trim();
+  if (text.length < 3) { act('descAct', 'bad', L.descShort); return; }
+  $('fill').disabled = true; act('descAct', 'run', L.descRun);
+  try {
+    const r = await fetch('/api/intake', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`);
+    if (!d.ok) throw new Error(d.reason);
+    const ticked = [];
+    for (const i of document.querySelectorAll('#profile input')) {
+      if (d.profile.includes(i.value)) { i.checked = true; ticked.push(L.profiles[i.value]); }
+    }
+    remember();
+    const parts = [ticked.length ? L.descTicked(ticked.join(', ')) : L.descNoProfile];
+    if (d.place) { state.place = null; $('picked').textContent = ''; $('go').disabled = true; $('q').value = d.place; parts.push(L.descPlace(d.place)); search(); }
+    else parts.push(L.descNoPlace);
+    act('descAct', ticked.length || d.place ? 'ok' : '', parts.join(' '));
+  } catch (e) {
+    act('descAct', 'bad', L.descFail(e.message));
+  }
+  $('fill').disabled = false;
+};
+$('desc').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('fill').click(); });
 
 $('locate').onclick = () => {
   if (!navigator.geolocation) { act('searchAct', 'bad', t().locUnsupported); return; }

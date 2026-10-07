@@ -90,7 +90,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 33 of 33 pass (after the design change; tests for the removed rules were deleted) | Verified 2026-10-07 |
+| Tests | `npm test`: 36 of 36 pass (design change plus intake) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
@@ -116,6 +116,7 @@ climate-brief/
   lib/verify.mjs        Claim verifier and the PROFILES allow-list
   lib/notice.mjs        Standard notices for serious hazards the model skipped; compound-day notice
   lib/trace.mjs         Real steps with durations, for the live process display
+  lib/intake.mjs        "Describe your home": one sentence read into allowed form choices
   lib/outlook.mjs       Long-range outlook from three climate models
   lib/store.mjs         Disk cache (folder data/, gitignored) for normals and outlooks
   eval/places.mjs       Tuned and held-out location lists
@@ -500,6 +501,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
   - 41 tests pass. Headless checks: geolocation granted and denied, reload restores choices with zero briefing requests, forget clears storage, process segments open the audit, no console errors.
   - **Next action:** after the quota reset, check the outlook card and the climate row on the live site with real data; then the owner records the video and submits.
 - **2026-10-08 (session 5, continued).** The owner approved the design change proposed after the wrong-day bug: **the model writes only `{hazard, advice}`; `fact_ids`, `level` and the evidence sentence are built from the data** (`verifyAll` in `lib/verify.mjs`, `evidenceFor` in `lib/notice.mjs`, prompt in `lib/llm.mjs`). The day-word heuristic added earlier the same day was deleted. Anything else the model writes is ignored (unit-tested). 33 tests pass. Sections 5 and 7a of this plan describe the older verifier rules and are superseded by this entry and by the README. Page, About, README, Devpost draft, review notes and the architecture diagram now tell the new story ("numbers from data, not from AI"); the third evidence card reads "Numbers written by the AI: 0". Runs 15 to 18 recorded in section 8. The owner also showed three research ideas built on ECMWF's AIFS model (energy digital twin, generative downscaling, physics guardrail); assessed as not buildable by the deadline and their cited claims unverified; one small piece was kept as a planned step (two forecast models side by side). Current plan: `C:\Users\Rofi\.claude\plans\eh-jangan-deh-yg-jolly-truffle.md`. **Next actions, in order: "Describe your home" (AI fills the form from one sentence; step 4b of that plan); after the Open-Meteo quota reset, check the climate row and the never-yet-seen outlook card on the live site (step 4); then two models side by side (step 5) if time allows.**
+- **2026-10-08 (session 5, continued).** The design change is committed, pushed and deployed (`c14eed3`); live check in both languages returned 3 of 3 actions with evidence matching the data, and the event stream still arrives step by step. Added a 10-minute pause after a failed archive request (`lib/climate.mjs`), because with the provider's quota exhausted each briefing waited for a timeout. **"Describe your home" built** (`lib/intake.mjs`, `POST /api/intake`, field and button in the page, both languages): six live descriptions in English and Indonesian were read correctly, an injection attempt produced an empty result, and the headless check confirmed chips tick, a place search starts, no briefing is requested by itself, no overflow, no console errors. `chat()` in `lib/llm.mjs` is now the single function that calls the model. 36 tests pass. **Still to do: step 4 (climate row and outlook card with real data after the quota reset) and step 5 (two models) of the plan file.**
 
 **Open questions for the owner**
 

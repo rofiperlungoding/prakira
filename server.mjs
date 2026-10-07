@@ -4,6 +4,7 @@ import { geocode } from './lib/facts.mjs';
 import { makeBrief, cleanProfile } from './lib/brief.mjs';
 import { rateLimiter, ttlCache } from './lib/limits.mjs';
 import { getOutlook } from './lib/outlook.mjs';
+import { readIntake, MAX_TEXT } from './lib/intake.mjs';
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
@@ -21,6 +22,7 @@ const SECURITY = {
 
 const briefLimit = rateLimiter(10, 10 * 60_000); // each briefing can cost a model call
 const geoLimit = rateLimiter(120, 10 * 60_000);
+const intakeLimit = rateLimiter(15, 10 * 60_000); // each one is a model call
 const briefCache = ttlCache(10 * 60_000, 200);
 
 const send = (res, code, body, type = 'application/json', extra = {}) => {
@@ -90,6 +92,22 @@ http.createServer(async (req, res) => {
         event('failed', { error: e.message }); // headers are already sent, so the error travels in the stream
       }
       return res.end();
+    }
+    if (u.pathname === '/api/intake' && req.method === 'POST') {
+      let b;
+      try { b = JSON.parse(await readBody(req)); } catch { return send(res, 400, { error: 'invalid request body' }); }
+      const text = typeof b?.text === 'string' ? b.text.trim() : '';
+      if (text.length < 3 || text.length > MAX_TEXT) return send(res, 400, { error: `the description must be 3 to ${MAX_TEXT} characters` });
+      const wait = intakeLimit(client(req));
+      if (wait) return limited(res, wait);
+      // The description is passed to the model and not logged or stored. A model failure is an expected
+      // state for the page to show (the form still works), not a server error.
+      try {
+        return send(res, 200, { ok: true, ...(await readIntake(text)) });
+      } catch (e) {
+        console.error(new Date().toISOString(), u.pathname, e.message);
+        return send(res, 200, { ok: false, reason: e.message });
+      }
     }
     if (u.pathname === '/api/outlook') {
       const wait = geoLimit(client(req));

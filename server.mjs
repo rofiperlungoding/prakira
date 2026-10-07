@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { geocode } from './lib/facts.mjs';
 import { makeBrief, cleanProfile } from './lib/brief.mjs';
 import { rateLimiter, ttlCache } from './lib/limits.mjs';
+import { getOutlook } from './lib/outlook.mjs';
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
@@ -63,12 +64,40 @@ http.createServer(async (req, res) => {
       const lang = b.lang === 'id' ? 'id' : 'en';
       const key = `${lat.toFixed(2)},${lon.toFixed(2)}|${profile.join(',')}|${lang}`;
       const hit = briefCache.get(key);
-      if (hit) return send(res, 200, hit);
-      const wait = briefLimit(client(req));
+      const wait = hit ? 0 : briefLimit(client(req));
       if (wait) return limited(res, wait);
-      const out = await makeBrief({ lat, lon, profile, lang });
-      if (!out.error) briefCache.set(key, out); // do not keep a failed model call for 10 minutes
-      return send(res, 200, out);
+      // A client that asks for an event stream sees each step as the server performs it, then the result.
+      const live = (req.headers.accept ?? '').includes('text/event-stream');
+      if (!live) {
+        if (hit) return send(res, 200, hit);
+        const out = await makeBrief({ lat, lon, profile, lang });
+        if (!out.error) briefCache.set(key, out); // do not keep a failed model call for 10 minutes
+        return send(res, 200, out);
+      }
+      res.writeHead(200, { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache, no-transform', 'x-accel-buffering': 'no', ...SECURITY });
+      const event = (name, data) => res.write(`event: ${name}\ndata: ${JSON.stringify(data)}\n\n`);
+      try {
+        if (hit) {
+          event('step', { id: 'cache', state: 'done', readAt: hit.generatedAt });
+          event('result', hit);
+        } else {
+          const out = await makeBrief({ lat, lon, profile, lang, onStep: (e) => event('step', e) });
+          if (!out.error) briefCache.set(key, out);
+          event('result', out);
+        }
+      } catch (e) {
+        console.error(new Date().toISOString(), u.pathname, e.message);
+        event('failed', { error: e.message }); // headers are already sent, so the error travels in the stream
+      }
+      return res.end();
+    }
+    if (u.pathname === '/api/outlook') {
+      const wait = geoLimit(client(req));
+      if (wait) return limited(res, wait);
+      const lat = u.searchParams.has('lat') ? Number(u.searchParams.get('lat')) : NaN;
+      const lon = u.searchParams.has('lon') ? Number(u.searchParams.get('lon')) : NaN;
+      if (!(lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180)) return send(res, 400, { error: 'invalid coordinates' });
+      return send(res, 200, await getOutlook(lat, lon));
     }
     send(res, 404, { error: 'not found' });
   } catch (e) {

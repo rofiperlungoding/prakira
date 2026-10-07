@@ -4,179 +4,451 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Prakira</title>
+<meta name="description" content="What the next 72 hours mean for your household. Every number checked against the forecast.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#f7f7f4; --fg:#1b1f1d; --mut:#5d6661; --card:#fff; --bd:#dcdfd9; --ok:#1a7f4b; --bad:#b3261e; --acc:#0b6b5c;
-          --s0:#d7efe0; --s1:#fff3c4; --s2:#ffd9a8; --s3:#ffb4a8; --s4:#e58a8a; --s5:#c96; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --bg:#121513; --fg:#e8ece9; --mut:#9aa59f; --card:#1b201d; --bd:#2f3732; --ok:#5fd18f; --bad:#ff8a80; --acc:#4fd1b8;
-          --s0:#1f4630; --s1:#4d4416; --s2:#5a3c17; --s3:#5e2a22; --s4:#6a2b2b; --s5:#6a3b1b; }
+  :root {
+    --paper:#f6f4ee; --card:#fffdf8; --ink:#17201c; --mut:#5b655f; --rule:#d9d5c8; --focus:#0b5fff;
+    --ok:#0f6b4f; --ok-bg:#dff1e8; --bad:#a3322d;
+    /* One sequential severity scale, ordered by lightness so it still reads in greyscale. */
+    --t0:#e6ece2; --t1:#f4e7b4; --t2:#f1c285; --t3:#e59068; --t4:#b8443f; --t4-ink:#fff;
+    --serif:"Fraunces", Georgia, "Times New Roman", serif;
+    --mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+    --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
-  * { box-sizing: border-box; }
-  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, sans-serif; }
-  main { max-width:860px; margin:0 auto; padding:24px 16px 64px; }
-  h1 { font-size:1.6rem; margin:0 0 4px; }
-  .sub { color:var(--mut); margin:0 0 20px; }
-  .card { background:var(--card); border:1px solid var(--bd); border-radius:12px; padding:16px; margin-bottom:16px; }
-  label { display:block; font-weight:600; margin-bottom:6px; }
-  input[type=text], select { width:100%; padding:10px; border:1px solid var(--bd); border-radius:8px; background:var(--bg); color:var(--fg); font:inherit; }
-  .row { display:flex; gap:12px; flex-wrap:wrap; }
-  .row > * { flex:1 1 200px; }
-  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; }
-  .chips label { font-weight:400; display:flex; gap:6px; align-items:center; margin:0; padding:6px 10px; border:1px solid var(--bd); border-radius:999px; cursor:pointer; }
-  button { padding:12px 20px; border:0; border-radius:8px; background:var(--acc); color:#fff; font:inherit; font-weight:600; cursor:pointer; }
-  button:disabled { opacity:.5; cursor:wait; }
-  .sugg button { background:transparent; color:var(--fg); border:1px solid var(--bd); margin:6px 6px 0 0; font-weight:400; padding:6px 10px; }
-  .days { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
-  .day h3 { margin:0 0 8px; font-size:1rem; }
-  .hz { display:flex; justify-content:space-between; gap:8px; padding:6px 10px; border-radius:8px; margin-bottom:6px; font-size:.92rem; }
-  .s0 { background:var(--s0); } .s1 { background:var(--s1); } .s2 { background:var(--s2); } .s3 { background:var(--s3); } .s4 { background:var(--s4); } .s5 { background:var(--s5); }
-  .claim { border-left:4px solid var(--ok); padding:4px 0 4px 12px; margin:14px 0; }
-  .claim.notice { border-left-color: var(--mut); }
-  .day .ev { color: var(--mut); font-size: .85rem; margin-top: 8px; }
-  .claim .ev { color:var(--mut); font-size:.92rem; }
-  .tag { display:inline-block; font-size:.75rem; padding:1px 8px; border-radius:999px; border:1px solid var(--bd); margin-right:6px; color:var(--mut); }
-  .ok { color:var(--ok); font-weight:600; }
-  .bad { color:var(--bad); }
-  details { margin-top:8px; color:var(--mut); font-size:.9rem; }
-  #err { color:var(--bad); }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#101614; --card:#171f1c; --ink:#e9eee9; --mut:#9aa7a0; --rule:#2c3833; --focus:#8ab4ff;
+      --ok:#6fd6ae; --ok-bg:#16382d; --bad:#ff9f95;
+      --t0:#1f2b26; --t1:#4a431c; --t2:#6b4517; --t3:#873f22; --t4:#a8322f; --t4-ink:#fff;
+    }
+  }
+  * { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 var(--sans); }
+  main { max-width:1040px; margin:0 auto; padding:20px 16px 72px; }
+  :focus-visible { outline:2px solid var(--focus); outline-offset:2px; }
+  button, input { font:inherit; color:inherit; }
+
+  header { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; border-bottom:2px solid var(--ink); padding-bottom:12px; }
+  .mark { font:650 2.2rem/1 var(--serif); letter-spacing:-.02em; margin:0; }
+  .tag { margin:6px 0 0; color:var(--mut); max-width:46ch; }
+  .seg { display:inline-flex; border:1px solid var(--ink); border-radius:999px; overflow:hidden; flex:none; }
+  .seg button { border:0; background:transparent; padding:6px 12px; font:500 .85rem var(--mono); cursor:pointer; }
+  .seg button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
+
+  .setup { display:grid; gap:14px; padding:18px 0; border-bottom:1px solid var(--rule); }
+  .label { font:600 .75rem var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--mut); display:block; margin-bottom:6px; }
+  #q { width:100%; padding:12px 14px; border:1px solid var(--ink); border-radius:6px; background:var(--card); font-size:1.05rem; }
+  #sugg { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin-top:8px; }
+  .pill { border:1px solid var(--rule); background:var(--card); border-radius:999px; padding:6px 12px; cursor:pointer; font-size:.92rem; }
+  .pill:hover { border-color:var(--ink); }
+  #picked { margin:8px 0 0; font:500 .9rem var(--mono); }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chips label { display:inline-flex; align-items:center; gap:6px; padding:7px 12px; border:1px solid var(--rule); border-radius:999px; background:var(--card); cursor:pointer; font-size:.92rem; }
+  .chips label:has(input:checked) { border-color:var(--ink); background:var(--ink); color:var(--paper); }
+  .chips input { position:absolute; opacity:0; width:1px; height:1px; }
+  .chips label:has(input:focus-visible) { outline:2px solid var(--focus); outline-offset:2px; }
+  .go { justify-self:start; border:0; border-radius:6px; background:var(--ink); color:var(--paper); padding:12px 22px; font-weight:600; cursor:pointer; }
+  .go:disabled { opacity:.45; cursor:not-allowed; }
+  .msg { margin:0; color:var(--mut); }
+  .err { color:var(--bad); font-weight:500; }
+
+  section { padding:22px 0; border-bottom:1px solid var(--rule); }
+  h2 { font:600 .75rem var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--mut); margin:0 0 12px; }
+
+  /* 72-hour strip: hazard rows by day columns */
+  .strip { display:grid; grid-template-columns:minmax(52px, 96px) repeat(3, minmax(0, 1fr)); gap:6px; }
+  .strip .dh { font:600 .85rem var(--sans); padding:0 2px 4px; }
+  .strip .dh small { display:block; font:400 .72rem var(--mono); color:var(--mut); text-transform:uppercase; letter-spacing:.06em; }
+  .strip .rh { font:600 .72rem var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--mut); align-self:center; }
+  .cell { position:relative; border:1px solid transparent; border-radius:6px; padding:8px 8px 7px; text-align:left; cursor:pointer; min-height:74px; display:flex; flex-direction:column; justify-content:space-between; background:var(--t0); color:var(--ink); transition:opacity .15s, box-shadow .15s; }
+  .cell.t1 { background:var(--t1); } .cell.t2 { background:var(--t2); } .cell.t3 { background:var(--t3); } .cell.t4 { background:var(--t4); color:var(--t4-ink); }
+  .cell.na { background:transparent; border:1px dashed var(--rule); cursor:default; color:var(--mut); font-size:.8rem; }
+  .cell.ctx { background:transparent; border:1px solid var(--rule); cursor:default; }
+  .num { font:600 1.35rem/1.1 var(--mono); letter-spacing:-.02em; }
+  .num small { font:400 .7rem var(--mono); margin-left:2px; opacity:.85; }
+  .lvl { font-size:.74rem; line-height:1.2; font-weight:500; margin-top:4px; }
+  .sub2 { font:400 .7rem var(--mono); opacity:.85; }
+  .cell .cmp { position:absolute; top:5px; right:6px; font:600 .62rem var(--mono); border:1px solid currentColor; border-radius:3px; padding:0 3px; }
+  .bar { position:relative; height:6px; background:var(--rule); border-radius:3px; margin-top:6px; }
+  .bar i { position:absolute; top:-3px; left:50%; width:1px; height:12px; background:var(--mut); }
+  .bar b { position:absolute; top:-2px; width:10px; height:10px; margin-left:-5px; border-radius:50%; background:var(--ink); }
+  .dim .cell:not(.lit):not(.ctx):not(.na), .dim .item:not(.lit) { opacity:.3; }
+  .cell.lit { box-shadow:0 0 0 2px var(--ink); }
+  .note { margin:10px 0 0; font-size:.82rem; color:var(--mut); }
+
+  /* Briefing */
+  .items { display:grid; gap:10px; }
+  .item { background:var(--card); border:1px solid var(--rule); border-left:4px solid var(--ok); border-radius:6px; padding:14px 16px; cursor:pointer; transition:opacity .15s; }
+  .item.notice, .item.compound { border-left-color:var(--mut); }
+  .item.lit { border-color:var(--ink); border-left-color:var(--ok); }
+  .item.notice.lit, .item.compound.lit { border-left-color:var(--mut); }
+  .item h3 { font:500 1.22rem/1.3 var(--serif); margin:0 0 6px; }
+  .item.notice h3, .item.compound h3 { font:500 1rem/1.4 var(--sans); }
+  .item p { margin:0; color:var(--mut); font-size:.93rem; }
+  .item p b { font:500 .9em var(--mono); color:var(--ink); background:var(--paper); border:1px solid var(--rule); border-radius:4px; padding:0 4px; white-space:nowrap; }
+  .badge { display:inline-block; margin-top:10px; font:600 .68rem var(--mono); letter-spacing:.06em; text-transform:uppercase; padding:2px 8px; border-radius:999px; border:1px solid var(--rule); color:var(--mut); }
+  .badge.ok { background:var(--ok-bg); border-color:transparent; color:var(--ok); }
+  .quiet { background:var(--card); border:1px solid var(--rule); border-radius:6px; padding:18px; font:500 1.15rem/1.4 var(--serif); }
+
+  /* Audit */
+  details { background:var(--card); border:1px solid var(--rule); border-radius:6px; }
+  summary { padding:12px 16px; cursor:pointer; font-weight:500; }
+  summary strong { color:var(--ok); }
+  .audit { padding:0 16px 16px; display:grid; gap:12px; font-size:.9rem; }
+  .audit h4 { margin:0 0 4px; font:600 .72rem var(--mono); letter-spacing:.06em; text-transform:uppercase; color:var(--mut); }
+  .audit ul { margin:0; padding-left:18px; }
+  .audit li { margin:2px 0; }
+  .rej { font:400 .85rem var(--mono); }
+  a { color:inherit; }
+  footer { padding-top:18px; color:var(--mut); font-size:.82rem; }
+
+  .skel { border-radius:6px; background:linear-gradient(90deg, var(--rule), var(--card), var(--rule)); background-size:200% 100%; animation:sh 1.2s linear infinite; min-height:74px; }
+  @keyframes sh { to { background-position:-200% 0; } }
+  @media (prefers-reduced-motion: reduce) { .skel { animation:none; } .cell, .item { transition:none; } }
+  @media (max-width:520px) {
+    .mark { font-size:1.8rem; } header { align-items:flex-start; }
+    .strip { grid-template-columns:44px repeat(3, minmax(0, 1fr)); gap:4px; }
+    .strip .rh { font-size:.62rem; letter-spacing:.02em; }
+    .cell { padding:6px 6px 5px; min-height:70px; } .num { font-size:1.08rem; } .lvl { font-size:.66rem; } .sub2 { font-size:.62rem; }
+    .item h3 { font-size:1.1rem; }
+  }
 </style>
 </head>
 <body>
 <main>
-  <h1>Prakira</h1>
-  <p class="sub">A 3-day heat, rain, air-quality and UV briefing for your household. Every claim is checked against the forecast numbers before you see it.</p>
-
-  <div class="card">
-    <label for="q">Where are you?</label>
-    <input id="q" type="text" placeholder="City, e.g. Jakarta" autocomplete="off">
-    <div id="sugg" class="sugg"></div>
-    <p id="picked" class="sub" style="margin:8px 0 0"></p>
-    <div class="row" style="margin-top:12px">
-      <div>
-        <label for="lang">Language</label>
-        <select id="lang"><option value="en">English</option><option value="id">Bahasa Indonesia</option></select>
-      </div>
+  <header>
+    <div>
+      <h1 class="mark">Prakira</h1>
+      <p class="tag" data-t="tagline"></p>
     </div>
-    <label style="margin-top:12px">Who needs to be protected?</label>
-    <div class="chips" id="profile"></div>
-    <p style="margin:16px 0 0"><button id="go" disabled>Generate briefing</button> <span id="status" class="sub"></span></p>
-    <p id="err"></p>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="id" aria-pressed="false">ID</button>
+    </div>
+  </header>
+
+  <div class="setup">
+    <div>
+      <label class="label" for="q" data-t="where"></label>
+      <input id="q" type="text" autocomplete="off" spellcheck="false">
+      <div id="sugg"></div>
+      <p id="picked" aria-live="polite"></p>
+    </div>
+    <div>
+      <span class="label" id="who" data-t="who"></span>
+      <div class="chips" id="profile" role="group" aria-labelledby="who"></div>
+    </div>
+    <button class="go" id="go" type="button" disabled data-t="go"></button>
+    <p class="msg" id="status" role="status" aria-live="polite"></p>
   </div>
 
   <div id="out"></div>
+
+  <footer>
+    <p data-t="foot1"></p>
+    <p><span data-t="foot2"></span> <a href="https://open-meteo.com/" rel="noopener">Open-Meteo.com</a> (CC BY 4.0), CAMS. <a href="https://github.com/rofiperlungoding/prakira" rel="noopener" data-t="method"></a></p>
+  </footer>
 </main>
+
 <script>
-const PROFILES = {
-  older_adult: 'Older adult', young_child: 'Young child', outdoor_worker: 'Outdoor worker', respiratory_condition: 'Asthma / lung condition',
-  pregnant: 'Pregnant', flood_prone_home: 'Flood-prone home', no_air_conditioning: 'No air conditioning'
+const T = {
+  en: {
+    tagline: 'What the next 72 hours mean for your household. Every number checked against the forecast.',
+    where: 'Where', who: 'Who lives there', go: 'Generate briefing', placeholder: 'City, for example Jakarta', examples: 'Try:',
+    selected: 'Selected:', searching: 'Search failed. Try again.', none: 'No place found.',
+    loading: 'Reading the forecast and writing your briefing…', retry: 'Try again',
+    strip: 'Next 72 hours', briefing: 'Your briefing', audit: 'Audit trail',
+    rows: { heat: 'Heat', rain: 'Rain', air: 'Air', uv: 'UV', ctx: 'Climate' },
+    units: { heat: 'heat index', air: 'US AQI', uv: 'UV index' },
+    day: { today: 'Today', tomorrow: 'Tomorrow', 'the day after tomorrow': 'In 2 days' },
+    weekday: (w) => w,
+    level: (l) => l,
+    chance: (p) => `${p}% chance`,
+    nodata: 'no data', compound: 'heat + polluted air on the same day', cmp: 'H+A',
+    ctx: (a) => (a === 0 ? 'as normal' : `${a > 0 ? '+' : '−'}${Math.abs(a)} °C`), norm: (n) => `normal ${n} °C`,
+    ctxNote: 'Climate row: forecast daily maximum compared with the 1991–2020 average for the same week at this place (ERA5-based archive). Forecast and archive come from different models, so part of the difference is model bias.',
+    tapNote: 'Select a briefing item to see the numbers it relies on, or select a number to see what relies on it.',
+    verified: 'verified against data', notice: 'standard notice', compoundBadge: 'compound day',
+    quiet: 'No serious hazards for this household in the next three days. No special action is needed.',
+    quietAudit: 'No advice was generated: nothing reached the level that matters for this household.',
+    passed: (a, b) => `${a} of ${b} model claims passed verification`,
+    failed: 'No verified advice could be produced. The hazard levels above are still correct.',
+    aRejected: 'Rejected model claims', aNone: 'None.', aHow: 'How this was made', aSources: 'Sources and limits', aOfficial: 'Official warnings',
+    how: (m, n) => ['Hazard levels are set by fixed published rules, never by the language model.', `The model (${m}, ${n} attempt${n === 1 ? '' : 's'}) only writes the actions. Each claim is kept only if its numbers and level match the data.`, 'Standard notices are fixed text for serious hazards the model did not cover.'],
+    sources: ['Weather and air quality: Open-Meteo forecast models and CAMS. These are model forecasts for a grid cell (about 11 km in Europe, 45 km elsewhere), not sensor readings at your address.', 'Heat: US National Weather Service heat index. Air: US EPA AQI categories. UV: WHO action tiers. Rain classes are approximate and are not a flood forecast.', 'The wording of each action is written by a language model and is not verified. Only its numbers and level are.'],
+    official: 'This is a companion, not an official warning. Always follow your national meteorological service:',
+    foot1: 'Not medical advice and not an official warning. A companion to your national meteorological service.', foot2: 'Data:', method: 'Method and source code',
+    profiles: { older_adult: 'Older adult', young_child: 'Young child', outdoor_worker: 'Outdoor worker', respiratory_condition: 'Asthma or lung condition', pregnant: 'Pregnant', flood_prone_home: 'Flood-prone home', no_air_conditioning: 'No air conditioning' },
+  },
+  id: {
+    tagline: 'Arti 72 jam ke depan bagi rumah tangga Anda. Setiap angka dicek terhadap prakiraan.',
+    where: 'Lokasi', who: 'Siapa yang tinggal di sana', go: 'Buat ringkasan', placeholder: 'Kota, misalnya Jakarta', examples: 'Coba:',
+    selected: 'Dipilih:', searching: 'Pencarian gagal. Coba lagi.', none: 'Tempat tidak ditemukan.',
+    loading: 'Membaca prakiraan dan menulis ringkasan…', retry: 'Coba lagi',
+    strip: '72 jam ke depan', briefing: 'Ringkasan Anda', audit: 'Jejak audit',
+    rows: { heat: 'Panas', rain: 'Hujan', air: 'Udara', uv: 'UV', ctx: 'Iklim' },
+    units: { heat: 'indeks panas', air: 'US AQI', uv: 'indeks UV' },
+    day: { today: 'Hari ini', tomorrow: 'Besok', 'the day after tomorrow': 'Lusa' },
+    weekday: (w) => ({ Sunday: 'Minggu', Monday: 'Senin', Tuesday: 'Selasa', Wednesday: 'Rabu', Thursday: 'Kamis', Friday: 'Jumat', Saturday: 'Sabtu' }[w] || w),
+    level: (l) => ({ low: 'rendah', caution: 'waspada', 'extreme caution': 'sangat waspada', danger: 'bahaya', 'extreme danger': 'sangat berbahaya',
+      'little or no rain': 'nyaris tanpa hujan', light: 'ringan', moderate: 'sedang', heavy: 'lebat', 'very heavy': 'sangat lebat', extreme: 'ekstrem',
+      good: 'baik', 'unhealthy for sensitive groups': 'tidak sehat bagi kelompok sensitif', unhealthy: 'tidak sehat', 'very unhealthy': 'sangat tidak sehat', hazardous: 'berbahaya',
+      'protection needed': 'perlu perlindungan', 'extra protection needed': 'perlu perlindungan ekstra' }[l] || l),
+    chance: (p) => `peluang ${p}%`,
+    nodata: 'tanpa data', compound: 'panas + udara tercemar di hari yang sama', cmp: 'P+U',
+    ctx: (a) => (a === 0 ? 'seperti normal' : `${a > 0 ? '+' : '−'}${Math.abs(a)} °C`), norm: (n) => `normal ${n} °C`,
+    ctxNote: 'Baris iklim: suhu maksimum harian prakiraan dibanding rata-rata 1991–2020 untuk minggu yang sama di tempat ini (arsip berbasis ERA5). Prakiraan dan arsip berasal dari model berbeda, jadi sebagian selisih adalah bias model.',
+    tapNote: 'Pilih satu butir ringkasan untuk melihat angka yang mendasarinya, atau pilih satu angka untuk melihat butir yang memakainya.',
+    verified: 'dicek terhadap data', notice: 'pemberitahuan standar', compoundBadge: 'hari gabungan',
+    quiet: 'Tidak ada bahaya serius bagi rumah tangga ini dalam tiga hari ke depan. Tidak perlu tindakan khusus.',
+    quietAudit: 'Tidak ada saran yang dibuat: tidak ada yang mencapai tingkat yang penting bagi rumah tangga ini.',
+    passed: (a, b) => `${a} dari ${b} klaim model lolos verifikasi`,
+    failed: 'Saran terverifikasi tidak dapat dibuat. Tingkat bahaya di atas tetap benar.',
+    aRejected: 'Klaim model yang ditolak', aNone: 'Tidak ada.', aHow: 'Cara pembuatan', aSources: 'Sumber dan batasan', aOfficial: 'Peringatan resmi',
+    how: (m, n) => ['Tingkat bahaya ditetapkan oleh aturan terbitan yang tetap, bukan oleh model bahasa.', `Model (${m}, ${n} percobaan) hanya menulis tindakan. Sebuah klaim dipertahankan hanya jika angka dan tingkatnya cocok dengan data.`, 'Pemberitahuan standar adalah teks tetap untuk bahaya serius yang tidak dibahas model.'],
+    sources: ['Cuaca dan kualitas udara: model prakiraan Open-Meteo dan CAMS. Ini prakiraan model untuk satu sel grid (sekitar 11 km di Eropa, 45 km di tempat lain), bukan bacaan sensor di alamat Anda.', 'Panas: indeks panas US National Weather Service. Udara: kategori AQI US EPA. UV: tingkat tindakan WHO. Kelas hujan bersifat perkiraan dan bukan prakiraan banjir.', 'Kalimat tiap tindakan ditulis oleh model bahasa dan tidak diverifikasi. Yang diverifikasi hanya angka dan tingkatnya.'],
+    official: 'Ini pendamping, bukan peringatan resmi. Selalu ikuti badan meteorologi nasional Anda:',
+    foot1: 'Bukan nasihat medis dan bukan peringatan resmi. Pendamping bagi badan meteorologi nasional Anda.', foot2: 'Data:', method: 'Metode dan kode sumber',
+    profiles: { older_adult: 'Lansia', young_child: 'Anak kecil', outdoor_worker: 'Pekerja luar ruangan', respiratory_condition: 'Asma atau penyakit paru', pregnant: 'Hamil', flood_prone_home: 'Rumah rawan banjir', no_air_conditioning: 'Tanpa AC' },
+  },
 };
+const EXAMPLES = [
+  { name: 'Jakarta', admin: '', country: 'Indonesia', lat: -6.2146, lon: 106.8451 },
+  { name: 'Delhi', admin: '', country: 'India', lat: 28.6139, lon: 77.209 },
+  { name: 'Phoenix', admin: 'Arizona', country: 'United States', lat: 33.4484, lon: -112.074 },
+];
+// Colour step (0 to 4) for each severity of each hazard. Chosen so that one colour means a similar degree of
+// concern across hazards: the top UV tier is not shown as dark as hazardous air.
+const TONES = { heat: [0, 1, 2, 3, 4], rain: [0, 0, 1, 2, 3, 4], air: [0, 1, 2, 3, 4, 4], uv: [0, 1, 3] };
+const OFFICIAL = { Indonesia: ['BMKG', 'https://www.bmkg.go.id/'] };
+const WMO = ['WMO Severe Weather Information Centre', 'https://severeweather.wmo.int/'];
+
 const $ = (id) => document.getElementById(id);
-let place = null;
+const state = { lang: 'en', place: null, data: null };
+const t = () => T[state.lang];
+const fmt = (v) => (state.lang === 'id' ? String(v).replace('.', ',') : String(v));
 
-$('profile').innerHTML = Object.entries(PROFILES).map(([k, v]) => `<label><input type="checkbox" value="${k}"> ${v}</label>`).join('');
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+}
+const placeName = (p) => [p.name, p.admin, p.country].filter(Boolean).join(', ');
 
-let t;
+function renderStatic() {
+  document.documentElement.lang = state.lang;
+  for (const n of document.querySelectorAll('[data-t]')) n.textContent = t()[n.dataset.t];
+  for (const b of document.querySelectorAll('[data-lang]')) b.setAttribute('aria-pressed', String(b.dataset.lang === state.lang));
+  $('q').placeholder = t().placeholder;
+  const checked = new Set([...document.querySelectorAll('#profile input:checked')].map((i) => i.value));
+  $('profile').textContent = '';
+  for (const [k, v] of Object.entries(t().profiles)) {
+    const l = el('label');
+    const i = el('input'); i.type = 'checkbox'; i.value = k; i.checked = checked.has(k);
+    l.append(i, document.createTextNode(v));
+    $('profile').appendChild(l);
+  }
+  if (state.place) $('picked').textContent = `${t().selected} ${placeName(state.place)}`;
+  if (!$('sugg').dataset.live) showExamples();
+}
+
+function pick(p) {
+  state.place = p;
+  $('picked').textContent = `${t().selected} ${placeName(p)}`;
+  $('go').disabled = false;
+  showExamples();
+}
+function showExamples() {
+  const s = $('sugg'); s.textContent = ''; delete s.dataset.live;
+  if (state.place) return;
+  s.appendChild(el('span', 'msg', t().examples));
+  for (const p of EXAMPLES) { const b = el('button', 'pill', p.name); b.type = 'button'; b.onclick = () => { $('q').value = p.name; pick(p); }; s.appendChild(b); }
+}
+
+let timer;
 $('q').addEventListener('input', () => {
-  clearTimeout(t);
-  t = setTimeout(async () => {
+  clearTimeout(timer);
+  timer = setTimeout(async () => {
     const q = $('q').value.trim();
-    if (q.length < 2) { $('sugg').textContent = ''; return; }
+    const s = $('sugg');
+    if (q.length < 2) { showExamples(); return; }
     try {
       const r = await (await fetch('/api/geocode?q=' + encodeURIComponent(q))).json();
-      $('sugg').textContent = '';
-      for (const p of r) {
-        const b = document.createElement('button');
-        b.textContent = [p.name, p.admin, p.country].filter(Boolean).join(', ');
-        b.onclick = () => { place = p; $('picked').textContent = 'Selected: ' + b.textContent; $('sugg').textContent = ''; $('go').disabled = false; };
-        $('sugg').appendChild(b);
-      }
-    } catch { $('sugg').textContent = 'Search failed. Try again.'; }
+      s.textContent = ''; s.dataset.live = '1';
+      if (!r.length) { s.appendChild(el('span', 'msg', t().none)); return; }
+      for (const p of r) { const b = el('button', 'pill', placeName(p)); b.type = 'button'; b.onclick = () => { $('q').value = p.name; pick(p); }; s.appendChild(b); }
+    } catch { s.textContent = ''; s.appendChild(el('span', 'msg err', t().searching)); }
   }, 300);
 });
 
-function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function tone(f) { return TONES[f.hazard][f.severity] ?? 0; }
 
-function render(d) {
-  const out = $('out'); out.textContent = '';
-  for (const w of d.warnings || []) out.appendChild(el('p', 'bad', w));
-  const days = [...new Set(d.facts.map((f) => f.date))];
-  const grid = el('div', 'days');
-  for (const date of days) {
-    const fs = d.facts.filter((f) => f.date === date);
-    const c = el('div', 'card day');
-    c.appendChild(el('h3', '', `${fs[0].weekday} (${fs[0].day})`));
-    for (const f of fs.filter((x) => x.level !== 'n/a')) {
-      const r = el('div', 'hz s' + Math.min(f.severity, 5));
-      r.appendChild(el('span', '', `${f.metric}: ${f.value}${f.unit ? ' ' + f.unit : ''}`));
-      r.appendChild(el('strong', '', f.level));
-      c.appendChild(r);
-    }
-    const cx = (d.context || []).find((x) => x.date === date);
-    if (cx) {
-      const diff = cx.anomaly === 0 ? 'about the same as' : `${Math.abs(cx.anomaly)} °C ${cx.anomaly > 0 ? 'warmer' : 'cooler'} than`;
-      c.appendChild(el('div', 'ev', `Max ${cx.forecast} °C: ${diff} the 1991-2020 average for this week (${cx.normal} °C).`));
-    }
-    grid.appendChild(c);
-  }
-  out.appendChild(grid);
-
-  const card = el('div', 'card');
-  card.appendChild(el('h2', '', 'Your briefing'));
-  if (d.quiet) {
-    card.appendChild(el('p', '', 'No serious hazards for this household in the next three days. No special action is needed.'));
-  } else if (!d.claims.length && !(d.notices || []).length) {
-    card.appendChild(el('p', 'bad', 'No verified advice could be produced' + (d.error ? ' (' + d.error + ')' : '') + '. The hazard levels above are still correct.'));
-  }
-  const byId = Object.fromEntries(d.facts.map((f) => [f.id, f]));
-  for (const c of d.claims) {
-    const div = el('div', 'claim');
-    div.appendChild(el('strong', '', c.advice));
-    const ev = el('div', 'ev', c.evidence + ' ');
-    ev.appendChild(el('span', 'tag', c.level));
-    for (const id of c.fact_ids) ev.appendChild(el('span', 'tag', byId[id] ? `${byId[id].metric}, ${byId[id].day}` : id));
-    div.appendChild(ev);
-    card.appendChild(div);
-  }
-  if (d.compound) {
-    const div = el('div', 'claim notice');
-    div.appendChild(el('strong', '', d.compound.evidence));
-    const ev = el('div', 'ev', d.compound.advice + ' ');
-    ev.appendChild(el('span', 'tag', 'compound day'));
-    div.appendChild(ev);
-    card.appendChild(div);
-  }
-  for (const n of d.notices || []) {
-    const div = el('div', 'claim notice');
-    div.appendChild(el('strong', '', n.evidence));
-    const ev = el('div', 'ev', n.advice + ' ');
-    ev.appendChild(el('span', 'tag', 'standard notice'));
-    div.appendChild(ev);
-    card.appendChild(div);
-  }
-  const v = el('p', 'sub');
-  v.appendChild(el('span', 'ok', `${d.claims.length} of ${d.total} claims passed verification`));
-  v.appendChild(document.createTextNode(` (model: ${d.model}, attempts: ${d.attempts}). Hazard levels are fixed rules, not model output. Not medical advice.`));
-  card.appendChild(v);
-  if (d.rejected.length) {
-    const det = el('details'); det.appendChild(el('summary', '', `${d.rejected.length} rejected claim(s)`));
-    for (const r of d.rejected) det.appendChild(el('div', 'bad', `${r.reason}: ${r.claim?.evidence ?? ''}`));
-    card.appendChild(det);
-  }
-  out.appendChild(card);
+// Highlight the cells and briefing items that share any of the given fact ids.
+function light(ids) {
+  const out = $('out');
+  const set = new Set(ids);
+  const hit = (n) => (n.dataset.ids || '').split(' ').some((x) => set.has(x));
+  out.classList.toggle('dim', set.size > 0);
+  for (const n of out.querySelectorAll('[data-ids]')) n.classList.toggle('lit', set.size > 0 && hit(n));
+}
+function linkable(node, ids) {
+  node.dataset.ids = ids.join(' ');
+  node.tabIndex = 0;
+  const on = () => light(ids);
+  node.addEventListener('mouseenter', on);
+  node.addEventListener('focus', on);
+  node.addEventListener('mouseleave', () => light([]));
+  node.addEventListener('blur', () => light([]));
+  node.addEventListener('click', (e) => { e.stopPropagation(); on(); });
 }
 
-$('go').onclick = async () => {
-  $('err').textContent = ''; $('go').disabled = true; $('status').textContent = 'Fetching forecast and writing briefing...';
+function strip(d) {
+  const L = t();
+  const byId = Object.fromEntries(d.facts.map((f) => [f.id, f]));
+  const dates = [...new Set(d.facts.map((f) => f.date))];
+  const compound = new Set(d.compound ? d.compound.fact_ids : []);
+  const g = el('div', 'strip');
+  g.appendChild(el('div'));
+  dates.forEach((date) => {
+    const f = d.facts.find((x) => x.date === date);
+    const h = el('div', 'dh', L.day[f.day]);
+    h.appendChild(el('small', '', L.weekday(f.weekday)));
+    g.appendChild(h);
+  });
+  const rows = [['heat', 'heat', []], ['rain', 'rain', ['rainprob']], ['air', 'aqi', ['pm25']], ['uv', 'uv', []]];
+  for (const [row, key, extra] of rows) {
+    g.appendChild(el('div', 'rh', L.rows[row]));
+    dates.forEach((_, i) => {
+      const f = byId[`${key}-${i}`];
+      if (!f) { g.appendChild(el('div', 'cell na', L.nodata)); return; }
+      const c = el('div', 'cell t' + tone(f));
+      c.setAttribute('role', 'button');
+      const n = el('div', 'num', fmt(f.value));
+      if (row === 'heat' || row === 'rain') n.appendChild(el('small', '', row === 'heat' ? '°C' : 'mm'));
+      const top = el('div'); top.appendChild(n);
+      if (row === 'rain') { if (byId[`rainprob-${i}`]) top.appendChild(el('div', 'sub2', L.chance(byId[`rainprob-${i}`].value))); }
+      else top.appendChild(el('div', 'sub2', L.units[row]));
+      c.append(top, el('div', 'lvl', L.level(f.level)));
+      if (compound.has(f.id)) { const m = el('span', 'cmp', L.cmp); m.title = L.compound; c.appendChild(m); }
+      c.setAttribute('aria-label', `${L.rows[row]}, ${L.day[f.day]}: ${fmt(f.value)} ${f.unit}, ${L.level(f.level)}`);
+      linkable(c, [f.id, ...extra.map((e) => `${e}-${i}`)]);
+      g.appendChild(c);
+    });
+  }
+  if ((d.context || []).length) {
+    g.appendChild(el('div', 'rh', L.rows.ctx));
+    dates.forEach((date) => {
+      const x = d.context.find((k) => k.date === date);
+      if (!x) { g.appendChild(el('div', 'cell na', L.nodata)); return; }
+      const c = el('div', 'cell ctx');
+      const top = el('div');
+      top.appendChild(el('div', 'num', L.ctx(x.anomaly)));
+      top.appendChild(el('div', 'sub2', L.norm(x.normal)));
+      const bar = el('div', 'bar'); bar.appendChild(el('i'));
+      const dot = el('b'); dot.style.left = (50 + Math.max(-8, Math.min(8, x.anomaly)) * 6.25) + '%';
+      bar.appendChild(dot);
+      c.append(top, bar);
+      g.appendChild(c);
+    });
+  }
+  return g;
+}
+
+// Evidence text with each number shown as a small chip.
+function evidence(text) {
+  const p = el('p');
+  for (const part of text.split(/(\d+(?:[.,]\d+)?)/)) p.appendChild(/^\d/.test(part) ? el('b', '', part) : document.createTextNode(part));
+  return p;
+}
+function item(kind, headline, body, badge, ids) {
+  const a = el('article', 'item' + (kind === 'model' ? '' : ' ' + kind));
+  a.appendChild(el('h3', '', headline));
+  a.appendChild(kind === 'model' ? evidence(body) : el('p', '', body));
+  a.appendChild(el('span', 'badge' + (kind === 'model' ? ' ok' : ''), badge));
+  linkable(a, ids);
+  return a;
+}
+
+function render(d) {
+  const L = t();
+  const out = $('out'); out.textContent = ''; out.className = '';
+  out.onclick = () => light([]);
+  for (const w of d.warnings || []) out.appendChild(el('p', 'msg err', w));
+
+  const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
+  s1.appendChild(strip(d));
+  if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote));
+  out.appendChild(s1);
+
+  const s2 = el('section'); s2.appendChild(el('h2', '', L.briefing));
+  const list = el('div', 'items');
+  if (d.quiet) list.appendChild(el('div', 'quiet', L.quiet));
+  for (const c of d.claims) list.appendChild(item('model', c.advice, c.evidence, '✓ ' + L.verified, c.fact_ids));
+  if (d.compound) list.appendChild(item('compound', d.compound.evidence, d.compound.advice, L.compoundBadge, d.compound.fact_ids));
+  for (const n of d.notices || []) list.appendChild(item('notice', n.evidence, n.advice, L.notice, n.fact_ids));
+  if (!d.quiet && !d.claims.length && !(d.notices || []).length) list.appendChild(el('p', 'msg err', L.failed + (d.error ? ` (${d.error})` : '')));
+  s2.appendChild(list);
+  if (!d.quiet) s2.appendChild(el('p', 'note', L.tapNote));
+  out.appendChild(s2);
+
+  const s3 = el('section'); s3.appendChild(el('h2', '', L.audit));
+  const det = el('details');
+  const sum = el('summary');
+  sum.appendChild(el('strong', '', d.quiet ? L.quietAudit : L.passed(d.claims.length, d.total)));
+  det.appendChild(sum);
+  const body = el('div', 'audit');
+  const block = (title, lines, cls) => { const b = el('div'); b.appendChild(el('h4', '', title)); const u = el('ul'); for (const x of lines) u.appendChild(el('li', cls, x)); b.appendChild(u); body.appendChild(b); };
+  if (!d.quiet) block(L.aRejected, d.rejected.length ? d.rejected.map((r) => `${r.reason} — “${r.claim && r.claim.advice ? r.claim.advice : ''}”`) : [L.aNone], 'rej');
+  block(L.aHow, L.how(d.model, d.attempts));
+  block(L.aSources, L.sources);
+  const off = el('div'); off.appendChild(el('h4', '', L.aOfficial));
+  const p = el('p'); p.style.margin = '0'; p.appendChild(document.createTextNode(L.official + ' '));
+  const [name, url] = OFFICIAL[state.place.country] || WMO;
+  const a = el('a', '', name); a.href = url; a.rel = 'noopener'; p.appendChild(a);
+  off.appendChild(p); body.appendChild(off);
+  det.appendChild(body); s3.appendChild(det); out.appendChild(s3);
+}
+
+function skeleton() {
+  const out = $('out'); out.textContent = ''; out.className = '';
+  const s = el('section'); const g = el('div', 'strip');
+  for (let i = 0; i < 16; i++) g.appendChild(el('div', i % 4 ? 'skel' : ''));
+  s.appendChild(g); out.appendChild(s);
+}
+
+async function generate() {
+  if (!state.place) return;
+  $('go').disabled = true; $('status').className = 'msg'; $('status').textContent = t().loading;
+  skeleton();
   try {
     const r = await fetch('/api/brief', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({
-      lat: place.lat, lon: place.lon, lang: $('lang').value,
+      lat: state.place.lat, lon: state.place.lon, lang: state.lang,
       profile: [...document.querySelectorAll('#profile input:checked')].map((i) => i.value) }) });
     const d = await r.json();
     if (!r.ok) throw new Error(d.error || 'Request failed');
-    render(d);
-  } catch (e) { $('err').textContent = 'Error: ' + e.message; }
-  $('go').disabled = false; $('status').textContent = '';
-};
+    state.data = d; render(d); $('status').textContent = '';
+  } catch (e) {
+    $('out').textContent = ''; state.data = null;
+    $('status').className = 'msg err'; $('status').textContent = e.message + ' ';
+    const b = el('button', 'pill', t().retry); b.type = 'button'; b.onclick = generate; $('status').appendChild(b);
+  }
+  $('go').disabled = false;
+}
+$('go').onclick = generate;
+for (const b of document.querySelectorAll('[data-lang]')) {
+  b.onclick = () => {
+    if (state.lang === b.dataset.lang) return;
+    state.lang = b.dataset.lang; renderStatic();
+    if (state.data) generate(); // model text must be rewritten in the new language
+  };
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') light([]); });
+renderStatic();
 </script>
 </body>
 </html>

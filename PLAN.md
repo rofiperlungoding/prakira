@@ -91,7 +91,7 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
 | Tests | `npm test`: 29 of 29 pass (after M5) | Verified 2026-10-07 |
-| UI | Checked in headless Chromium on 2026-10-07 (desktop light English, phone 375 px dark Indonesian, quiet case): renders, no horizontal overflow, no console errors. Screenshots in `docs/screenshots/`. Plain styling; to be redesigned (M7). Known gaps for M7: interface labels, day names and level names stay English in Indonesian mode; the quiet case shows "0 of 0 claims passed verification"; strip labels wrap awkwardly on desktop. | Verified 2026-10-07 |
+| UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
 | Climate context, compound flag, coverage fallback | Built (M2, M4, M5) | Verified 2026-10-07 |
@@ -205,7 +205,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 - [ ] **M6. Readability (1 h).** Add a Flesch-Kincaid grade function (pure JS, syllable heuristic) and report, in the eval, the median grade and the share of English claims at or below grade 8. Do not report it for Indonesian (the formula is not valid there); say so.
   - *Accept:* unit test on two reference sentences with hand-computed values; eval prints the metric. If under 70% of claims meet grade 8, tighten the prompt once and re-run.
 
-- [ ] **M7. Interface redesign (5 h).** Spec in section 9. *Accept:* the checklist at the end of section 9.
+- [x] **M7. Interface redesign (5 h).** Done 2026-10-07 (`public/index.html`, single file, no framework). Checklist result is at the end of section 9. Polish left over: in the quiet case the audit text still says "0 attempts"; on a 375 px screen the compound badge sits close to the heat number; long Indonesian level names wrap to three lines in a phone cell.
 
 - [ ] **M8. Deploy to the owner's own server (2.5 h).** Hosting decision (2026-10-07): the owner's self-hosted Linux server behind a Cloudflare Tunnel. Target URL: `https://prakira.rofihosted.space`. **Server-side steps and cautions are in `DEPLOY.local.md` (not in git, on the owner's machine) and in the server's own repository docs. Read them first; that server is live and used by other people.**
   - Code changes needed here first: bind `127.0.0.1` (host from env); add `GET /healthz`; configurable port; take the client address from the `CF-Connecting-IP` header for rate limiting; add an in-memory per-IP limit (for example 10 briefings per 10 minutes) and a short response cache keyed by rounded coordinates, profile and language; cap the normals cache at about 50 locations; send basic security headers (`X-Content-Type-Options`, `Referrer-Policy: same-origin`, a Content-Security-Policy that allows only self and the font host).
@@ -312,13 +312,13 @@ Add later runs here with date, commit hash, language, and what changed.
 - States: empty (short explanation and three example cities), loading (skeleton of the strip, then cards), partial (air quality missing, clearly marked), failure (strip still shown, plain message, retry button).
 
 **Non-negotiable checks (acceptance for M7):**
-- [ ] Works at 375 px width with no horizontal scroll, and at 1440 px.
-- [ ] Light and dark mode both correct.
-- [ ] Text contrast at least 4.5:1; severity never shown by colour alone (the level word is always present).
-- [ ] Whole flow usable by keyboard; visible focus; search suggestions reachable; `lang` attribute follows the chosen language.
-- [ ] Model text is inserted as text, never as HTML.
-- [ ] No console errors; first result visible within about 10 s on a normal connection.
-- [ ] Opened and checked in a real browser, with screenshots saved to `docs/screenshots/`.
+- [x] Works at 375 px width with no horizontal scroll, and at 1440 px. (Checked by `scripts/ui-check.cjs`, 2026-10-07.)
+- [x] Light and dark mode both correct. (Screenshots viewed.)
+- [ ] Text contrast at least 4.5:1; severity never shown by colour alone (the level word is always present). **Level word: done. Contrast ratios were not measured with a tool; do that before submission.**
+- [ ] Whole flow usable by keyboard; visible focus; search suggestions reachable; `lang` attribute follows the chosen language. **`lang` checked. Cells and items are focusable and focus triggers the audit link. A full keyboard-only pass by a person was not done.**
+- [x] Model text is inserted as text, never as HTML. (`textContent` only; no `innerHTML` in the file.)
+- [x] No console errors; first result visible within about 10 s on a normal connection. (No console errors in three scenarios. Timing was not measured separately; a cold request took about 2 to 10 s in earlier checks.)
+- [x] Opened and checked in a browser, with screenshots saved to `docs/screenshots/`. (Headless Chromium only. Not yet checked in Safari or Firefox, or on a real phone.)
 
 Still no framework and no build step. One HTML file with inline CSS and JS is acceptable; split into `public/app.css` and `public/app.js` if the file passes about 600 lines.
 
@@ -407,7 +407,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). Next action at that point: M2.
 - **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). Next action at that point: M3.
 - **2026-10-07 (session 3, continued).** M3 done (section 7a): per-household serious thresholds, quiet mode, stricter verifier, prompt with required fact ids, grouped notices, decimal-comma handling. 25 tests pass. Eval runs 4 (English) and 5 (Indonesian) recorded in section 8. UI still not opened in a browser. Next action at that point: M5, M4.
-- **2026-10-07 (session 3, continued).** UI checked in a headless browser (the owner asked for this): works in both languages and both colour schemes; gaps listed in section 4. M5 and M4 done; 29 tests pass. `scripts/ui-check.cjs` added for repeatable UI checks (on the owner's PC Playwright is at `C:/Users/Rofi/Documents/Codes/CatCoder/CatCoder/node_modules/playwright`). No eval was re-run after M4 and M5: they do not touch the model path. **Next action: M7 (interface redesign, spec in section 9), then M8 (deploy; tell the owner before the tunnel restart), M6, M9.**
+- **2026-10-07 (session 3, continued).** UI checked in a headless browser (the owner asked for this): works in both languages and both colour schemes; gaps listed in section 4. M5 and M4 done; 29 tests pass. `scripts/ui-check.cjs` added for repeatable UI checks (on the owner's PC Playwright is at `C:/Users/Rofi/Documents/Codes/CatCoder/CatCoder/node_modules/playwright`). No eval was re-run after M4 and M5: they do not touch the model path. Next action at that point: M7.
+- **2026-10-07 (session 3, continued).** M7 done: interface rebuilt to the section 9 spec; fonts Fraunces, IBM Plex Mono, IBM Plex Sans from Google Fonts with system fallbacks (M8's Content-Security-Policy must allow `fonts.googleapis.com` and `fonts.gstatic.com`). Colour steps per hazard are set in `TONES` in the page script so that one colour means a similar degree of concern across hazards. `scripts/ui-check.cjs` updated for the new page and now also tests the audit link. **Next action: M8 (deploy; tell the owner before the tunnel restart), then M6, M9.**
 
 **Open questions for the owner**
 

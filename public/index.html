@@ -32,6 +32,7 @@
   .s0 { background:var(--s0); } .s1 { background:var(--s1); } .s2 { background:var(--s2); } .s3 { background:var(--s3); } .s4 { background:var(--s4); } .s5 { background:var(--s5); }
   .claim { border-left:4px solid var(--ok); padding:4px 0 4px 12px; margin:14px 0; }
   .claim.notice { border-left-color: var(--mut); }
+  .day .ev { color: var(--mut); font-size: .85rem; margin-top: 8px; }
   .claim .ev { color:var(--mut); font-size:.92rem; }
   .tag { display:inline-block; font-size:.75rem; padding:1px 8px; border-radius:999px; border:1px solid var(--bd); margin-right:6px; color:var(--mut); }
   .ok { color:var(--ok); font-weight:600; }
@@ -110,6 +111,11 @@ function render(d) {
       r.appendChild(el('strong', '', f.level));
       c.appendChild(r);
     }
+    const cx = (d.context || []).find((x) => x.date === date);
+    if (cx) {
+      const diff = cx.anomaly === 0 ? 'about the same as' : `${Math.abs(cx.anomaly)} °C ${cx.anomaly > 0 ? 'warmer' : 'cooler'} than`;
+      c.appendChild(el('div', 'ev', `Max ${cx.forecast} °C: ${diff} the 1991-2020 average for this week (${cx.normal} °C).`));
+    }
     grid.appendChild(c);
   }
   out.appendChild(grid);
@@ -128,6 +134,14 @@ function render(d) {
     const ev = el('div', 'ev', c.evidence + ' ');
     ev.appendChild(el('span', 'tag', c.level));
     for (const id of c.fact_ids) ev.appendChild(el('span', 'tag', byId[id] ? `${byId[id].metric}, ${byId[id].day}` : id));
+    div.appendChild(ev);
+    card.appendChild(div);
+  }
+  if (d.compound) {
+    const div = el('div', 'claim notice');
+    div.appendChild(el('strong', '', d.compound.evidence));
+    const ev = el('div', 'ev', d.compound.advice + ' ');
+    ev.appendChild(el('span', 'tag', 'compound day'));
     div.appendChild(ev);
     card.appendChild(div);
   }

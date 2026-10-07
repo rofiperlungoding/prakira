@@ -90,11 +90,12 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 25 of 25 pass (after M3) | Verified 2026-10-07 |
-| UI | Works over the API. **Never opened in a browser.** Plain styling; to be redesigned (M7). | Unverified visually |
+| Tests | `npm test`: 29 of 29 pass (after M5) | Verified 2026-10-07 |
+| UI | Checked in headless Chromium on 2026-10-07 (desktop light English, phone 375 px dark Indonesian, quiet case): renders, no horizontal overflow, no console errors. Screenshots in `docs/screenshots/`. Plain styling; to be redesigned (M7). Known gaps for M7: interface labels, day names and level names stay English in Indonesian mode; the quiet case shows "0 of 0 claims passed verification"; strip labels wrap awkwardly on desktop. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
-| Climate context, compound flag, readability, coverage fallback | Not built | |
+| Climate context, compound flag, coverage fallback | Built (M2, M4, M5) | Verified 2026-10-07 |
+| Readability metric | Not built (M6) | |
 | Deployment, video, diagram, Devpost text | Not started | |
 
 Runtime: Node 20 or newer (dev machine: Node 25, Windows 11). Zero npm dependencies. Plain ES modules, no build step. Keep it that way unless a task says otherwise.
@@ -110,7 +111,10 @@ climate-brief/
   lib/facts.mjs         Open-Meteo fetch, fact table, hazard bands
   lib/llm.mjs           Mistral call (JSON mode), prompt. Default model open-mistral-nemo
   lib/verify.mjs        Claim verifier and the PROFILES allow-list
-  lib/notice.mjs        Standard notices for serious hazards the model skipped
+  lib/notice.mjs        Standard notices for serious hazards the model skipped; compound-day notice
+  lib/climate.mjs       Climate context: forecast maximum against the 1991 to 2020 week average
+  scripts/ui-check.cjs  Headless browser check and screenshots (needs an existing Playwright install)
+  docs/screenshots/     Screenshots from the last UI check
   lib/brief.mjs         Orchestration and retry (max 3 attempts, 3 s apart)
   lib/verify.test.mjs   Unit tests for the verifier
   lib/facts.test.mjs    Unit tests for heat index, bands and fact building
@@ -191,11 +195,11 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 - [x] **M3. Constrain the advice text (1.5 h).** Done 2026-10-07; what was built is in section 7a. Prompt: short sentences, common words, no clock times, no temperatures, no doses, no brand names, no diagnosis, one action per claim. Verifier: reject a claim whose `advice` contains any digit.
   - *Accept:* unit tests; one eval run before and after, both recorded in section 8. If the raw pass rate falls below 80%, relax to "digits allowed only if they match a cited fact" and record that decision.
 
-- [ ] **M4. Climate context (2.5 h).** For the location, fetch daily `temperature_2m_max` for 1991-01-01 to 2020-12-31 from the Open-Meteo archive once, compute the mean over the 7-day window centred on each forecast date, cache in memory by rounded coordinates. Add `temperature_2m_max` to the forecast request. Create facts `normal-N` (value, °C) and `anomaly-N` (forecast minus normal, rounded to whole degrees, level `n/a`). Optional layer: on failure add a warning and continue.
+- [x] **M4. Climate context (2.5 h).** Done 2026-10-07 (`lib/climate.mjs`, response field `context`). Built as a deterministic line in the UI; the model does **not** see or cite it (simpler and safer than planned). Live check: Jakarta +3 °C, London -1 to +2 °C, Phoenix +6 to +7 °C against the 1991 to 2020 week average; cold request about 2 to 10 s in total, cached lookup about 1 ms. For the location, fetch daily `temperature_2m_max` for 1991-01-01 to 2020-12-31 from the Open-Meteo archive once, compute the mean over the 7-day window centred on each forecast date, cache in memory by rounded coordinates. Add `temperature_2m_max` to the forecast request. Create facts `normal-N` (value, °C) and `anomaly-N` (forecast minus normal, rounded to whole degrees, level `n/a`). Optional layer: on failure add a warning and continue.
   - Show it in the UI as one line per day and a small bar. The model may cite it as context. No health claim may be tied to the anomaly.
   - *Accept:* unit test of the window mean with a small synthetic series; a live check for Jakarta and London prints plausible normals; the request completes in under 5 s cold and under 0.5 s cached.
 
-- [ ] **M5. Compound-day flag (45 min).** Deterministic fact `compound-N` when, on the same day, heat is at "extreme caution" or worse and air quality is at "unhealthy for sensitive groups" or worse. Include it in the standard-notice set.
+- [x] **M5. Compound-day flag (45 min).** Done 2026-10-07 (`buildCompound` in `lib/notice.mjs`, response field `compound`). One deterministic notice listing the days; never written by the model. Its health sentence rests on Du 2024, of which only the title was checked: confirm from the paper before the submission, or soften the sentence. Deterministic fact `compound-N` when, on the same day, heat is at "extreme caution" or worse and air quality is at "unhealthy for sensitive groups" or worse. Include it in the standard-notice set.
   - *Accept:* unit tests for the four combinations.
 
 - [ ] **M6. Readability (1 h).** Add a Flesch-Kincaid grade function (pure JS, syllable heuristic) and report, in the eval, the median grade and the share of English claims at or below grade 8. Do not report it for Indonesian (the formula is not valid there); say so.
@@ -402,7 +406,8 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 2).** Planning only, no product code changed. Second literature pass: 12 more queries, 15 abstracts read, review rewritten as v0.2 with requirements R1 to R8. Science audit found band errors S1 to S5. Verified the Open-Meteo archive and climate APIs respond. Devpost rules could not be re-read (HTTP 429; browser extension offline). Plan rewritten as version 2. Next action at that point: M0, then M1.
 - **2026-10-07 (session 3).** Name and hosting decided (Prakira; owner's server). M0 done: public repo created and pushed. M1 done: NWS heat index implemented and tested, bands corrected, sources recorded; 17 tests pass; live check on Jakarta, London, Phoenix. Added `AGENTS.md` as the entry point for any AI assistant. Owner gave standing approval to push after each finished task. Not deployed yet (M8). Next action at that point: M2.
 - **2026-10-07 (session 3, continued).** M2 done: standard notices for uncovered serious hazards, in English and Indonesian, checked by the same verifier; 21 tests pass; eval run 3 recorded in section 8. `npm run eval -- 20 id` now runs the eval in Indonesian. UI shows notices in a plain style (not yet opened in a browser). Next action at that point: M3.
-- **2026-10-07 (session 3, continued).** M3 done (section 7a): per-household serious thresholds, quiet mode, stricter verifier, prompt with required fact ids, grouped notices, decimal-comma handling. 25 tests pass. Eval runs 4 (English) and 5 (Indonesian) recorded in section 8. UI still not opened in a browser. **Next action: M5 (compound-day flag), then M4 (climate context against the 1991 to 2020 normal).**
+- **2026-10-07 (session 3, continued).** M3 done (section 7a): per-household serious thresholds, quiet mode, stricter verifier, prompt with required fact ids, grouped notices, decimal-comma handling. 25 tests pass. Eval runs 4 (English) and 5 (Indonesian) recorded in section 8. UI still not opened in a browser. Next action at that point: M5, M4.
+- **2026-10-07 (session 3, continued).** UI checked in a headless browser (the owner asked for this): works in both languages and both colour schemes; gaps listed in section 4. M5 and M4 done; 29 tests pass. `scripts/ui-check.cjs` added for repeatable UI checks (on the owner's PC Playwright is at `C:/Users/Rofi/Documents/Codes/CatCoder/CatCoder/node_modules/playwright`). No eval was re-run after M4 and M5: they do not touch the model path. **Next action: M7 (interface redesign, spec in section 9), then M8 (deploy; tell the owner before the tunnel restart), M6, M9.**
 
 **Open questions for the owner**
 

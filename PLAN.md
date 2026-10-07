@@ -90,12 +90,12 @@ Full review: `docs/climate-novelty-literature.md` (38 references, 15 abstracts r
 |---|---|---|
 | Repo | Local `C:\Users\Rofi\Documents\Codes\climate-brief`, branch `main`; public remote https://github.com/rofiperlungoding/prakira | Verified 2026-10-07 |
 | MVP | Facts, model call, verifier, server, single-page UI, eval script | Verified by tests and curl 2026-10-07 |
-| Tests | `npm test`: 31 of 31 pass (after M8) | Verified 2026-10-07 |
+| Tests | `npm test`: 34 of 34 pass (after M6) | Verified 2026-10-07 |
 | UI | Redesigned (M7): 72-hour strip, climate row, briefing cards with number chips, audit link between cards and cells, audit panel, full English and Indonesian interface, light and dark. Checked in headless Chromium in three scenarios: no overflow, no console errors, audit link works. Screenshots in `docs/screenshots/`. | Verified 2026-10-07 |
 | Eval | Two live runs on 2026-10-07 (section 8) | Verified |
 | Science of the bands | Fixed in M1 (section 6a). Rain classes remain unverified against a primary source. | Verified 2026-10-07 |
 | Climate context, compound flag, coverage fallback | Built (M2, M4, M5) | Verified 2026-10-07 |
-| Readability metric | Not built (M6) | |
+| Readability metric | Built (M6); first result 60% at or below grade 8 | Verified 2026-10-07 |
 | Deployment | Live at https://prakira.rofihosted.space since 2026-10-07 (M8). The deployed code is commit `46b5cb2`; redeploy after any later change. | Verified 2026-10-07 |
 | Video, diagram, Devpost text | Not started | |
 
@@ -205,7 +205,7 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
 - [x] **M5. Compound-day flag (45 min).** Done 2026-10-07 (`buildCompound` in `lib/notice.mjs`, response field `compound`). One deterministic notice listing the days; never written by the model. Its health sentence rests on Du 2024, of which only the title was checked: confirm from the paper before the submission, or soften the sentence. Deterministic fact `compound-N` when, on the same day, heat is at "extreme caution" or worse and air quality is at "unhealthy for sensitive groups" or worse. Include it in the standard-notice set.
   - *Accept:* unit tests for the four combinations.
 
-- [ ] **M6. Readability (1 h).** Add a Flesch-Kincaid grade function (pure JS, syllable heuristic) and report, in the eval, the median grade and the share of English claims at or below grade 8. Do not report it for Indonesian (the formula is not valid there); say so.
+- [x] **M6. Readability (1 h).** Done 2026-10-07 (`lib/readability.mjs`; the eval reports the median Flesch-Kincaid grade of each verified claim, action plus evidence, and the share at or below grade 8; English only). First result is in section 8, run 6: 60% at or below grade 8, under the 70% bar set here. **The one allowed prompt tightening has not been done yet. If it is done, do it while looking only at the tuned set, then re-run the held-out set once.** Add a Flesch-Kincaid grade function (pure JS, syllable heuristic) and report, in the eval, the median grade and the share of English claims at or below grade 8. Do not report it for Indonesian (the formula is not valid there); say so.
   - *Accept:* unit test on two reference sentences with hand-computed values; eval prints the metric. If under 70% of claims meet grade 8, tighten the prompt once and re-run.
 
 - [x] **M7. Interface redesign (5 h).** Done 2026-10-07 (`public/index.html`, single file, no framework). Checklist result is at the end of section 9. Polish left over: in the quiet case the audit text still says "0 attempts"; on a 375 px screen the compound badge sits close to the heat number; long Indonesian level names wrap to three lines in a phone cell.
@@ -287,6 +287,21 @@ Finding from run 3: the model covers only about two thirds of serious facts, so 
 How to read these: the pass rate fell from run 3 because the verifier is stricter (it now rejects disproportionate and numeric advice), not because the model got worse. Claims are now one per hazard, so there are about 42 per run instead of about 100. **Caveat: the prompt was tuned once after looking at results on these same 20 locations. There is no held-out set, so these numbers are optimistic.** M9 must add locations that were never used for tuning and report them separately.
 
 Intermediate runs during M3 development (not comparable, code was changing): Indonesian 57.1% before the decimal-comma fix (14 of 18 rejections were "37,6" read as two numbers), then 92.9%; English 79.5% before the prompt listed required fact ids.
+
+**Run 6, 2026-10-07, first run on the held-out set (code after commit 5058c88), English, 15 locations never used for tuning, 0 failed, 2 quiet (Paris, Toronto):**
+
+| Metric | Run 6, held-out, English |
+|---|---|
+| Model claims passing verification | 25 of 29 (86.2%) |
+| Serious facts covered by a verified model claim | 80.5% of 82 |
+| Covered with standard notices | 100% (by construction) |
+| Verifier catch rate on corrupted claims | 100% |
+| Readability of verified claims (25) | median grade 7.4; 60.0% at or below grade 8 |
+| Rejection reasons | stay-indoors advice at "extreme caution" 2; wrong level 1; missing evidence 1 |
+
+Reading: the held-out pass rate (86.2%) is close to the tuned-set English run (84.1%), so the tuned-set figure does not look inflated by tuning. This is one run of 29 claims: the uncertainty is large. Readability misses the grade 8 target for 40% of claims. The syllable count is a heuristic, and the text includes terms such as "US AQI" and "UV index" that the formula scores poorly.
+
+The eval now takes a third argument: `npm run eval -- 15 en heldout` or `npm run eval -- 20 id tuned`. Each run writes its own file in `eval/out/` (gitignored), including the text of every verified claim, which M9's manual review can use.
 
 Add later runs here with date, commit hash, language, and what changed.
 
@@ -416,6 +431,7 @@ Target 3:00. Screen recording with voice. Show the real deployed site.
 - **2026-10-07 (session 4).** The owner rejected the M7 look ("too plain") and gave a reference landing page (light pastel-green hero, phone mockup, sticker, feature cards, numbered process, coloured stat cards, accordion questions). `public/index.html` was rebuilt as a full landing page in that style: nav, hero with a CSS phone mockup and sticker, "Advice with receipts" with accordion, four hazard cards, the tool in a panel, "How a briefing is made" with a pipeline diagram, "Measured, not promised" with three stat cards and a caveat line, FAQ, footer. Light theme only (dark mode removed). Font: Plus Jakarta Sans and IBM Plex Mono. All visuals are CSS and inline SVG; no photos were downloaded. The app logic (strip, audit link, audit panel) is unchanged. Headless check: no overflow at 375, 1280, 1440 px; no console errors; audit link works. Section 9 of this plan describes the earlier design and is now out of date for the visual language; the layout of the result area still applies. **The evidence cards show eval figures from runs 4 and 5 (84 to 95%, 100%, 100%) hard-coded in the page: update them when M9 produces final numbers.** Redeployed to the server. **Next action: owner feedback on the new look, then M6, M9.**
 - **2026-10-07 (session 4, continued).** Owner feedback on the landing page: the monospace labels and small uppercase text were hard to read. Two passes followed. (1) Readability: monospace removed, uppercase labels removed, text sizes and secondary-text contrast raised. (2) Fonts, at the owner's choice of "fonts only": **Outfit** for headings and numbers, **DM Sans** for text (both Google Fonts, SIL Open Font Licence). A logo was added at the owner's request: a lowercase p whose bowl holds a check mark, on a lime tile. Files: `docs/brand/prakira-mark.svg`, `docs/brand/prakira-logo.svg` (wordmark is live text in Outfit), `docs/brand/logo-preview.png`. The mark is inlined in the nav and used as the favicon through a data URI. No trademark or similarity search was done for the name or the mark. Headless check passes; redeployed. **Next action: M6, then M9. Use the logo in the README, the video and the Devpost page.**
 - **2026-10-07 (session 4, continued).** The owner rejected the first logo (a p with a check mark) and chose concept E out of five: **a sun rising over three lines, one line for each of the three days ahead**, on a warm cream tile (`#fff3d6`, sun `#f4a04c`, ink `#101a13`). `docs/brand/prakira-mark.svg` and `prakira-logo.svg` were replaced; the nav and the favicon use the new mark. Redeployed. **Next action: M6, then M9.**
+- **2026-10-07 (session 4, continued).** M6 done. Held-out location set added to the eval (15 places) and run once in English (section 8, run 6). 34 tests pass. Fixed a bug the owner spotted in the hero phone mockup: a hero style rule (`.hero small`) coloured the mockup's level labels grey, so "very unhealthy" was dark text on red; the rule is now scoped and the labels are white. Redeployed. **Next action: M9 (three tuned-set runs and one held-out run per language, manual review of 12 briefings from the saved eval files, README with logo and diagram, update the evidence cards in the page with final numbers), then M10 (video), M11 (Devpost).**
 
 **Open questions for the owner**
 

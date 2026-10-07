@@ -30,7 +30,7 @@ Air-quality values are model forecasts (CAMS, about 11 km in Europe and 45 km el
 
 ```
 npm start          # needs .env with MISTRAL_API_KEY; serves http://localhost:3000
-npm test           # 31 unit tests, no network
+npm test           # 34 unit tests, no network
 npm run eval       # live groundedness eval over 20 locations (needs network and key)
 ```
 

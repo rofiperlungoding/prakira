@@ -56,7 +56,7 @@
   .hero h1 { font-size:clamp(2.2rem, 5vw, 3.6rem); }
   .hero p { color:#2f3d33; max-width:44ch; margin:18px 0 26px; }
   .hero .cta { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-  .hero small { display:block; margin-top:22px; color:var(--mut); }
+  .hero .cta + small { display:block; margin-top:22px; color:var(--mut); }
   .stage { position:relative; height:520px; }
   .phone { position:absolute; right:-10px; top:36px; width:320px; height:600px; background:#fff; border:9px solid var(--ink); border-radius:44px; transform:rotate(13deg); box-shadow:0 30px 60px -30px rgba(16,26,19,.45); padding:34px 14px 14px; overflow:hidden; }
   .phone::before { content:""; position:absolute; top:10px; left:50%; width:86px; height:18px; margin-left:-43px; background:var(--ink); border-radius:12px; }
@@ -64,7 +64,7 @@
   .phone .pl { font:600 .68rem var(--sans); color:var(--mut); margin:10px 0 5px; }
   .mini { display:grid; grid-template-columns:repeat(3, 1fr); gap:4px; }
   .mini div { border-radius:6px; padding:7px 7px 6px; font:600 1.02rem/1.2 var(--head); min-width:0; }
-  .mini div small { display:block; font:500 .56rem/1.25 var(--sans); margin-top:3px; }
+  .mini div small { display:block; font:600 .6rem/1.25 var(--sans); margin-top:3px; color:inherit; }
   .pc { border:1px solid var(--rule); border-left:3px solid var(--ok); border-radius:8px; padding:9px 10px; margin-top:9px; font-size:.72rem; line-height:1.4; color:var(--mut); }
   .pc b { display:block; font-size:.82rem; font-weight:600; margin-bottom:3px; color:var(--ink); }
   .pc span { display:inline-block; margin-top:6px; font:600 .6rem var(--sans); color:var(--ok); background:var(--ok-bg); border-radius:99px; padding:2px 6px; }

@@ -89,7 +89,7 @@
   .acc summary { list-style:none; cursor:pointer; padding:9px 0; display:flex; align-items:center; gap:12px; font-weight:500; }
   .acc summary::-webkit-details-marker { display:none; }
   .acc summary::before { content:"+"; font:400 1.05rem/1 var(--sans); width:22px; height:22px; flex:none; display:grid; place-items:center; border:1px solid var(--rule); border-radius:4px; background:#fff; }
-  .acc details[open] summary::before { content:"−"; }
+  .acc details[open]:not(.shut) summary::before { content:"−"; }
   .acc p { margin:0 0 12px 34px; color:var(--mut); font-size:1rem; }
 
   /* Hazard cards */
@@ -333,7 +333,7 @@
   .acc summary { transition:transform .25s cubic-bezier(.2,.8,.2,1); }
   .acc summary:hover { transform:translateX(4px); }
   .acc summary::before { transition:transform .35s cubic-bezier(.2,.8,.2,1), background .3s; }
-  .acc details[open] summary::before { transform:rotate(180deg); background:var(--lime); }
+  .acc details[open]:not(.shut) summary::before { transform:rotate(180deg); background:var(--lime); }
 
   /* Hero stage: two layers that follow the pointer at different depths. */
   .par { position:absolute; inset:0; pointer-events:none; translate:calc(var(--mx, 0) * var(--k, 10) * 1px) calc(var(--my, 0) * var(--k, 10) * 1px); }
@@ -352,11 +352,8 @@
   .art .wire { border-left:0; width:2px; background:repeating-linear-gradient(var(--ink) 0 5px, transparent 5px 10px); }
   .art .card p em { display:inline-block; }
 
-  @supports (interpolate-size: allow-keywords) {
-    .acc details { interpolate-size:allow-keywords; }
-    .acc details::details-content { block-size:0; overflow:hidden; opacity:0; transition:block-size .45s cubic-bezier(.2,.8,.2,1), opacity .4s, content-visibility .45s allow-discrete; }
-    .acc details[open]::details-content { block-size:auto; opacity:1; }
-  }
+  .acc details p { transition:opacity .3s, transform .4s cubic-bezier(.2,.8,.2,1); }
+  .acc details.shut p { opacity:0; transform:translateY(-6px); }
 
   @media (prefers-reduced-motion: no-preference) {
     .mo .rv { opacity:0; transform:translateY(28px); }
@@ -464,7 +461,7 @@
   </div>
 </div></header>
 
-<section class="band" id="meet"><div class="wrap two">
+<section class="band" id="meet"><div class="wrap two" style="align-items:start">
   <div class="art" aria-hidden="true">
     <div class="row"><div class="c" style="background:var(--t2)">37.2<small data-t="mL1"></small></div><div class="c on" style="background:var(--t4);color:#fff">204<small data-t="mL2"></small></div><div class="c" style="background:var(--t3)">9<small>UV</small></div></div>
     <div class="row"><div class="c" style="background:var(--t2)">36.6<small data-t="mL1"></small></div><div class="c on" style="background:var(--t4);color:#fff">228<small data-t="mL2"></small></div><div class="c" style="background:var(--t3)">9<small>UV</small></div></div>
@@ -1326,6 +1323,25 @@ function countUp(n) {
   }, { passive: true });
 
   if (MOTION) {
+    // Questions open and fold with an animated height. <details> has no height transition of its own, so the
+    // click is taken over: the element stays open while it folds, and is closed when the animation ends.
+    for (const d of document.querySelectorAll('.acc details')) {
+      const sum = d.querySelector('summary');
+      let anim = null;
+      sum.addEventListener('click', (e) => {
+        e.preventDefault();
+        const opening = !d.open || d.classList.contains('shut');
+        const from = d.offsetHeight;
+        if (anim) anim.cancel();
+        if (opening) { d.open = true; d.classList.add('shut'); }
+        const to = opening ? d.offsetHeight : sum.offsetHeight;
+        d.style.overflow = 'hidden';
+        requestAnimationFrame(() => d.classList.toggle('shut', !opening));
+        anim = d.animate({ height: [from + 'px', to + 'px'] }, { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+        anim.onfinish = () => { anim = null; d.style.overflow = ''; if (!opening) { d.open = false; d.classList.remove('shut'); } };
+      });
+    }
+
     document.documentElement.classList.add('mo');
     // Reveal on scroll. The classes are removed afterwards so hover transitions are not delayed.
     const io = new IntersectionObserver((entries) => {

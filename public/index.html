@@ -85,7 +85,8 @@
   .art .card p em { font:600 .95em var(--sans); font-style:normal; color:var(--ink); background:var(--soft); border:1px solid var(--rule); border-radius:4px; padding:0 4px; }
   .art .wire { height:22px; border-left:2px dashed var(--ink); margin-left:40px; }
   .pillico { width:44px; height:28px; border-radius:99px; background:var(--lime); display:grid; place-items:center; margin-bottom:12px; }
-  .acc { margin-top:20px; }
+  .acc { margin-top:20px; position:relative; }
+  #meet .art { align-self:stretch; }
   .acc summary { list-style:none; cursor:pointer; padding:9px 0; display:flex; align-items:center; gap:12px; font-weight:500; }
   .acc summary::-webkit-details-marker { display:none; }
   .acc summary::before { content:"+"; font:400 1.05rem/1 var(--sans); width:22px; height:22px; flex:none; display:grid; place-items:center; border:1px solid var(--rule); border-radius:4px; background:#fff; }
@@ -473,7 +474,7 @@
     <h2 class="big" data-t="meetH"></h2>
     <p class="lede" style="margin-left:0" data-t="meetP"></p>
     <div class="acc">
-      <details><summary data-t="m1q"></summary><p data-t="m1a"></p></details>
+      <details open><summary data-t="m1q"></summary><p data-t="m1a"></p></details>
       <details><summary data-t="m2q"></summary><p data-t="m2a"></p></details>
       <details><summary data-t="m3q"></summary><p data-t="m3a"></p></details>
       <details><summary data-t="m4q"></summary><p data-t="m4a"></p></details>
@@ -552,7 +553,7 @@
 <section class="band" id="faq" style="padding-top:20px"><div class="wrap two" style="align-items:start">
   <h2 class="big" data-t="faqH"></h2>
   <div class="acc" style="margin-top:0">
-    <details><summary data-t="f1q"></summary><p data-t="f1a"></p></details>
+    <details open><summary data-t="f1q"></summary><p data-t="f1a"></p></details>
     <details><summary data-t="f2q"></summary><p data-t="f2a"></p></details>
     <details><summary data-t="f3q"></summary><p data-t="f3a"></p></details>
     <details><summary data-t="f4q"></summary><p data-t="f4a"></p></details>
@@ -1283,6 +1284,7 @@ const MOTION = matchMedia('(prefers-reduced-motion: no-preference)').matches && 
 // Rebuilt whenever the language changes: the headline split into words.
 function decorate() {
   const L = t();
+  reserve();
   if (!MOTION) return;
   const h = document.querySelector('.hero h1');
   h.setAttribute('aria-label', L.h1);
@@ -1292,6 +1294,55 @@ function decorate() {
     const inner = el('span', '', word); inner.style.setProperty('--i', i);
     mask.appendChild(inner);
     h.append(mask, ' ');
+  });
+}
+
+// Each group of questions keeps room for its longest answer, and only one answer is open at a time, so
+// opening a question never moves what is below it.
+function reserve() {
+  for (const acc of document.querySelectorAll('.acc')) {
+    let closed = 0, tallest = 0;
+    for (const d of acc.querySelectorAll('details')) {
+      closed += d.querySelector('summary').getBoundingClientRect().height; // fractional: rounded heights add up wrong
+      const copy = d.querySelector('p').cloneNode(true); // measured off-screen at the real width
+      copy.style.cssText = 'position:absolute;visibility:hidden;left:0;right:0;opacity:1;transform:none';
+      acc.appendChild(copy);
+      tallest = Math.max(tallest, copy.getBoundingClientRect().height + 12);
+      copy.remove();
+    }
+    acc.style.minHeight = `${Math.ceil(closed + tallest) + 1}px`;
+  }
+}
+addEventListener('resize', reserve);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(reserve);
+
+// <details> has no height transition of its own, so the click is taken over: the element stays open while
+// it folds, and is closed when the animation ends. Without motion, the browser's own exclusive groups are used.
+{
+  const folding = new WeakMap();
+  const isOpen = (d) => d.open && !d.classList.contains('shut');
+  const setOpen = (d, opening) => {
+    const from = d.offsetHeight;
+    if (folding.has(d)) folding.get(d).cancel();
+    if (opening) { d.open = true; d.classList.add('shut'); }
+    const to = opening ? d.offsetHeight : d.querySelector('summary').offsetHeight;
+    d.style.overflow = 'hidden';
+    requestAnimationFrame(() => d.classList.toggle('shut', !opening));
+    const anim = d.animate({ height: [from + 'px', to + 'px'] }, { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    folding.set(d, anim);
+    anim.onfinish = () => { folding.delete(d); d.style.overflow = ''; if (!opening) { d.open = false; d.classList.remove('shut'); } };
+  };
+  document.querySelectorAll('.acc').forEach((acc, i) => {
+    const all = [...acc.querySelectorAll('details')];
+    for (const d of all) {
+      if (!MOTION) { d.setAttribute('name', 'acc' + i); continue; }
+      d.querySelector('summary').addEventListener('click', (e) => {
+        e.preventDefault();
+        const opening = !isOpen(d);
+        if (opening) for (const other of all) if (other !== d && isOpen(other)) setOpen(other, false);
+        setOpen(d, opening);
+      });
+    }
   });
 }
 
@@ -1323,25 +1374,6 @@ function countUp(n) {
   }, { passive: true });
 
   if (MOTION) {
-    // Questions open and fold with an animated height. <details> has no height transition of its own, so the
-    // click is taken over: the element stays open while it folds, and is closed when the animation ends.
-    for (const d of document.querySelectorAll('.acc details')) {
-      const sum = d.querySelector('summary');
-      let anim = null;
-      sum.addEventListener('click', (e) => {
-        e.preventDefault();
-        const opening = !d.open || d.classList.contains('shut');
-        const from = d.offsetHeight;
-        if (anim) anim.cancel();
-        if (opening) { d.open = true; d.classList.add('shut'); }
-        const to = opening ? d.offsetHeight : sum.offsetHeight;
-        d.style.overflow = 'hidden';
-        requestAnimationFrame(() => d.classList.toggle('shut', !opening));
-        anim = d.animate({ height: [from + 'px', to + 'px'] }, { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
-        anim.onfinish = () => { anim = null; d.style.overflow = ''; if (!opening) { d.open = false; d.classList.remove('shut'); } };
-      });
-    }
-
     document.documentElement.classList.add('mo');
     // Reveal on scroll. The classes are removed afterwards so hover transitions are not delayed.
     const io = new IntersectionObserver((entries) => {

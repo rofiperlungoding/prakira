@@ -230,13 +230,13 @@
   .psteps li.fail .dot { opacity:1; }
   @keyframes pulse { 50% { transform:scale(1.6); opacity:.5; } }
   .pline { display:flex; flex-wrap:wrap; gap:6px; }
-  .seg { display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:1.5px solid var(--rule); background:#fff; border-radius:10px; padding:8px 12px; cursor:pointer; text-align:left; flex:1 1 130px; position:relative; }
-  .seg:hover { border-color:var(--ink); }
-  .seg b { font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:7px; }
-  .seg b::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--ok); }
-  .seg span { font-size:.84rem; color:var(--mut); }
-  .seg.fail b::before { background:var(--bad); } .seg.fail span { color:var(--bad); }
-  .seg.skip b::before { background:var(--rule); } .seg.skip { background:var(--soft); }
+  .pline .seg { display:flex; flex-direction:column; align-items:flex-start; gap:1px; border:1.5px solid var(--rule); background:#fff; border-radius:10px; padding:8px 12px; cursor:pointer; text-align:left; flex:1 1 130px; position:relative; overflow:visible; transition:border-color .2s, transform .25s cubic-bezier(.2,.8,.2,1); }
+  .pline .seg:hover { border-color:var(--ink); transform:translateY(-2px); }
+  .pline .seg b { font-weight:600; font-size:.92rem; display:flex; align-items:center; gap:7px; }
+  .pline .seg b::before { content:""; width:8px; height:8px; border-radius:50%; background:var(--ok); }
+  .pline .seg span { font-size:.84rem; color:var(--mut); }
+  .pline .seg.fail b::before { background:var(--bad); } .pline .seg.fail span { color:var(--bad); }
+  .pline .seg.skip b::before { background:var(--rule); } .pline .seg.skip { background:var(--soft); }
   .audit [data-au] { border-radius:8px; padding:6px 8px; margin:-6px -8px; transition:background .3s; }
   .audit .hot { background:var(--hero); }
 
@@ -303,9 +303,133 @@
     .cell .cmp { position:static; align-self:flex-start; margin-top:3px; }
     .item h3 { font-size:1.08rem; } .stage { height:360px; } .hz h3 { font-size:1.2rem; } .d-start, .d-note { display:none; }
   }
+
+  /* ---- Motion layer. Decoration only: nothing here carries information, and all of it is switched off
+     under prefers-reduced-motion. Content is hidden for a reveal only after the script adds ".mo". ---- */
+  .pbar { position:fixed; left:0; top:0; width:100%; height:3px; background:var(--ink); transform-origin:0 50%; transform:scaleX(var(--p, 0)); z-index:60; pointer-events:none; }
+  .top { position:sticky; top:0; z-index:40; height:66px; margin-bottom:-66px; background:none; pointer-events:none; }
+  .top nav { pointer-events:auto; transition:box-shadow .35s, background .35s, transform .35s cubic-bezier(.2,.8,.2,1); }
+  .top.sc nav { background:rgba(255,255,255,.86); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); box-shadow:0 14px 34px -18px rgba(16,26,19,.45); transform:translateY(-4px); }
+  .hero { padding-top:66px; position:relative; }
+  .hero .wrap { position:relative; z-index:1; }
+  section[id] { scroll-margin-top:84px; }
+  .links a { position:relative; }
+  .links a::after { content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px; background:var(--ink); transform:scaleX(0); transform-origin:0 50%; transition:transform .3s cubic-bezier(.2,.8,.2,1); }
+  .links a:hover::after { transform:scaleX(1); }
+
+  .btn { position:relative; overflow:hidden; transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+  .btn::after { content:""; position:absolute; inset:0; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); transform:translateX(-120%); pointer-events:none; }
+  .btn:not(:disabled):hover { transform:translateY(-2px); box-shadow:0 10px 22px -12px rgba(16,26,19,.6); }
+  .btn:not(:disabled):hover::after { transform:translateX(120%); transition:transform .7s; }
+  .btn:not(:disabled):active { transform:translateY(0) scale(.97); }
+  #q, #desc { transition:border-color .2s, background .2s, box-shadow .25s; }
+  #q:focus, #desc:focus { box-shadow:0 0 0 4px rgba(183,240,124,.55); }
+  .pill, .chips label { transition:transform .2s cubic-bezier(.2,.8,.2,1), border-color .2s, background .2s; }
+  .pill:hover, .chips label:hover { transform:translateY(-2px); }
+  .stat { transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s; }
+  .stat:hover { transform:translateY(-6px) rotate(-.6deg); box-shadow:0 22px 34px -24px rgba(16,26,19,.55); }
+  .item { transition:opacity .15s, transform .25s cubic-bezier(.2,.8,.2,1), border-color .2s; }
+  .item:hover { transform:translateX(4px); }
+  .acc summary { transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+  .acc summary:hover { transform:translateX(4px); }
+  .acc summary::before { transition:transform .35s cubic-bezier(.2,.8,.2,1), background .3s; }
+  .acc details[open] summary::before { transform:rotate(180deg); background:var(--lime); }
+
+  /* Hero stage: two layers that follow the pointer at different depths. */
+  .par { position:absolute; inset:0; pointer-events:none; translate:calc(var(--mx, 0) * var(--k, 10) * 1px) calc(var(--my, 0) * var(--k, 10) * 1px); }
+  .par.p1 { --k:-16; } .par.p2 { --k:24; z-index:2; }
+  .d-note, .d-spark { translate:calc(var(--mx, 0) * 34px) calc(var(--my, 0) * 34px); }
+  .phone { transform:rotate(var(--pr, 13deg)) scale(var(--ps, 1)); }
+  .hero::before, .hero::after { content:""; position:absolute; border-radius:50%; filter:blur(70px); opacity:.6; pointer-events:none; }
+  .hero::before { width:420px; height:420px; left:-140px; top:-90px; background:var(--lime); }
+  .hero::after { width:380px; height:380px; right:8%; bottom:-170px; background:var(--mint); }
+
+  /* Ticker between the hero and the page */
+  .ticker { overflow:hidden; padding:16px 0; margin:-16px 0; position:relative; z-index:3; pointer-events:none; }
+  .tkb { background:var(--ink); color:var(--paper); transform:rotate(-1.1deg) scale(1.03); padding:13px 0; }
+  .tk { display:flex; width:max-content; }
+  .tk span { display:inline-flex; align-items:center; gap:26px; padding-right:26px; font:500 1.05rem var(--head); white-space:nowrap; }
+  .tk span::after { content:""; width:9px; height:9px; border-radius:50%; background:var(--lime); }
+  .tk span:nth-child(3n+1)::after { background:var(--mint); } .tk span:nth-child(3n+2)::after { background:var(--lilac); }
+
+  /* Hazard pictures tilt towards the pointer */
+  .hz .pic { transform:perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition:transform .3s cubic-bezier(.2,.8,.2,1); }
+  .hz .pic::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.6), transparent 55%); opacity:0; transition:opacity .3s; pointer-events:none; }
+  .hz:hover .pic::after { opacity:1; }
+  .hz .pic svg * { transform-box:fill-box; transform-origin:center; }
+  .art .wire { border-left:0; width:2px; background:repeating-linear-gradient(var(--ink) 0 5px, transparent 5px 10px); }
+  .art .card p em { display:inline-block; }
+
+  @supports (interpolate-size: allow-keywords) {
+    .acc details { interpolate-size:allow-keywords; }
+    .acc details::details-content { block-size:0; overflow:hidden; opacity:0; transition:block-size .45s cubic-bezier(.2,.8,.2,1), opacity .4s, content-visibility .45s allow-discrete; }
+    .acc details[open]::details-content { block-size:auto; opacity:1; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mo .rv { opacity:0; transform:translateY(28px); }
+    .mo .rv.in { opacity:1; transform:none; transition:opacity .7s cubic-bezier(.2,.8,.2,1) calc(var(--d, 0) * 80ms), transform .9s cubic-bezier(.2,.8,.2,1) calc(var(--d, 0) * 80ms); }
+
+    .hero h1 .w { display:inline-block; overflow:hidden; vertical-align:bottom; padding-bottom:.14em; margin-bottom:-.14em; }
+    .hero h1 .w > span { display:inline-block; animation:wordup .9s cubic-bezier(.2,.8,.2,1) calc(var(--i) * 55ms) backwards; }
+    .hero p, .hero .cta, .hero .cta + small { animation:fadeup .8s cubic-bezier(.2,.8,.2,1) .55s backwards; }
+    .hero .cta { animation-delay:.7s; } .hero .cta + small { animation-delay:.85s; }
+    .hero::before { animation:blob 16s ease-in-out infinite alternate; }
+    .hero::after { animation:blob 20s ease-in-out infinite alternate-reverse; }
+    .stage { transform:translateY(calc(var(--sy, 0) * .1px)); }
+    .par.p1 { animation:phonein 1.2s cubic-bezier(.2,.8,.2,1) .15s backwards; }
+    .par.p2 { animation:stickin .8s cubic-bezier(.3,1.5,.5,1) .75s backwards; }
+    .phone { animation:floaty 7s ease-in-out 1.4s infinite; }
+    .phone .mini div { animation:pop .55s cubic-bezier(.2,.8,.2,1) .8s backwards; }
+    .phone .mini div:nth-child(2) { animation-delay:.9s; } .phone .mini div:nth-child(3) { animation-delay:1s; }
+    .phone .pc { animation:pop .6s cubic-bezier(.2,.8,.2,1) 1.25s backwards; } .phone .pc + .pc { animation-delay:1.45s; }
+    .phone .pc span { animation:glow 3s ease-in-out 2s infinite; }
+    .d-note { animation:fadeup .7s 1.2s backwards; }
+    .tk { animation:tick 46s linear infinite; }
+
+    .art .c.on { animation:ring 4s ease-in-out infinite; }
+    .art .row:nth-child(2) .c.on { animation-delay:.25s; }
+    .art .wire { animation:wire .5s linear infinite; }
+    .art .card p em { animation:chip 4s ease-in-out .7s infinite; }
+    .art .card p em:nth-of-type(2) { animation-delay:.95s; }
+
+    .hz.a svg path:nth-child(2) { transform-origin:50% 100%; animation:merc 3.2s ease-in-out infinite; }
+    .hz.b svg path { animation:drip 2.4s cubic-bezier(.5,0,.5,1) infinite; }
+    .hz.c svg path { stroke-dasharray:22 8; animation:gust 1.8s linear infinite; }
+    .hz.c svg path:nth-child(2) { animation-duration:1.4s; } .hz.c svg path:nth-child(3) { animation-duration:2.3s; }
+    .hz.d svg path { animation:spin 16s linear infinite; }
+    .hz.d svg circle { animation:beat 3s ease-in-out infinite; }
+
+    .pipe div { animation:flow 7s ease-in-out infinite; }
+    .pipe div:nth-of-type(2) { animation-delay:1.1s; } .pipe div:nth-of-type(3) { animation-delay:2.2s; }
+    .pipe div:nth-of-type(4) { animation-delay:3.3s; } .pipe div:nth-of-type(5) { animation-delay:4.4s; }
+    .pipe i { animation:nudge 1.4s ease-in-out infinite; }
+    .chips label:has(input:checked) { animation:chipin .35s cubic-bezier(.3,1.6,.5,1); }
+
+    @keyframes wordup { from { transform:translateY(115%) rotate(7deg); } }
+    @keyframes fadeup { from { opacity:0; transform:translateY(18px); } }
+    @keyframes blob { to { transform:translate(90px, 50px) scale(1.25); } }
+    @keyframes phonein { from { opacity:0; transform:translateY(160px) rotate(10deg); } }
+    @keyframes stickin { from { opacity:0; transform:scale(.3) rotate(-40deg); } }
+    @keyframes floaty { 50% { transform:rotate(calc(var(--pr, 13deg) - 1.5deg)) scale(var(--ps, 1)) translateY(-12px); } }
+    @keyframes glow { 50% { box-shadow:0 0 0 5px rgba(23,96,63,.14); } }
+    @keyframes tick { to { transform:translateX(-50%); } }
+    @keyframes ring { 0%, 60%, 100% { box-shadow:0 0 0 2px var(--ink); transform:none; } 20% { box-shadow:0 0 0 2px var(--ink), 0 0 0 10px rgba(184,68,63,.22); transform:scale(1.04); } }
+    @keyframes wire { to { background-position:0 10px; } }
+    @keyframes chip { 0%, 55%, 100% { background:var(--soft); transform:none; } 25% { background:var(--lime); transform:translateY(-2px) scale(1.12); } }
+    @keyframes merc { 0%, 100% { transform:scaleY(.4); } 50% { transform:scaleY(1); } }
+    @keyframes drip { 0%, 100% { transform:translateY(-2px); } 45% { transform:translateY(2.5px) scale(1.07, .93); } 62% { transform:translateY(0) scale(.96, 1.05); } }
+    @keyframes gust { from { stroke-dashoffset:30; } to { stroke-dashoffset:0; } }
+    @keyframes beat { 50% { transform:scale(1.14); } }
+    @keyframes flow { 0%, 24%, 100% { transform:none; box-shadow:none; } 9% { transform:scale(1.035); box-shadow:0 0 0 2px var(--ink), 0 14px 26px -16px rgba(16,26,19,.55); } }
+    @keyframes nudge { 50% { transform:translateY(4px); } }
+    @keyframes chipin { from { transform:scale(.88); } }
+  }
+  @media (max-width:900px) { .phone { --pr:9deg; --ps:.86; } .hero::after { right:-80px; } }
 </style>
 </head>
 <body>
+<div class="pbar" aria-hidden="true"></div>
 
 <div class="top"><div class="wrap">
   <nav aria-label="Main">
@@ -331,11 +455,11 @@
   <div class="stage" aria-hidden="true">
     <span class="doodle d-note"><span class="scribble" data-t="d1"></span><svg viewBox="0 0 56 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c16-8 36 2 44 24"/><path d="M36 28l11 5 3-12"/></svg></span>
     <span class="doodle d-spark"><svg viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M23 4v12M23 30v12M4 23h12M30 23h12M10 10l6 6M30 30l6 6M36 10l-6 6M16 30l-6 6"/></svg></span>
-    <div class="sticker">
+    <div class="par p2"><div class="sticker">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
       <b data-t="sticker"></b>
-    </div>
-    <div class="phone">
+    </div></div>
+    <div class="par p1"><div class="phone">
       <div class="ph">Prakira</div>
       <div class="pl" data-t="mHeat"></div>
       <div class="mini"><div style="background:var(--t2)">37.2<small data-t="mL1"></small></div><div style="background:var(--t2)">36.6<small data-t="mL1"></small></div><div style="background:var(--t2)">36.1<small data-t="mL1"></small></div></div>
@@ -346,9 +470,11 @@
       <div class="pc"><b data-t="mC1"></b><i style="font-style:normal" data-t="mC1e"></i><br><span data-t="verified"></span></div>
       <div class="pc"><b data-t="mC2"></b><i style="font-style:normal" data-t="mC2e"></i><br><span data-t="verified"></span></div>
       <div class="ex" data-t="example"></div>
-    </div>
+    </div></div>
   </div>
 </div></header>
+
+<div class="ticker" aria-hidden="true"><div class="tkb"><div class="tk"></div></div></div>
 
 <section class="band" id="meet"><div class="wrap two">
   <div class="art" aria-hidden="true">
@@ -727,6 +853,7 @@ function renderStatic() {
   }
   if (state.place) $('picked').textContent = `${t().selected} ${placeName(state.place)}`;
   if (!$('sugg').dataset.live) showExamples();
+  decorate();
 }
 
 function pick(p) {
@@ -1164,6 +1291,102 @@ for (const b of document.querySelectorAll('[data-lang]')) {
   };
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') light([]); });
+
+/* ---- Motion: decoration only. Runs fully only when the visitor has not asked for reduced motion. ---- */
+const MOTION = matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window;
+
+// Text that is rebuilt whenever the language changes: the ticker, and the headline split into words.
+function decorate() {
+  const L = t();
+  const tk = document.querySelector('.tk');
+  tk.textContent = '';
+  // An even number of repeats, so moving the row by half its width lands on an identical frame.
+  for (let k = 0; k < 6; k++) for (const w of [L.hz1, L.hz2, L.hz3, L.hz4, L.sticker, L.meetH, L.evH]) tk.appendChild(el('span', '', w));
+  if (!MOTION) return;
+  const h = document.querySelector('.hero h1');
+  h.setAttribute('aria-label', L.h1);
+  h.textContent = '';
+  L.h1.split(' ').forEach((word, i) => {
+    const mask = el('span', 'w'); mask.setAttribute('aria-hidden', 'true');
+    const inner = el('span', '', word); inner.style.setProperty('--i', i);
+    mask.appendChild(inner);
+    h.append(mask, ' ');
+  });
+}
+
+function countUp(n) {
+  const m = n.textContent.match(/^(\d+)(.*)$/);
+  if (!m) return;
+  const to = Number(m[1]), from = to ? 0 : 24, t0 = performance.now();
+  const step = (now) => {
+    const p = Math.min(1, (now - t0) / 1300);
+    n.textContent = Math.round(from + (to - from) * (1 - (1 - p) ** 3)) + m[2];
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+{
+  const top = document.querySelector('.top'), bar = document.querySelector('.pbar'), stage = document.querySelector('.stage');
+  let queued = false;
+  addEventListener('scroll', () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.setProperty('--p', max > 0 ? scrollY / max : 0);
+      top.classList.toggle('sc', scrollY > 24);
+      stage.style.setProperty('--sy', Math.min(scrollY, 800));
+    });
+  }, { passive: true });
+
+  if (MOTION) {
+    document.documentElement.classList.add('mo');
+    // Reveal on scroll. The classes are removed afterwards so hover transitions are not delayed.
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const n = e.target;
+        io.unobserve(n);
+        n.classList.add('in');
+        if (n.classList.contains('stat')) countUp(n.querySelector('.n'));
+        setTimeout(() => n.classList.remove('rv', 'in'), 1900);
+      }
+    }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    for (const n of document.querySelectorAll('h2.big, .band .lede, .art, .acc details, .hz, .panel, .steps li, .pipe, .stat, .fine')) {
+      n.classList.add('rv');
+      n.style.setProperty('--d', [...n.parentNode.children].indexOf(n) % 6);
+      io.observe(n);
+    }
+
+    if (matchMedia('(pointer: fine)').matches) {
+      // Hero layers ease towards the pointer.
+      const hero = document.querySelector('.hero');
+      let tx = 0, ty = 0, x = 0, y = 0, running = false;
+      const ease = () => {
+        x += (tx - x) * 0.08; y += (ty - y) * 0.08;
+        stage.style.setProperty('--mx', x.toFixed(3)); stage.style.setProperty('--my', y.toFixed(3));
+        running = Math.abs(tx - x) > 0.002 || Math.abs(ty - y) > 0.002;
+        if (running) requestAnimationFrame(ease);
+      };
+      const aim = (nx, ny) => { tx = nx; ty = ny; if (!running) { running = true; requestAnimationFrame(ease); } };
+      hero.addEventListener('pointermove', (e) => { const r = hero.getBoundingClientRect(); aim((e.clientX - r.left) / r.width - 0.5, (e.clientY - r.top) / r.height - 0.5); });
+      hero.addEventListener('pointerleave', () => aim(0, 0));
+
+      for (const card of document.querySelectorAll('.hz')) {
+        const pic = card.querySelector('.pic');
+        card.addEventListener('pointermove', (e) => {
+          const r = pic.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+          pic.style.setProperty('--ry', `${((px - 0.5) * 14).toFixed(1)}deg`); pic.style.setProperty('--rx', `${((0.5 - py) * 14).toFixed(1)}deg`);
+          pic.style.setProperty('--gx', `${(px * 100).toFixed(0)}%`); pic.style.setProperty('--gy', `${(py * 100).toFixed(0)}%`);
+        });
+        card.addEventListener('pointerleave', () => { pic.style.setProperty('--rx', '0deg'); pic.style.setProperty('--ry', '0deg'); });
+      }
+    }
+  }
+}
 
 // First paint: restore what this browser remembers. The briefing itself is not requested until asked for.
 const saved = recall();

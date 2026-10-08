@@ -46,28 +46,30 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 | Air | Highest hourly US AQI of the day (Open-Meteo applies the EPA averaging periods) | EPA categories, 0 to 50 good up to above 300 hazardous | [AirNow](https://www.airnow.gov/aqi/aqi-basics/), [Open-Meteo air quality docs](https://open-meteo.com/en/docs/air-quality-api) |
 | UV | Daily maximum UV index, rounded | WHO action tiers: 0 to 2 low; 3 to 7 protection needed; 8 and above extra protection needed | [WHO](https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index) |
 | Rain | Daily total with the day's peak rain probability | Below 1 mm little or no rain; to 20 light; to 50 moderate; to 100 heavy; to 150 very heavy; above extreme | **Not verified against a primary source.** Commonly quoted BMKG daily classes; only the 150 mm threshold was corroborated, through news reports. Not a flood forecast. |
-| Climate | Forecast daily maximum minus the 1991 to 2020 average for the same week | No level; context only | Open-Meteo archive (ERA5-based). Forecast and archive are different models, so part of the difference is model bias. |
+| Climate | Forecast daily maximum minus the 1991 to 2020 average for the same week | No level; context only | Open-Meteo archive (ERA5-based), or NASA POWER (MERRA-2) when the archive is unavailable. Forecast and archive are different models, so part of the difference is model bias. |
 
 The household adjustments (for example, an older adult lowers the heat threshold from "extreme caution" to "caution") are this project's judgement from the wording of the NWS and EPA categories. They are not an official rule.
 
 ## Evaluation
 
-Runs on 8 October 2026 (WIB) with live data. "Tuned" cities are the 20 the system was developed against; "held-out" cities are 15 that were never used while adjusting the prompt or the rules.
+Runs 19 to 22, on 8 October 2026 (07:00 WIB) with live data, after the reviewed word lists were added to the screen. "Tuned" cities are the 20 the system was developed against; "held-out" cities are 15 that were never used while adjusting the prompt or the rules.
 
 | Metric | English, tuned | English, held-out | Indonesian, tuned | Indonesian, held-out |
 |---|---|---|---|---|
-| AI actions kept by the screen | 42 of 43 (97.7%) | 26 of 27 (96.3%) | 42 of 44 (95.5%) | 26 of 27 (96.3%) |
-| Serious hazards covered by a kept AI action | 99.2% | 92.3% | 97.5% | 92.3% |
+| AI actions kept by the screen | 33 of 43 (76.7%) | 23 of 27 (85.2%) | 39 of 43 (90.7%) | 22 of 27 (81.5%) |
+| Serious hazards covered by a kept AI action | 76.3% | 84.2% | 89.8% | 84.2% |
 | Serious hazards covered once notices are added | 100% | 100% | 100% | 100% |
 | Numbers written by the AI and shown to the user | 0 | 0 | 0 | 0 |
-| Reading grade of the action (Flesch-Kincaid): median; share at grade 8 or below | 4.8; 97.6% | 4.8; 96.2% | not computed | not computed |
+| Reading grade of the action (Flesch-Kincaid): median; share at grade 8 or below | 4.8; 97.0% | 4.4; 95.7% | not computed | not computed |
 
 How to read this honestly:
 
-- **"Kept" is a narrow test.** It means the action passed the screening rules. It does not mean the action is good advice. The figures are high partly because the model now has very little it can get wrong.
-- **Small samples, one run each.** 27 to 44 actions per run. Earlier runs of this project differed by ten points between repeats.
+- **"Kept" is a narrow test.** It means the action passed the screening rules. It does not mean the action is good advice.
+- **The screen is strict on purpose.** An action may only use words from a reviewed list for its own hazard (`lib/vocab.mjs`). That removes an action about the wrong hazard ("stay near water" for polluted air, seen on the live site), a wrong word ("bayam", spinach, where "bayangan", shade, was meant) and bad advice built from unlisted words ("use fans to pull clean air in" on a polluted day). It also removes some sound actions that use a word not on the list. Each removed action is replaced by a standard notice, so strictness costs wording and never coverage. The word lists were written from the tuned cities only; the held-out columns show how they carry over.
+- **Small samples, one run each.** 27 to 43 actions per run. Earlier runs of this project differed by ten points between repeats.
 - **Coverage with notices is 100% by construction**, and "numbers written by the AI: 0" is true by construction as well: the code never displays model-written numbers.
-- **Removed actions** (5 across the four runs): "stay indoors" at too low a level 3; a hazard that is not serious for the household 1; a second action for the same hazard 1.
+- **Removed actions** (23 across the four runs): a word outside the reviewed list 22; "stay indoors" at too low a level 1. A rule added after these runs (an action that contains an internal label such as "young_child") would remove one more action in the English tuned run.
+- **Before the word lists** (runs 15 to 18, earlier the same day) the screen kept 95% to 98% of actions. Reading those kept actions is what showed the three problems above.
 - **The reading grade** uses a syllable heuristic, covers only the action, and is valid for English only.
 
 **Why the design changed.** Until 8 October the model also wrote the evidence sentence, and a verifier checked its numbers against the data. That verifier passed a sentence whose numbers were all real but attached to the wrong days ("224 today, 219 tomorrow" when the data said 219 today and 224 the day after), and showed it with a "verified" badge. It was found by looking at a live result, not by the evaluation. A stricter check fixed that case but relied on a heuristic, so the model was taken out of the numbers entirely. Figures from the earlier design (72% to 97% of claims passing, depending on the day and the rules in force) are in [`PLAN.md`](PLAN.md), section 8, and are not comparable with the table above.
@@ -76,11 +78,11 @@ How to read this honestly:
 
 ## Limits
 
-- **The wording of each action is not verified.** It is screened for digits and for one kind of over-warning. A poor, vague or over-cautious action can pass, and "96% kept" says nothing about that.
+- **The wording of each action is screened, not verified.** The screen removes digits, one kind of over-warning, and any word outside a reviewed list for the hazard. Reviewed words can still be combined into a weak or awkward action, and no person or clinician has reviewed the advice.
 - **The description sentence goes to the model provider.** "Describe your home" sends what the visitor typed to Mistral. Prakira does not store or log it, and the page says so and asks visitors to leave out names. The form works without it.
-- **Free data limits.** Open-Meteo counts a multi-decade request as many calls against a free daily limit. The 30-year normal and the long-range outlook are fetched once per place and cached on disk; when the limit is reached the page says so and the briefing still works.
+- **Free data limits.** Open-Meteo counts a multi-decade request as many calls against a free daily limit. The 30-year normal and the long-range outlook are fetched once per place and cached on disk. When Open-Meteo's limit is reached, both fall back to NASA POWER (`lib/power.mjs`; MERRA-2 reanalysis, free, no key), and the page names the source. Its grid is about 50 km, coarser than ERA5, so a city centre reads cooler: the same place can show a different "normal" depending on which record answered.
 - **The two-model row compares temperature only,** between two 0.25° models, and is separate from the forecast the hazard levels are computed from (Open-Meteo's default blend). In mountains or on coasts, two coarse grids can differ for reasons of terrain, not of weather.
-- **The long-range outlook is model output:** the median of three climate models on a high-emissions pathway, for daily maximum air temperature, in two 10-year windows. It is context, not a prediction for your home.
+- **The long-range outlook is model output:** the median of three climate models on a high-emissions pathway, for daily maximum air temperature, in two 10-year windows. It is context, not a prediction for your home. When the climate models cannot be reached, the card looks back instead: hot days a year in 1991 to 2000 and in 2011 to 2020 from the NASA POWER record, labelled as a look back. Two 10-year windows from one reanalysis are not a trend estimate.
 - **One action per hazard.** Advice for one hazard can conflict with another (closing windows against bad air in a hot home without air conditioning). A compound-day notice flags the overlap but does not resolve it.
 - **Model forecasts, not sensors.** Air quality comes from CAMS at about 11 km in Europe and 45 km elsewhere.
 - **Not an official warning and not medical advice.** It is a companion to your national meteorological service.
@@ -98,7 +100,7 @@ npm start                                   # http://localhost:3000
 ```
 
 ```bash
-npm test                       # 40 unit tests, offline
+npm test                       # 43 unit tests, offline
 npm run eval -- 15 en heldout  # live evaluation: [count] [en|id] [tuned|heldout]
 ```
 
@@ -117,7 +119,9 @@ lib/intake.mjs        "Describe your home": reads one sentence into form choices
 lib/verify.mjs        Screens each AI action and builds the item shown; consistency check for built items
 lib/notice.mjs        Standard notices and the compound-day notice
 lib/trace.mjs         Records each real step with its duration, for the live process display
-lib/outlook.mjs       Long-range outlook from three climate models
+lib/outlook.mjs       Long-range outlook from three climate models; look back from the record when they are unavailable
+lib/power.mjs         NASA POWER daily record, the second source for the normal and the look back
+lib/vocab.mjs         Reviewed word lists that an action may use, by hazard and language
 lib/models.mjs        Agreement between a physics forecast model and an AI forecast model
 lib/store.mjs         Disk cache for normals and outlooks
 lib/readability.mjs   Reading grade, used by the evaluation

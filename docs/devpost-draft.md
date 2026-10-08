@@ -49,13 +49,13 @@ If nothing is serious for your household, it says so and gives no advice. If the
 
 Five layers, and only one of them is a language model:
 
-1. **Data:** Open-Meteo forecast, the CAMS air-quality forecast, and an ERA5-based climate archive. No API key.
+1. **Data:** Open-Meteo forecast, the CAMS air-quality forecast, and an ERA5-based climate archive, with NASA POWER as the second source when the free daily limit is reached. No API key.
 2. **Rules:** code computes the NWS heat index from temperature and humidity, assigns every hazard level, and decides which levels are serious for the chosen household.
 3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one short action per serious hazard, and nothing else. It is told not to write numbers.
 4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
-The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 40 unit tests run offline.
+The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 43 unit tests run offline.
 
 ## Results
 
@@ -63,13 +63,13 @@ Live evaluation on 8 October 2026. "Held-out" means 15 cities never used while a
 
 | | English, held-out | Indonesian, held-out |
 |---|---|---|
-| AI actions kept by the screen | 26 of 27 (96.3%) | 26 of 27 (96.3%) |
-| Serious hazards covered by the AI alone | 92.3% | 92.3% |
+| AI actions kept by the screen | 23 of 27 (85.2%) | 22 of 27 (81.5%) |
+| Serious hazards covered by the AI alone | 84.2% | 84.2% |
 | Serious hazards covered with notices | 100% | 100% |
 | Numbers written by the AI and shown to the user | 0 | 0 |
-| Reading grade of the action (median; at grade 8 or below) | 4.8; 96.2% | not computed |
+| Reading grade of the action (median; at grade 8 or below) | 4.4; 95.7% | not computed |
 
-"Kept" means the action passed the screening rules; it is not a rating of the advice. These are small samples and one run each. Coverage with notices and the zero in the fourth row are true by design. The full record, including the earlier design and runs made with bugs since fixed, is in the repository.
+"Kept" means the action passed the screening rules; it is not a rating of the advice. The screen is strict on purpose: an action may only use words from a reviewed list for its own hazard, and anything else is replaced by a standard notice. Before that rule the screen kept 96%, and reading those actions turned up "stay near water" for polluted air and "use fans to pull clean air in". These are small samples and one run each. Coverage with notices and the zero in the fourth row are true by design. The full record, including the earlier design and runs made with bugs since fixed, is in the repository.
 
 ## Challenges we ran into
 

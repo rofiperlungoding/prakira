@@ -431,7 +431,7 @@
   <h2 class="big center" data-t="evH"></h2>
   <p class="lede center" data-t="evP"></p>
   <div class="stats">
-    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">96%</div><p data-t="ev1p"></p></div>
+    <div class="stat a"><h3 data-t="ev1"></h3><div class="n">83%</div><p data-t="ev1p"></p></div>
     <div class="stat b"><h3 data-t="ev2"></h3><div class="n">100%</div><p data-t="ev2p"></p></div>
     <div class="stat c"><h3 data-t="ev3"></h3><div class="n">0</div><p data-t="ev3p"></p></div>
   </div>
@@ -518,7 +518,9 @@ const T = {
     share: 'Share on WhatsApp', copy: 'Copy text', copied: 'Copied.', copyFail: 'Could not copy. Select the text and copy it by hand.', shareFoot: 'Numbers come straight from forecast data. Not an official warning, not medical advice.',
     outlookH: 'Looking further ahead', outRun: 'Reading three climate models…', outFail: (m) => `Outlook unavailable: ${m}`,
     outLine: (th) => `Days a year at or above ${th} °C (daily high)`, outPast: (y) => `${y[0]} to ${y[1]}`, outRange: (a, b) => `models: ${a} to ${b}`,
-    outRare: (th) => `Days at or above ${th} °C stay rare here in both 2011 to 2020 and 2041 to 2050: under one a year in every model.`,
+    outRare: (th, p, seen) => `Days at or above ${th} °C ${seen ? 'were' : 'stay'} rare here in both ${p.past[0]} to ${p.past[1]} and ${p.future[0]} to ${p.future[1]}: under one a year${seen ? '' : ' in every model'}.`,
+    outSeen: 'Looking back, not ahead: the climate models are not available right now, so this is what the record already shows for this place.',
+    outNoteSeen: 'From NASA POWER (MERRA-2 reanalysis, grid of about 50 km). A reanalysis is not a weather-station measurement, and a grid this coarse reads cooler than a city centre. Air temperature, not heat index. Two 10-year windows: a difference between them is not by itself a trend.',
     outNote: 'Median of three climate models (CMIP6 HighResMIP, bias-corrected against ERA5-Land) on a high-emissions pathway close to RCP8.5. Model output, not measurement, and air temperature, not heat index. The models differ: read the range, not one number.',
     d1: 'numbers from data', d2: 'start here',
     strip: 'Next 72 hours', briefing: 'Your briefing', audit: 'Audit trail',
@@ -530,7 +532,7 @@ const T = {
     weekday: (w) => w, level: (l) => l, chance: (p) => `${p}% chance`,
     nodata: 'no data', compound: 'heat + polluted air on the same day', cmp: 'H+A',
     ctx: (a) => (a === 0 ? 'as normal' : `${a > 0 ? '+' : '−'}${Math.abs(a)} °C`), norm: (n) => `normal ${n} °C`,
-    ctxNote: 'Climate row: forecast daily maximum compared with the 1991–2020 average for the same week at this place (ERA5-based archive). Forecast and archive come from different models, so part of the difference is model bias.',
+    ctxNote: (src) => `Climate row: forecast daily maximum compared with the 1991–2020 average for the same week at this place (${src === 'MERRA-2' ? 'NASA POWER, MERRA-2 reanalysis, grid of about 50 km' : 'ERA5-based archive'}). Forecast and archive come from different models, so part of the difference is model bias.`,
     tapNote: 'Select a briefing item to see the numbers it relies on, or select a number to see what relies on it.',
     verified: 'numbers straight from the data', notice: 'standard notice', compoundBadge: 'compound day',
     quiet: 'No serious hazards for this household in the next three days. No special action is needed.',
@@ -549,14 +551,14 @@ const T = {
     pp1: 'Forecast and climate data', pp2: 'Rules set the levels', pp3: 'AI writes the actions', pp4: 'Checker screens each action', pp5: 'Your briefing',
     ppSrc: 'open data', ppRule: 'fixed rules', ppAi: 'not trusted', ppYou: 'with receipts',
     evH: 'Measured, not promised', evP: 'Tested on 35 cities across climates. The headline figures are from 15 cities the system was never tuned on.',
-    ev1: 'AI actions kept', ev1p: 'Share of the AI\'s actions that pass the screen, on cities the system was never tuned on: 96% in English and 96% in Indonesian. The rest are removed before you see them.',
-    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as an AI action or as a standard notice. The AI alone covers 92%.',
+    ev1: 'AI actions kept', ev1p: 'Share of the AI\'s actions that pass the screen, on cities the system was never tuned on: 85% in English and 81% in Indonesian. The rest are removed before you see them, and a standard notice takes their place.',
+    ev2: 'Serious hazards covered', ev2p: 'Every serious hazard reaches you, as an AI action or as a standard notice. The AI alone covers 84%.',
     ev3: 'Numbers written by the AI', ev3p: 'Every figure in a briefing comes from the forecast data. The AI writes only the action, and an action that contains a number is removed.',
-    evFine: 'Results from 8 October 2026: one run per language on 15 held-out cities (27 actions each); on the 20 cities used for development, 98% and 95% were kept. Small samples, one run each. "Kept" means the action passed the screening rules (no numbers, a hazard that is serious for the household, no over-warning). It is not a judgement of how good the advice is: that has been read by an AI assistant, not yet by a person or a clinician. Coverage is 100% by design, because notices fill every gap. Method, code and limits are public.',
+    evFine: 'Results from 8 October 2026: one run per language on 15 held-out cities (27 actions each, 45 of 54 kept); on the 20 cities used for development, 77% and 91% were kept. Small samples, one run each. "Kept" means the action passed the screening rules (no numbers, a hazard that is serious for the household, no over-warning, and only words from a reviewed list for that hazard, so an action about the wrong hazard or with an odd word is removed). It is not a judgement of how good the advice is: that has been read by an AI assistant, not yet by a person or a clinician. Coverage is 100% by design, because notices fill every gap. Method, code and limits are public.',
     faqH: 'More questions?',
     f1q: 'Is this an official warning?', f1a: 'No. Prakira is a companion to your national meteorological service, such as BMKG in Indonesia. In an emergency, follow official instructions.',
     f2q: 'Is this medical advice?', f2a: 'No. It suggests everyday protective actions. It does not diagnose and it has not been reviewed by clinicians.',
-    f3q: 'Where does the data come from?', f3a: 'Open-Meteo forecast models, the CAMS air-quality forecast, and an ERA5-based climate archive. These are model values for a grid cell several kilometres wide, not sensor readings at your address.',
+    f3q: 'Where does the data come from?', f3a: 'Open-Meteo forecast models, the CAMS air-quality forecast, and an ERA5-based climate archive (NASA POWER when that is unavailable). These are model values for a grid cell several kilometres wide, not sensor readings at your address.',
     f4q: 'Why does my household matter?', f4a: 'The same heat is a different risk for an older adult, a child, or someone who works outside. Choosing who lives there lowers the level at which Prakira speaks up about the hazard that affects them. These adjustments are our judgement based on the wording of the official categories, not an official rule.',
     f5q: 'What does "against normal" mean?', f5a: 'It compares the forecast daily maximum with the 1991 to 2020 average for the same week at that place. It shows how unusual the coming days are for your local climate.',
     foot1: 'Not medical advice and not an official warning.', foot2: 'Data:', method: 'Method and source code',
@@ -612,7 +614,9 @@ const T = {
     share: 'Bagikan ke WhatsApp', copy: 'Salin teks', copied: 'Tersalin.', copyFail: 'Tidak dapat menyalin. Pilih teksnya dan salin secara manual.', shareFoot: 'Angka berasal langsung dari data prakiraan. Bukan peringatan resmi, bukan nasihat medis.',
     outlookH: 'Melihat lebih jauh ke depan', outRun: 'Membaca tiga model iklim…', outFail: (m) => `Proyeksi tidak tersedia: ${m}`,
     outLine: (th) => `Hari per tahun dengan suhu maksimum ${th} °C atau lebih`, outPast: (y) => `${y[0]} sampai ${y[1]}`, outRange: (a, b) => `model: ${a} sampai ${b}`,
-    outRare: (th) => `Hari dengan suhu ${th} °C atau lebih tetap jarang di sini pada 2011 sampai 2020 maupun 2041 sampai 2050: kurang dari satu per tahun di setiap model.`,
+    outRare: (th, p, seen) => `Hari dengan suhu ${th} °C atau lebih ${seen ? '' : 'tetap '}jarang di sini pada ${p.past[0]} sampai ${p.past[1]} maupun ${p.future[0]} sampai ${p.future[1]}: kurang dari satu per tahun${seen ? '' : ' di setiap model'}.`,
+    outSeen: 'Melihat ke belakang, bukan ke depan: model iklim sedang tidak tersedia, jadi ini yang sudah tercatat untuk tempat ini.',
+    outNoteSeen: 'Dari NASA POWER (reanalisis MERRA-2, grid sekitar 50 km). Reanalisis bukan pengukuran stasiun cuaca, dan grid sekasar ini terbaca lebih sejuk daripada pusat kota. Ini suhu udara, bukan indeks panas. Dua jendela 10 tahun: selisih di antaranya belum tentu sebuah tren.',
     outNote: 'Median tiga model iklim (CMIP6 HighResMIP, dikoreksi bias terhadap ERA5-Land) pada jalur emisi tinggi yang mendekati RCP8.5. Ini keluaran model, bukan pengukuran, dan suhu udara, bukan indeks panas. Model saling berbeda: baca rentangnya, bukan satu angka.',
     d1: 'angka dari data', d2: 'mulai di sini',
     strip: '72 jam ke depan', briefing: 'Ringkasan Anda', audit: 'Jejak audit',
@@ -629,7 +633,7 @@ const T = {
     chance: (p) => `peluang ${p}%`,
     nodata: 'tanpa data', compound: 'panas + udara tercemar di hari yang sama', cmp: 'P+U',
     ctx: (a) => (a === 0 ? 'seperti normal' : `${a > 0 ? '+' : '−'}${Math.abs(a)} °C`), norm: (n) => `normal ${n} °C`,
-    ctxNote: 'Baris iklim: suhu maksimum harian prakiraan dibanding rata-rata 1991–2020 untuk minggu yang sama di tempat ini (arsip berbasis ERA5). Prakiraan dan arsip berasal dari model berbeda, jadi sebagian selisih adalah bias model.',
+    ctxNote: (src) => `Baris iklim: suhu maksimum harian prakiraan dibanding rata-rata 1991–2020 untuk minggu yang sama di tempat ini (${src === 'MERRA-2' ? 'NASA POWER, reanalisis MERRA-2, grid sekitar 50 km' : 'arsip berbasis ERA5'}). Prakiraan dan arsip berasal dari model berbeda, jadi sebagian selisih adalah bias model.`,
     tapNote: 'Pilih satu butir ringkasan untuk melihat angka yang mendasarinya, atau pilih satu angka untuk melihat butir yang memakainya.',
     verified: 'angka langsung dari data', notice: 'pemberitahuan standar', compoundBadge: 'hari gabungan',
     quiet: 'Tidak ada bahaya serius bagi rumah tangga ini dalam tiga hari ke depan. Tidak perlu tindakan khusus.',
@@ -648,14 +652,14 @@ const T = {
     pp1: 'Data prakiraan dan iklim', pp2: 'Aturan menetapkan tingkat', pp3: 'AI menulis tindakan', pp4: 'Penyaring memeriksa tiap tindakan', pp5: 'Ringkasan Anda',
     ppSrc: 'data terbuka', ppRule: 'aturan tetap', ppAi: 'tidak dipercaya', ppYou: 'dengan bukti',
     evH: 'Diukur, bukan dijanjikan', evP: 'Diuji pada 35 kota di berbagai iklim. Angka utama berasal dari 15 kota yang tidak pernah dipakai untuk menyetel sistem.',
-    ev1: 'Tindakan AI yang dipakai', ev1p: 'Bagian tindakan AI yang lolos penyaringan, pada kota yang tidak pernah dipakai untuk menyetel sistem: 96% dalam bahasa Inggris dan 96% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya.',
-    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan AI atau pemberitahuan standar. AI sendiri mencakup 92%.',
+    ev1: 'Tindakan AI yang dipakai', ev1p: 'Bagian tindakan AI yang lolos penyaringan, pada kota yang tidak pernah dipakai untuk menyetel sistem: 85% dalam bahasa Inggris dan 81% dalam bahasa Indonesia. Sisanya dibuang sebelum Anda melihatnya, dan diganti pemberitahuan standar.',
+    ev2: 'Bahaya serius tercakup', ev2p: 'Setiap bahaya serius sampai ke Anda, sebagai tindakan AI atau pemberitahuan standar. AI sendiri mencakup 84%.',
     ev3: 'Angka yang ditulis AI', ev3p: 'Setiap angka dalam ringkasan berasal dari data prakiraan. AI hanya menulis tindakan, dan tindakan yang memuat angka dibuang.',
-    evFine: 'Hasil 8 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (27 tindakan masing-masing); pada 20 kota yang dipakai saat pengembangan, 98% dan 95% dipakai. Sampelnya kecil dan hanya satu pengujian. "Dipakai" berarti tindakan lolos aturan penyaringan (tanpa angka, bahaya yang serius bagi rumah tangga, tidak berlebihan). Itu bukan penilaian mutu sarannya: saran baru dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Metode, kode, dan batasannya terbuka.',
+    evFine: 'Hasil 8 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (27 tindakan masing-masing, 45 dari 54 dipakai); pada 20 kota yang dipakai saat pengembangan, 77% dan 91% dipakai. Sampelnya kecil dan hanya satu pengujian. "Dipakai" berarti tindakan lolos aturan penyaringan (tanpa angka, bahaya yang serius bagi rumah tangga, tidak berlebihan, dan hanya memakai kata dari daftar yang sudah diperiksa untuk bahaya itu, sehingga tindakan untuk bahaya yang salah atau dengan kata yang janggal dibuang). Itu bukan penilaian mutu sarannya: saran baru dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Metode, kode, dan batasannya terbuka.',
     faqH: 'Masih ada pertanyaan?',
     f1q: 'Apakah ini peringatan resmi?', f1a: 'Bukan. Prakira adalah pendamping bagi badan meteorologi nasional Anda, seperti BMKG di Indonesia. Dalam keadaan darurat, ikuti arahan resmi.',
     f2q: 'Apakah ini nasihat medis?', f2a: 'Bukan. Prakira menyarankan tindakan perlindungan sehari-hari. Prakira tidak mendiagnosis dan belum ditinjau oleh tenaga medis.',
-    f3q: 'Dari mana datanya?', f3a: 'Model prakiraan Open-Meteo, prakiraan kualitas udara CAMS, dan arsip iklim berbasis ERA5. Ini nilai model untuk satu sel grid selebar beberapa kilometer, bukan bacaan sensor di alamat Anda.',
+    f3q: 'Dari mana datanya?', f3a: 'Model prakiraan Open-Meteo, prakiraan kualitas udara CAMS, dan arsip iklim berbasis ERA5 (NASA POWER bila arsip itu tidak tersedia). Ini nilai model untuk satu sel grid selebar beberapa kilometer, bukan bacaan sensor di alamat Anda.',
     f4q: 'Mengapa rumah tangga saya berpengaruh?', f4a: 'Panas yang sama adalah risiko yang berbeda bagi lansia, anak, atau orang yang bekerja di luar. Memilih siapa yang tinggal di sana menurunkan tingkat saat Prakira mulai bersuara tentang bahaya yang mengenai mereka. Penyesuaian ini adalah penilaian kami dari kata-kata kategori resmi, bukan aturan resmi.',
     f5q: 'Apa arti "dibanding normal"?', f5a: 'Membandingkan suhu maksimum harian prakiraan dengan rata-rata 1991 sampai 2020 untuk minggu yang sama di tempat itu. Ini menunjukkan seberapa tidak biasa hari-hari mendatang bagi iklim setempat.',
     foot1: 'Bukan nasihat medis dan bukan peringatan resmi.', foot2: 'Data:', method: 'Metode dan kode sumber',
@@ -1002,19 +1006,22 @@ async function loadOutlook(place) {
     if (state.place !== place || !box.isConnected) return; // the user moved on
     if (!o.available) throw new Error(o.reason);
     status.className = 'act'; status.textContent = '';
-    if (o.rare) { box.appendChild(el('p', 'olead', L.outRare(o.threshold))); }
+    const seen = o.source === 'observed';
+    if (seen) box.appendChild(el('p', 'note', L.outSeen));
+    if (o.rare) { box.appendChild(el('p', 'olead', L.outRare(o.threshold, o.periods, seen))); }
     else {
       box.appendChild(el('p', 'olead', L.outLine(o.threshold)));
       const row = el('div', 'orow');
       for (const [k, arrow] of [['past', false], ['future', true]]) {
         if (arrow) row.appendChild(el('span', 'oarrow', '→'));
         const c = el('div', 'ocol');
-        c.append(el('b', '', String(o[k].median)), el('span', '', L.outPast(o.periods[k])), el('small', '', L.outRange(o[k].min, o[k].max)));
+        c.append(el('b', '', String(o[k].median)), el('span', '', L.outPast(o.periods[k])));
+        if (!seen) c.appendChild(el('small', '', L.outRange(o[k].min, o[k].max)));
         row.appendChild(c);
       }
       box.appendChild(row);
     }
-    box.appendChild(el('p', 'note', L.outNote));
+    box.appendChild(el('p', 'note', seen ? L.outNoteSeen : L.outNote));
   } catch (e) {
     if (box.isConnected) { status.className = 'act bad'; status.textContent = L.outFail(e.message); }
   }
@@ -1035,7 +1042,7 @@ function render(d) {
 
   const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
   s1.appendChild(strip(d));
-  if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote));
+  if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote(d.context[0].source)));
   if ((d.models || []).length) s1.appendChild(el('p', 'note', L.modNote));
   out.appendChild(s1);
 
@@ -1077,7 +1084,7 @@ function render(d) {
   };
   const [hRules, hModel, hNotice] = L.how(d.model, d.attempts);
   block('forecast', L.steps.forecast, [L.readAt(clock(d.generatedAt)).replace(/^./, (x) => x.toUpperCase()), L.sources[0]]);
-  block('climate', L.steps.climate, [L.ctxNote]);
+  block('climate', L.steps.climate, [L.ctxNote(d.context?.[0]?.source)]);
   block('models', L.steps.models, [L.modNote]);
   block('rules', L.steps.rules, [hRules, L.sources[1], L.auHouse]);
   block('model', L.steps.model, [hModel, L.sources[2]]);

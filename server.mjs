@@ -121,8 +121,7 @@ http.createServer(async (req, res) => {
         return send(res, 200, { available: true, ...(await getOutlook(lat, lon)) });
       } catch (e) {
         console.error(new Date().toISOString(), u.pathname, e.message);
-        const limit = /HTTP 429/.test(e.message);
-        return send(res, 200, { available: false, reason: limit ? 'the climate data provider has reached its free daily limit; try again tomorrow' : e.message });
+        return send(res, 200, { available: false, reason: 'neither the climate models nor the temperature record answered; try again later' });
       }
     }
     send(res, 404, { error: 'not found' });

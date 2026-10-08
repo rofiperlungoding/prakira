@@ -52,7 +52,7 @@ Five layers, and only one of them is a language model:
 1. **Data:** Open-Meteo forecast, the CAMS air-quality forecast, and an ERA5-based climate archive, with NASA POWER as the second source when the free daily limit is reached. No API key.
 2. **Rules:** code computes the NWS heat index from temperature and humidity, assigns every hazard level, and decides which levels are serious for the chosen household.
 3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one short action per serious hazard, and nothing else. It is told not to write numbers.
-4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
+4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, uses only words from a reviewed list for that hazard, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
 The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 43 unit tests run offline.
@@ -99,7 +99,6 @@ Checking an AI's output is weaker than not needing to. Our verifier passed a wro
 
 - A review of the advice by people, including a health professional.
 - Resolve conflicts between hazards (bad air against heat in a home without air conditioning).
-- A long-range card from climate projections: how many very hot days to expect in the 2040s compared with the recent past.
 - More languages, each with its own verification tests.
 
 ## Built with

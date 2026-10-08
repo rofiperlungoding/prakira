@@ -26,7 +26,16 @@ Submit a working, honest project to **ForgeHacks Online 2026**, track **AI + Cli
 | Team | Registered on Devpost. Owner `rofi` (GitHub `rofiperlungoding`) does the build with AI assistance. | Stated by owner 2026-10-07 |
 | Budget | $0. Free tiers only. No paid fallbacks. | Standing rule |
 
-**Devpost rules could not be re-read on 2026-10-07** (the site returned HTTP 429 to automated fetches three times, and the browser extension was not connected). The owner must open `https://forgehacks-2026.devpost.com/rules` once by hand and confirm five things: deadline time and timezone, video length limit, repo must be public, team/track lock, any new rule since 17 Sep. Record the result in section 13.
+**Devpost rules page, read from the owner's screenshot on 2026-10-08** (`https://forgehacks-2026.devpost.com/rules`):
+
+- Submission deadline: October 10, 12:00 PM EDT, which is 23:00 WIB. Confirmed.
+- Judging period: October 10 to 11. Winners announced October 12, 3:00 PM EDT. The demo must stay up through 11 October at least.
+- "Code must be publicly viewable." Confirmed.
+- AI coding tools are explicitly allowed, and are scored separately from the project's own use of AI.
+- "Projects must be substantially created during the hackathon period."
+- Open to current students; teams of 1 to 4; all team members must be listed on the Devpost submission; one submission per team (the most recently submitted one is judged).
+- The Technical criterion says "thoughtful integration of AI (not just a wrapper)".
+- **Not on the rules page:** a video length limit, and any team or track lock. The "2 to 4 minutes" figure remains the earlier record; check the submission form.
 
 ---
 
@@ -517,6 +526,6 @@ If no action is removed in the recorded run, say so and show the removed-action 
 
 **Open questions for the owner**
 
-1. Please open the Devpost rules page by hand and confirm the five items in section 1.
+1. Done 2026-10-08 (section 1). Still open: check the video length limit on the Devpost submission form.
 2. Please open https://prakira.rofihosted.space on a phone (mobile data) and say whether it works and reads well.
 3. About page: confirm the line "built by Rofi, a student in Indonesia", and send two or three sentences in your own words on what made you want to build this, if you want a personal paragraph there.

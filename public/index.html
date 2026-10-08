@@ -344,14 +344,6 @@
   .hero::before { width:420px; height:420px; left:-140px; top:-90px; background:var(--lime); }
   .hero::after { width:380px; height:380px; right:8%; bottom:-170px; background:var(--mint); }
 
-  /* Ticker between the hero and the page */
-  .ticker { overflow:hidden; padding:16px 0; margin:-16px 0; position:relative; z-index:3; pointer-events:none; }
-  .tkb { background:var(--ink); color:var(--paper); transform:rotate(-1.1deg) scale(1.03); padding:13px 0; }
-  .tk { display:flex; width:max-content; }
-  .tk span { display:inline-flex; align-items:center; gap:26px; padding-right:26px; font:500 1.05rem var(--head); white-space:nowrap; }
-  .tk span::after { content:""; width:9px; height:9px; border-radius:50%; background:var(--lime); }
-  .tk span:nth-child(3n+1)::after { background:var(--mint); } .tk span:nth-child(3n+2)::after { background:var(--lilac); }
-
   /* Hazard pictures tilt towards the pointer */
   .hz .pic { transform:perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition:transform .3s cubic-bezier(.2,.8,.2,1); }
   .hz .pic::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.6), transparent 55%); opacity:0; transition:opacity .3s; pointer-events:none; }
@@ -385,7 +377,6 @@
     .phone .pc { animation:pop .6s cubic-bezier(.2,.8,.2,1) 1.25s backwards; } .phone .pc + .pc { animation-delay:1.45s; }
     .phone .pc span { animation:glow 3s ease-in-out 2s infinite; }
     .d-note { animation:fadeup .7s 1.2s backwards; }
-    .tk { animation:tick 46s linear infinite; }
 
     .art .c.on { animation:ring 4s ease-in-out infinite; }
     .art .row:nth-child(2) .c.on { animation-delay:.25s; }
@@ -413,7 +404,6 @@
     @keyframes stickin { from { opacity:0; transform:scale(.3) rotate(-40deg); } }
     @keyframes floaty { 50% { transform:rotate(calc(var(--pr, 13deg) - 1.5deg)) scale(var(--ps, 1)) translateY(-12px); } }
     @keyframes glow { 50% { box-shadow:0 0 0 5px rgba(23,96,63,.14); } }
-    @keyframes tick { to { transform:translateX(-50%); } }
     @keyframes ring { 0%, 60%, 100% { box-shadow:0 0 0 2px var(--ink); transform:none; } 20% { box-shadow:0 0 0 2px var(--ink), 0 0 0 10px rgba(184,68,63,.22); transform:scale(1.04); } }
     @keyframes wire { to { background-position:0 10px; } }
     @keyframes chip { 0%, 55%, 100% { background:var(--soft); transform:none; } 25% { background:var(--lime); transform:translateY(-2px) scale(1.12); } }
@@ -473,8 +463,6 @@
     </div></div>
   </div>
 </div></header>
-
-<div class="ticker" aria-hidden="true"><div class="tkb"><div class="tk"></div></div></div>
 
 <section class="band" id="meet"><div class="wrap two">
   <div class="art" aria-hidden="true">
@@ -1295,13 +1283,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') light([]);
 /* ---- Motion: decoration only. Runs fully only when the visitor has not asked for reduced motion. ---- */
 const MOTION = matchMedia('(prefers-reduced-motion: no-preference)').matches && 'IntersectionObserver' in window;
 
-// Text that is rebuilt whenever the language changes: the ticker, and the headline split into words.
+// Rebuilt whenever the language changes: the headline split into words.
 function decorate() {
   const L = t();
-  const tk = document.querySelector('.tk');
-  tk.textContent = '';
-  // An even number of repeats, so moving the row by half its width lands on an identical frame.
-  for (let k = 0; k < 6; k++) for (const w of [L.hz1, L.hz2, L.hz3, L.hz4, L.sticker, L.meetH, L.evH]) tk.appendChild(el('span', '', w));
   if (!MOTION) return;
   const h = document.querySelector('.hero h1');
   h.setAttribute('aria-label', L.h1);

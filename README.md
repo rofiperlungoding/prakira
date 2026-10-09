@@ -7,6 +7,8 @@
   <img src="https://img.shields.io/badge/dependencies-0-fff3d6?style=for-the-badge&labelColor=101a13" alt="No dependencies">
 </p>
 
+**Demo video (2:34):** https://youtu.be/HVf6HvzaQvM
+
 **Climate briefings with receipts.** Prakira turns the next 72 hours of heat, rain, air quality and UV into a few actions for one household, in English or Bahasa Indonesia, and shows the numbers behind every action.
 
 ForgeHacks 2026 · track: AI + Climate

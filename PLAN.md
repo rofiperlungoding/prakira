@@ -284,9 +284,9 @@ Status key: `[ ]` todo, `[~]` in progress, `[x]` done. Work in the listed order.
   - One architecture diagram (SVG) showing the trusted and untrusted layers.
   - *Accept:* a person who has never seen the project can run it and find every claim's evidence from the README alone.
 
-- [ ] **M10. Demo video (2.5 h).** 2:30 to 3:30; never over 4:00. Script in section 10. Record a clean successful run as a backup clip before the final recording. Upload, then open the link logged-out.
+- [x] **M10. Demo video (2.5 h).** 2:30 to 3:30; never over 4:00. Script in section 10. Record a clean successful run as a backup clip before the final recording. Upload, then open the link logged-out.
 
-- [ ] **M11. Devpost text and submission (1.5 h).** Draft in `docs/devpost-draft.md` first. Include the disclosure from section 11. Submit by 18:00 WIB on 10 Oct, then open the public project page logged-out and click every link. Make no risky change after submitting.
+- [x] **M11. Devpost text and submission (1.5 h).** Draft in `docs/devpost-draft.md` first. Include the disclosure from section 11. Submit by 18:00 WIB on 10 Oct, then open the public project page logged-out and click every link. Make no risky change after submitting.
 
 ### 7a. What M2 and M3 built (read before touching the model path)
 

@@ -50,7 +50,13 @@ Upload in this order. All are PNG, under 300 KB.
 
 ## Video demo link (YouTube or Vimeo)
 
-Upload the film to YouTube with visibility **Public**, then paste the URL. Suggested YouTube title and description:
+Uploaded to YouTube (public). Paste this URL:
+
+```text
+https://youtu.be/HVf6HvzaQvM
+```
+
+The upload instructions below are kept for reference. Suggested YouTube title and description:
 
 ```text
 Prakira: climate briefings with receipts (ForgeHacks 2026, AI + Climate)

@@ -43,12 +43,13 @@ Written at the end of session 7 for the next assistant. Where this section and a
 
 **Open items**
 
-1. Owner: record the video, add its link to the Devpost draft, submit. Check the video length limit on the Devpost form (not on the rules page).
+1. Owner: upload the film to YouTube (Public), paste the link into the Devpost form and the README, submit. Every form field is ready in `docs/devpost-draft.md`; the "About the project" text is `docs/devpost-about.md`. The length limit is confirmed: 2 to 4 minutes (section 1); the film is 2:34.
 2. Owner: open the site on a phone on mobile data; confirm the About line "built by Rofi, a student in Indonesia".
-3. `docs/screenshots/`: `hero.png` and `result.png` are current; the others show the old design. Retake or delete them before submission.
-4. `README.md` and `docs/devpost-draft.md` describe the audit link and the process line as always visible; they now sit behind "Show all the data". The README has one updated sentence; re-read both against the live page before submission.
-5. Not done: contrast ratios measured with a tool, a keyboard-only pass, Safari and Firefox, a trademark check of the logo, a human review of the advice.
-6. `public/about.html` has the new palette and logo but was not otherwise simplified.
+3. Done 2026-10-10: `docs/screenshots/` retaken from the live site (session 9). The two pictures of the old design were deleted.
+4. Done 2026-10-10: the Devpost text was rewritten against the live page (session 9).
+5. **Open, owner's decision:** the page, `lib/facts.mjs` and `public/about.html` attribute the daily rain classes (20, 50, 100, 150 mm) to "WMO-No. 1150 / WMO-No. 8". This was not confirmed: a web search on 2026-10-10 found the same cut points in a provincial report that cites BMKG, and did not find them in either WMO document. The README and the Devpost text say "commonly quoted from BMKG, not checked against a primary source". `public/about.html` also names ISO/IEC 42001, which is a management-system standard this project was not assessed against.
+6. Not done: contrast ratios measured with a tool, a keyboard-only pass, Safari and Firefox, a trademark check of the logo, a human review of the advice.
+7. `public/about.html` has the new palette and logo but was not otherwise simplified.
 
 ---
 
@@ -62,7 +63,7 @@ Submit a working, honest project to **ForgeHacks Online 2026**, track **AI + Cli
 | Internal submit target | **Sat 2026-10-10, 18:00 WIB** | Decision |
 | Track prompt | "Build an AI-powered solution addressing environmental understanding, climate preparation, resource use, or resilient systems." | Verified 2026-10-07 (forgehacks.vercel.app) |
 | Judging criteria | Real-World Impact & Relevance; Technical Implementation & AI Use; Innovation & Creativity; Execution & Completeness; Presentation & Communication. No published weights. | Recorded 2026-09-16 |
-| Required artifacts | Title, description, track, public demo video "2 to 4 minutes max", public GitHub repo with README, usage/testing instructions. | Recorded 2026-09-16/17 |
+| Required artifacts | (1) Title and short description with a clear problem and solution; (2) track; (3) public demo video, "2-4 minutes max", showing the problem and how the project works, posted online; (4) GitHub repository with source code and a clear README; (5) written description covering problem and target users, technical approach and components, real-world impact; (6) screenshots, architecture diagram, or deployment link. "Incomplete submissions (missing video or code) will not be eligible for judging." | Read from the owner's screenshot of "What to submit", 2026-10-10 |
 | Pre-existing work | Generic boilerplate allowed; project-specific code must be built during the event; disclose what you started with. | Recorded 2026-09-17 |
 | Team | Registered on Devpost. Owner `rofi` (GitHub `rofiperlungoding`) does the build with AI assistance. | Stated by owner 2026-10-07 |
 | Budget | $0. Free tiers only. No paid fallbacks. | Standing rule |
@@ -76,7 +77,8 @@ Submit a working, honest project to **ForgeHacks Online 2026**, track **AI + Cli
 - "Projects must be substantially created during the hackathon period."
 - Open to current students; teams of 1 to 4; all team members must be listed on the Devpost submission; one submission per team (the most recently submitted one is judged).
 - The Technical criterion says "thoughtful integration of AI (not just a wrapper)".
-- **Not on the rules page:** a video length limit, and any team or track lock. The "2 to 4 minutes" figure remains the earlier record; check the submission form.
+- **Not on the rules page:** any team or track lock. The video length limit ("2-4 minutes max") is on the "What to submit" list, confirmed 2026-10-10.
+- **Devpost form fields** (owner's screenshots, 2026-10-10): project name (60 characters), elevator pitch (200), thumbnail (JPG, PNG or GIF; 5 MB; 3:2), "About the project" (Markdown), "Built with" (up to 25 tags), "Try it out" links, image gallery (up to 15; 5 MB each; 3:2), video demo link (YouTube or Vimeo).
 
 ---
 
@@ -561,8 +563,11 @@ The script is in `docs/video-script.md` (rewritten 2026-10-09 for the points-fir
 
 - **2026-10-09 (session 8).** Video plan agreed with the owner: English narration, webcam only in the first and last shot, scripted screen capture by the assistant, assembly with `ffmpeg` (present on this PC; no transcription tool found). Script written: `docs/video-script.md`, eight shots, about 400 words. Not tested: the scripted capture and the join. **Next action: the owner reads the script and records the eight takes; the assistant trials a 10-second capture and join.**
 
+- **2026-10-10 (session 9).** The owner sent the "What to submit" list and the Devpost form. `docs/devpost-draft.md` is now one paste-ready block per form field, with a check against the six required items; `docs/devpost-about.md` is the "About the project" text (no tables), rewritten for the points-first page, with the sections the list asks for (problem and target users, technical approach and components, real-world impact). Removed from the README and the Devpost text: a citation that is not in the literature review ("Zhao et al., 2027"), "ISO/IEC 42001 alignment", "benchmarked against WMO normals" and "conforms to WCAG 2.1 AA/AAA" (none of these was checked). `docs/screenshots/` retaken: `node scripts/ui-check.cjs https://prakira.rofihosted.space docs/screenshots` reported no overflow, 18 cells, 4 items and 3 lit cells on hover at 1280 px (English) and 375 px (Indonesian); the only console error is Cloudflare's own analytics script, blocked by the page's content security policy. Added 3:2 pictures for the Devpost gallery (`result.png`, `data.png`, `audit.png`, `architecture.png`) and `thumbnail.png`. 43 tests pass. Not verified: that Devpost renders the About text as intended (not pasted yet), and the rain-class source (section 0, open item 5). **Next action: the owner uploads the film and submits.**
+
 **Open questions for the owner**
 
-1. Done 2026-10-08 (section 1). Still open: check the video length limit on the Devpost submission form.
-2. Please open https://prakira.rofihosted.space on a phone (mobile data) and say whether it works and reads well.
-3. About page: confirm the line "built by Rofi, a student in Indonesia", and send two or three sentences in your own words on what made you want to build this, if you want a personal paragraph there.
+1. Done 2026-10-10 (section 1): the video limit is 2 to 4 minutes.
+2. Rain classes: keep the WMO attribution on the page, or change it to "daily classes commonly quoted from BMKG"? See section 0, open item 5.
+3. Please open https://prakira.rofihosted.space on a phone (mobile data) and say whether it works and reads well.
+4. About page: confirm the line "built by Rofi, a student in Indonesia", and send two or three sentences in your own words on what made you want to build this, if you want a personal paragraph there.

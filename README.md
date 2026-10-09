@@ -1,4 +1,11 @@
-<p><img src="docs/brand/prakira-horizontal.svg" alt="Prakira" width="300"></p>
+<p align="center"><a href="https://prakira.rofihosted.space"><img src="docs/screenshots/banner.png" alt="Prakira: climate briefings with receipts. The AI writes the action, code supplies every number." width="100%"></a></p>
+
+<p align="center">
+  <a href="https://prakira.rofihosted.space"><img src="https://img.shields.io/badge/live_demo-prakira.rofihosted.space-f4a04c?style=for-the-badge&labelColor=101a13" alt="Live demo"></a>
+  <img src="https://img.shields.io/badge/ForgeHacks_2026-AI_+_Climate-fff3d6?style=for-the-badge&labelColor=101a13" alt="ForgeHacks 2026, track AI + Climate">
+  <img src="https://img.shields.io/badge/tests-43_passing-fff3d6?style=for-the-badge&labelColor=101a13" alt="43 unit tests passing">
+  <img src="https://img.shields.io/badge/dependencies-0-fff3d6?style=for-the-badge&labelColor=101a13" alt="No dependencies">
+</p>
 
 **Climate briefings with receipts.** Prakira turns the next 72 hours of heat, rain, air quality and UV into a few actions for one household, in English or Bahasa Indonesia, and shows the numbers behind every action.
 
@@ -6,9 +13,18 @@ ForgeHacks 2026 · track: AI + Climate
 
 - **Live demo:** https://prakira.rofihosted.space (self-hosted on a small home server; 10 briefings per 10 minutes per visitor)
 - **Why it exists and the research behind it:** https://prakira.rofihosted.space/about
-- **Screenshots:** [`docs/screenshots/`](docs/screenshots/) ([the points](docs/screenshots/result.png), [all the data](docs/screenshots/data.png), [the audit trail](docs/screenshots/audit.png))
 
-![The landing page](docs/screenshots/hero.png)
+![Three evaluation figures: 85% of AI actions kept by the screen, 100% of serious hazards covered, 0 numbers written by the AI](docs/screenshots/stats.png)
+
+## What you get
+
+| The answer: a short list of points | All the data, behind one switch |
+|---|---|
+| [![The numbered points](docs/screenshots/result.png)](docs/screenshots/result.png) | [![The 72-hour grid, the climate row and the models row](docs/screenshots/data.png)](docs/screenshots/data.png) |
+| **The audit trail: every step, every removal** | **The landing page** |
+| [![The audit trail](docs/screenshots/audit.png)](docs/screenshots/audit.png) | [![The landing page](docs/screenshots/hero.png)](docs/screenshots/hero.png) |
+
+![The four hazards: heat, rain, air and UV, each with the source of its levels](docs/screenshots/hazards.png)
 
 ## The idea in one paragraph
 
@@ -110,6 +126,9 @@ Environment variables: `MISTRAL_API_KEY` (required), `MISTRAL_MODEL` (default `o
 
 ## Repository map
 
+<details>
+<summary>Every file and what it does</summary>
+
 ```text
 server.mjs            HTTP server: /, /about, /healthz, /api/geocode, /api/brief (JSON or event stream), /api/intake, /api/outlook
 public/index.html     Landing page and tool (vanilla JS; model text is inserted as text, never as HTML)
@@ -133,6 +152,8 @@ docs/                 Literature review, review notes, architecture, logo, scree
 PLAN.md               Working plan, decisions and the full evaluation record
 AGENTS.md             Entry point for AI coding assistants
 ```
+
+</details>
 
 ## Provenance and disclosure
 

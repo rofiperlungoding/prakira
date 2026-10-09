@@ -16,7 +16,7 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 
 ## How it works
 
-![Architecture](docs/architecture.svg)
+![How a Prakira briefing is made: data, rules, model, screen and evidence, notices](docs/screenshots/architecture.png)
 
 Shaped by the impact-based approach of the WMO guidelines on multi-hazard warnings (WMO-No. 1150) and the UN Sendai Framework (Target G): say what the weather will do, not only what it will be. Rules and model are kept apart, and only one layer is a language model:
 

@@ -11,6 +11,47 @@ Plan version: 2 (2026-10-07, night, WIB). Update section 13 at the end of every 
 
 ---
 
+## 0. Handoff, 2026-10-09 (read this first)
+
+Written at the end of session 7 for the next assistant. Where this section and a later section disagree, this section is right: sections 4, 5, 7a and 9 describe earlier designs in places.
+
+**State**
+
+- Build is finished and live at https://prakira.rofihosted.space. The served page matches the last commit on `main` (see `git log -1`). `npm test`: 43 of 43 pass.
+- Remaining tasks are M10 (demo video, the owner records it; script in section 10) and M11 (Devpost submission, draft in `docs/devpost-draft.md`). Deadline: Saturday 2026-10-10, 23:00 WIB; internal target 18:00 WIB. Judging runs 10 to 11 October, so the site must stay up.
+- Changed on 9 October: simpler form, three-card "receipts" section, new logo and brand kit (`docs/brand/`, guide in `docs/brand/README.md`), both pages moved to the brand palette, the result opens as numbered points with everything else behind "Show all the data".
+
+**What the owner wants (learned this session)**
+
+- Simple above everything. Few things on screen, plain words, points instead of paragraphs, nothing the reader has to work out. Full detail only when the reader asks for it.
+- The four hazard cards are the owner's reference for "good": one picture, one word, one sentence.
+- Brand palette only: Ink `#101a13`, Sunrise `#f4a04c` (the single accent), Cream `#fff3d6`, Paper `#fbfbf6`. Green and red are for status only. Do not change the severity scale (`--t0` to `--t4`): it carries meaning.
+- No bordered cards and no pill badges in the result. The owner rejected both.
+- The owner sends a screenshot and a short, blunt message in Indonesian. Act on it, show a screenshot back, keep the reply short.
+
+**How to work here**
+
+- All page code is in `public/index.html` (one file: CSS, markup, strings for English and Indonesian in `T`, script). Brand rules are the block at the end of the stylesheet. Every visible string has an `en` and an `id` entry; change both.
+- The server reads the page at start. **Restart the local server after editing the page**, or you will test the old one.
+- Check every UI change in a browser before saying it works: `node scripts/ui-check.cjs` (needs a running server and the Playwright install named in section 13, session 3), or your own screenshots at 1280 px and 375 px, in both languages.
+- After a change: `npm test`, add a line to section 13, commit, push, then deploy.
+- **Deploy:** from the `gtawifi-vps` repository, `sh scripts/deploy_prakira.sh /c/Users/Rofi/Documents/Codes/climate-brief`. It restarts only the `prakira` service. Then check `curl -s https://prakira.rofihosted.space/healthz`. Read `DEPLOY.local.md` first. Never restart `web`, `router`, `hermes` or `tunnel` on that server; other people use them.
+- Commits: the global git email on this PC is one GitHub rejects. Use `git -c user.email="$(git log -1 --format=%ae)" commit ...`.
+- The repository has mixed line endings and `core.autocrlf` warnings on commit; they are harmless.
+- Do not run `npm run eval` or anything that fetches the Open-Meteo archive in a loop: it used up the free daily quota once (section 13, session 5).
+- No new features, dependencies or build steps. Model output stays untrusted; levels and numbers come from `lib/facts.mjs`, never from the model.
+
+**Open items**
+
+1. Owner: record the video, add its link to the Devpost draft, submit. Check the video length limit on the Devpost form (not on the rules page).
+2. Owner: open the site on a phone on mobile data; confirm the About line "built by Rofi, a student in Indonesia".
+3. `docs/screenshots/`: `hero.png` and `result.png` are current; the others show the old design. Retake or delete them before submission.
+4. `README.md` and `docs/devpost-draft.md` describe the audit link and the process line as always visible; they now sit behind "Show all the data". The README has one updated sentence; re-read both against the live page before submission.
+5. Not done: contrast ratios measured with a tool, a keyboard-only pass, Safari and Firefox, a trademark check of the logo, a human review of the advice.
+6. `public/about.html` has the new palette and logo but was not otherwise simplified.
+
+---
+
 ## 1. Mission and constraints
 
 Submit a working, honest project to **ForgeHacks Online 2026**, track **AI + Climate**.

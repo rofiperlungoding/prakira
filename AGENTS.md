@@ -4,7 +4,7 @@ This repository is **Prakira**, a ForgeHacks 2026 submission (track AI + Climate
 
 ## Read in this order before doing anything
 
-1. **`PLAN.md`**: mission, current state, task list with acceptance tests, operating rules, decision log, session log. It is the single source of truth for what to do next.
+1. **`PLAN.md`**: start with section 0 (handoff: current state, what the owner wants, how to deploy). Then mission, current state, task list with acceptance tests, operating rules, decision log, session log. It is the single source of truth for what to do next.
 2. `docs/climate-novelty-literature.md`: why the product is shaped this way (requirements R1 to R8).
 3. `README.md`: the public description.
 4. `DEPLOY.local.md` if present (not in git): private server deployment notes.

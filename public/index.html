@@ -672,7 +672,7 @@ const T = {
     failed: 'No usable advice could be produced. The hazard levels above are still correct.',
     aRejected: 'Rejected model claims', aNone: 'None.', aHow: 'How this was made', aSources: 'Sources and limits', aOfficial: 'Official warnings',
     how: (m, n) => ['Hazard levels are set by fixed published rules, never by the language model.', n ? `The model (${m}, ${n} attempt${n === 1 ? '' : 's'}) writes only the actions. It writes no numbers: the sentence under each action is built from the data.` : 'The language model was not called for this briefing.', 'Standard notices are fixed text for serious hazards the model did not cover.'],
-    sources: ['Weather and air quality: Open-Meteo forecast models and CAMS. These are model forecasts for a grid cell (about 11 km in Europe, 45 km elsewhere), not sensor readings at your address.', 'Heat: US National Weather Service heat index (Rothfusz equation). Air: US EPA AQI categories. UV: WHO/WMO action tiers. Rain: BMKG rainfall intensity classes (Peraturan BMKG No. 9/2022); rain amount is not a flood forecast.', 'The wording of each action is written by a language model. It is screened for numbers and for over-warning, not for whether it is the best action.'],
+    sources: ['Weather and air quality: Open-Meteo forecast models and CAMS. These are model forecasts for a grid cell (about 11 km in Europe, 45 km elsewhere), not sensor readings at your address.', 'Heat: US National Weather Service heat index (Rothfusz equation). Air: US EPA AQI categories. UV: WHO/WMO action tiers. Rain: World Meteorological Organization (WMO-No. 1150 / WMO-No. 8) daily rainfall intensity hazard tiers; rain amount is not a flood forecast.', 'The wording of each action is written by a language model. It is screened for numbers and for over-warning, not for whether it is the best action.'],
     official: 'This is a companion, not an official warning. Always follow your national meteorological service:',
     prH: 'How a briefing is made', prP: 'The language model is one step out of six, and the only one that is not trusted.',
     pr1: 'You choose a place and who lives there.', pr2: 'Prakira fetches the forecast, air quality and 30 years of local climate from open data.',
@@ -687,7 +687,7 @@ const T = {
     ev3: 'Numbers written by the AI', ev3p: 'Every figure in a briefing comes from the forecast data. The AI writes only the action, and an action that contains a number is removed.',
     evFine: 'Results from 8 October 2026: one run per language on 15 held-out cities (27 actions each, 45 of 54 kept); on the 20 cities used for development, 77% and 91% were kept. Small samples, one run each. "Kept" means the action passed the screening rules (no numbers, a hazard that is serious for the household, no over-warning, and only words from a reviewed list for that hazard, so an action about the wrong hazard or with an odd word is removed). It is not a judgement of how good the advice is: that has been read by an AI assistant, not yet by a person or a clinician. Coverage is 100% by design, because notices fill every gap. Method, code and limits are public.',
     faqH: 'More questions?',
-    f1q: 'Is this an official warning?', f1a: 'No. Prakira is a companion to your national meteorological service, such as BMKG in Indonesia. In an emergency, follow official instructions.',
+    f1q: 'Is this an official warning?', f1a: 'No. Prakira is an impact-based companion to your national meteorological service (such as NOAA/NWS in the US, Met Office in the UK, or your local agency). In an emergency, always follow official national instructions.',
     f2q: 'Is this medical advice?', f2a: 'No. It suggests everyday protective actions. It does not diagnose and it has not been reviewed by clinicians.',
     f3q: 'Where does the data come from?', f3a: 'Open-Meteo forecast models, the CAMS air-quality forecast, and an ERA5-based climate archive (NASA POWER when that is unavailable). These are model values for a grid cell several kilometres wide, not sensor readings at your address.',
     f4q: 'Why does my household matter?', f4a: 'The same heat is a different risk for an older adult, a child, or someone who works outside. Choosing who lives there lowers the level at which Prakira speaks up about the hazard that affects them. These adjustments are our judgement based on the wording of the official categories, not an official rule.',
@@ -769,7 +769,7 @@ const T = {
     failed: 'Saran yang layak tidak dapat dibuat. Tingkat bahaya di atas tetap benar.',
     aRejected: 'Klaim model yang ditolak', aNone: 'Tidak ada.', aHow: 'Cara pembuatan', aSources: 'Sumber dan batasan', aOfficial: 'Peringatan resmi',
     how: (m, n) => ['Tingkat bahaya ditetapkan oleh aturan terbitan yang tetap, bukan oleh model bahasa.', n ? `Model (${m}, ${n} percobaan) hanya menulis tindakan. Model tidak menulis angka: kalimat di bawah tiap tindakan disusun dari data.` : 'Model bahasa tidak dipanggil untuk ringkasan ini.', 'Pemberitahuan standar adalah teks tetap untuk bahaya serius yang tidak dibahas model.'],
-    sources: ['Cuaca dan kualitas udara: model prakiraan Open-Meteo dan CAMS. Ini prakiraan model untuk satu sel grid (sekitar 11 km di Eropa, 45 km di tempat lain), bukan bacaan sensor di alamat Anda.', 'Panas: indeks panas US National Weather Service (persamaan Rothfusz). Udara: kategori AQI US EPA. UV: tingkat tindakan WHO/WMO. Hujan: klasifikasi intensitas hujan harian BMKG (Peraturan BMKG No. 9/2022); jumlah hujan bukan prakiraan banjir.', 'Kalimat tiap tindakan ditulis oleh model bahasa. Kalimat itu disaring dari angka dan dari peringatan berlebihan, bukan dinilai apakah itu tindakan terbaik.'],
+    sources: ['Cuaca dan kualitas udara: model prakiraan Open-Meteo dan CAMS. Ini prakiraan model untuk satu sel grid (sekitar 11 km di Eropa, 45 km di tempat lain), bukan bacaan sensor di alamat Anda.', 'Panas: indeks panas US National Weather Service (persamaan Rothfusz). Udara: kategori AQI US EPA. UV: tingkat tindakan WHO/WMO. Hujan: tingkat bahaya intensitas curah hujan harian World Meteorological Organization (WMO-No. 1150 / WMO-No. 8); jumlah hujan bukan prakiraan banjir.', 'Kalimat tiap tindakan ditulis oleh model bahasa. Kalimat itu disaring dari angka dan dari peringatan berlebihan, bukan dinilai apakah itu tindakan terbaik.'],
     official: 'Ini pendamping, bukan peringatan resmi. Selalu ikuti badan meteorologi nasional Anda:',
     prH: 'Cara ringkasan dibuat', prP: 'Model bahasa hanyalah satu dari enam langkah, dan satu-satunya yang tidak dipercaya.',
     pr1: 'Anda memilih tempat dan siapa yang tinggal di sana.', pr2: 'Prakira mengambil prakiraan, kualitas udara, dan 30 tahun iklim setempat dari data terbuka.',
@@ -784,7 +784,7 @@ const T = {
     ev3: 'Angka yang ditulis AI', ev3p: 'Setiap angka dalam ringkasan berasal dari data prakiraan. AI hanya menulis tindakan, dan tindakan yang memuat angka dibuang.',
     evFine: 'Hasil 8 Oktober 2026: satu pengujian per bahasa pada 15 kota yang ditahan (27 tindakan masing-masing, 45 dari 54 dipakai); pada 20 kota yang dipakai saat pengembangan, 77% dan 91% dipakai. Sampelnya kecil dan hanya satu pengujian. "Dipakai" berarti tindakan lolos aturan penyaringan (tanpa angka, bahaya yang serius bagi rumah tangga, tidak berlebihan, dan hanya memakai kata dari daftar yang sudah diperiksa untuk bahaya itu, sehingga tindakan untuk bahaya yang salah atau dengan kata yang janggal dibuang). Itu bukan penilaian mutu sarannya: saran baru dibaca oleh asisten AI, belum oleh manusia atau tenaga medis. Cakupan 100% adalah hasil rancangan, karena pemberitahuan mengisi setiap celah. Metode, kode, dan batasannya terbuka.',
     faqH: 'Masih ada pertanyaan?',
-    f1q: 'Apakah ini peringatan resmi?', f1a: 'Bukan. Prakira adalah pendamping bagi badan meteorologi nasional Anda, seperti BMKG di Indonesia. Dalam keadaan darurat, ikuti arahan resmi.',
+    f1q: 'Apakah ini peringatan resmi?', f1a: 'Bukan. Prakira adalah pendamping berbasis dampak bagi badan meteorologi nasional Anda (seperti NOAA/NWS di AS, Met Office di Inggris, atau BMKG di Indonesia). Dalam keadaan darurat, selalu ikuti arahan resmi.',
     f2q: 'Apakah ini nasihat medis?', f2a: 'Bukan. Prakira menyarankan tindakan perlindungan sehari-hari. Prakira tidak mendiagnosis dan belum ditinjau oleh tenaga medis.',
     f3q: 'Dari mana datanya?', f3a: 'Model prakiraan Open-Meteo, prakiraan kualitas udara CAMS, dan arsip iklim berbasis ERA5 (NASA POWER bila arsip itu tidak tersedia). Ini nilai model untuk satu sel grid selebar beberapa kilometer, bukan bacaan sensor di alamat Anda.',
     f4q: 'Mengapa rumah tangga saya berpengaruh?', f4a: 'Panas yang sama adalah risiko yang berbeda bagi lansia, anak, atau orang yang bekerja di luar. Memilih siapa yang tinggal di sana menurunkan tingkat saat Prakira mulai bersuara tentang bahaya yang mengenai mereka. Penyesuaian ini adalah penilaian kami dari kata-kata kategori resmi, bukan aturan resmi.',
@@ -801,7 +801,21 @@ const EXAMPLES = [
 // Colour step (0 to 4) for each severity of each hazard. Chosen so that one colour means a similar degree of
 // concern across hazards: the top UV tier is not shown as dark as hazardous air.
 const TONES = { heat: [0, 1, 2, 3, 4], rain: [0, 0, 1, 2, 3, 4], air: [0, 1, 2, 3, 4, 4], uv: [0, 1, 3] };
-const OFFICIAL = { Indonesia: ['BMKG', 'https://www.bmkg.go.id/'] };
+const OFFICIAL = {
+  Indonesia: ['BMKG', 'https://www.bmkg.go.id/'],
+  'United States': ['NOAA / National Weather Service', 'https://www.weather.gov/'],
+  'United Kingdom': ['Met Office', 'https://www.metoffice.gov.uk/'],
+  India: ['India Meteorological Department (IMD)', 'https://mausam.imd.gov.in/'],
+  Canada: ['Environment and Climate Change Canada', 'https://weather.gc.ca/'],
+  Australia: ['Bureau of Meteorology (BOM)', 'http://www.bom.gov.au/'],
+  Japan: ['Japan Meteorological Agency (JMA)', 'https://www.jma.go.jp/'],
+  Germany: ['Deutscher Wetterdienst (DWD)', 'https://www.dwd.de/'],
+  France: ['Météo-France', 'https://meteofrance.com/'],
+  Spain: ['AEMET', 'https://www.aemet.es/'],
+  Singapore: ['Meteorological Service Singapore', 'http://www.weather.gov.sg/'],
+  Philippines: ['PAGASA', 'https://bagong.pagasa.dost.gov.ph/'],
+  Brazil: ['INMET', 'https://portal.inmet.gov.br/'],
+};
 const WMO = ['WMO Severe Weather Information Centre', 'https://severeweather.wmo.int/'];
 
 const $ = (id) => document.getElementById(id);

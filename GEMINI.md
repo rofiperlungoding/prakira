@@ -15,6 +15,26 @@ Read this file fully before you touch anything. Then read `AGENTS.md` and `PLAN.
 | Devpost text | `docs/devpost-draft.md` (one block per form field) and `docs/devpost-about.md` (the About text) |
 | Pictures | `docs/screenshots/` (retaken from the live site on 2026-10-10), `docs/architecture.svg` |
 
+## 1b. Sponsor benefits: status from the owner (2026-10-10)
+
+Owner's report, not checked by the assistant. Redemption codes are left out on purpose: the repository is public. The packet (`ForgeHacks 2026 Participant Packet`) has them.
+
+| Benefit | Value | Status |
+|---|---|---|
+| Featherless AI | $25 | Claimed. Login email arrived 3 October |
+| Adaption | $500 | Claimed. Email arrived 5 October |
+| Momen | $100 | Claimed. Welcome email arrived 3 October |
+| n8n Cloud Pro | 1 month | Claimed. Activation email arrived 3 October |
+| YouCam API (Perfect Corp) | $27.50 | Claimed |
+| Agentboxd Builder | 1 month | Claimed |
+| DevSwarm, ProjectAAL | | Skipped. Not used |
+| Kariaa | $40 | On hold. The owner will decide later |
+
+Rules for these benefits:
+- They are for the owner's own use. Using them does not change the project. Do not add a feature because a benefit is available.
+- Do not put a redemption code in any file in this repository.
+- If the owner asks you to use one, ask first which benefit and what for. Do not sign up for anything or accept terms on the owner's behalf.
+
 ## 2. What is still open
 
 Do these only when the owner asks, in this order.

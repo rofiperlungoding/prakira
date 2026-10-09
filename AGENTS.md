@@ -2,6 +2,8 @@
 
 This repository is **Prakira**, a ForgeHacks 2026 submission (track AI + Climate). Deadline: Saturday 2026-10-10, 23:00 WIB at the latest; internal target 18:00 WIB.
 
+**Gemini: read `GEMINI.md` first.** It has the handover and the quality rules.
+
 ## Read in this order before doing anything
 
 1. **`PLAN.md`**: start with section 0 (handoff: current state, what the owner wants, how to deploy). Then mission, current state, task list with acceptance tests, operating rules, decision log, session log. It is the single source of truth for what to do next.

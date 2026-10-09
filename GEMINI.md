@@ -2,7 +2,7 @@
 
 You are taking over **Prakira** from another assistant. The project is submitted to ForgeHacks 2026 (track AI + Climate) and is being judged on 10 and 11 October 2026. Judges open the live site, the repository and the video. Your job is to keep all of them correct and consistent. It is not to add things.
 
-Read this file fully before you touch anything. Then read `AGENTS.md` and `PLAN.md` section 0.
+Read this file fully before you touch anything. For the full context of the project, read `docs/handover-antigravity.md` first. Then read `AGENTS.md` and `PLAN.md` section 0.
 
 ## 1. State on 2026-10-10
 

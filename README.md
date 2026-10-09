@@ -30,7 +30,7 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
    For each kept action, code attaches the facts, the rule-based level, and an evidence sentence built from the forecast values in day order ("The US AQI peaks at 219 today, 216 tomorrow and 224 the day after tomorrow."). Anything else the model writes, including numbers, levels or its own evidence, is ignored.
 5. **Notices** (`lib/notice.mjs`). Any serious hazard without a kept action gets fixed-template text, so nothing serious is silently missing.
 
-**The process is visible.** The server reports each of these steps as it happens (`lib/trace.mjs`, sent as an event stream), with measured durations and real counts. The page shows them live while you wait and keeps them as one line above the result; each segment opens its part of the audit trail.
+**The process is visible.** The server reports each of these steps as it happens (`lib/trace.mjs`, sent as an event stream), with measured durations and real counts. The page shows them live while you wait. The result opens as a short list of points: what to do, each with the numbers behind it. "Show all the data" opens the rest: the process as one line (each segment opens its part of the audit trail), the 72-hour grid, the climate and model rows, the long-range card and the audit trail.
 
 **Describe your home.** Instead of filling in the form, a visitor can write one sentence ("We live in Depok, my dad is 68 and has asthma, no AC"). The model proposes the place name and household options (`lib/intake.mjs`). Its answer is reduced on the server to the seven allowed options and a plain place name, which is only used to start the normal place search. The visitor still picks the place and presses the button.
 

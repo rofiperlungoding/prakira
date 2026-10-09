@@ -26,6 +26,7 @@ const CASES = [
     for (const p of profiles) await page.check(`#profile input[value="${p}"]`, { force: true });
     await page.click('#go');
     await page.waitForSelector('#out details', { timeout: 90000 });
+    await page.click('.more > summary'); // the grid, process and audit sit behind this switch
     await page.screenshot({ path: `${out}/${name}-1-result.png`, fullPage: true });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
     const htmlLang = await page.evaluate(() => document.documentElement.lang);
@@ -36,7 +37,7 @@ const CASES = [
       lit = await page.locator('.cell.lit').count();
       await page.screenshot({ path: `${out}/${name}-2-audit-link.png`, fullPage: true });
     }
-    await page.click('#out summary');
+    await page.click('#out .au summary');
     await page.screenshot({ path: `${out}/${name}-3-audit-open.png`, fullPage: true });
     const n = (sel) => page.locator(sel).count();
     console.log(`${name}: overflow=${overflow} lang=${htmlLang} cells=${await n('.cell')} items=${await n('.item')} litCellsOnHover=${lit} processSegments=${await n('.pline .seg')} peakLines=${await n('.cell .pk')} shareButtons=${await n('.tools .btn')}`);

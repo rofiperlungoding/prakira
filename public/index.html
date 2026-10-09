@@ -133,7 +133,7 @@
   .bar { position:relative; height:6px; background:var(--rule); border-radius:3px; margin-top:6px; }
   .bar i { position:absolute; top:-3px; left:50%; width:1px; height:12px; background:var(--mut); }
   .bar b { position:absolute; top:-2px; width:10px; height:10px; margin-left:-5px; border-radius:50%; background:var(--ink); }
-  .dim .cell:not(.lit):not(.ctx):not(.na), .dim .item:not(.lit) { opacity:.3; }
+  .full.dim .cell:not(.lit):not(.ctx):not(.na), .full.dim .item:not(.lit) { opacity:.3; }
   .cell.lit { box-shadow:0 0 0 2px var(--ink); }
   .note { margin:12px 0 0; font-size:.9rem; color:var(--mut); }
 
@@ -149,8 +149,8 @@
   .badge { display:inline-block; margin-top:10px; font:600 .8rem var(--sans); padding:3px 9px; border-radius:999px; border:1px solid var(--rule); color:var(--mut); background:#fff; }
   .badge.ok { background:var(--ok-bg); border-color:transparent; color:var(--ok); }
   .quiet { background:var(--cream); border-radius:10px; padding:20px; font:500 1.25rem/1.35 var(--head); }
-  #out details { background:#fff; border:1.5px solid var(--rule); border-radius:10px; }
-  #out summary { padding:13px 16px; cursor:pointer; font-weight:600; color:var(--ok); }
+  #out details.au { background:#fff; border:1.5px solid var(--rule); border-radius:10px; }
+  #out .au summary { padding:13px 16px; cursor:pointer; font-weight:600; color:var(--ok); }
   .audit { padding:0 16px 16px; display:grid; gap:14px; font-size:.95rem; }
   .audit h4 { margin:0 0 4px; font:600 .95rem var(--sans); color:var(--ink); color:var(--mut); }
   .audit ul { margin:0; padding-left:18px; } .audit li { margin:2px 0; }
@@ -422,6 +422,14 @@
   .stat.b { background:var(--ink); color:var(--cream); } .stat.b p { color:#d9decf; }
   .pipe { border-radius:18px; } .pipe div.ai { background:var(--sun); }
   .pipe div.v { background:var(--ink); color:var(--cream); } .pipe div.v span { color:#d9decf; }
+  /* Result: points first; all the data behind one switch */
+  #out h2.what { font:500 1.5rem/1.2 var(--head); color:var(--ink); letter-spacing:-.02em; }
+  #out:not(.full) .item { cursor:default; }
+  .more { margin-top:22px; }
+  .more > summary { list-style:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; border:1.5px solid var(--ink); border-radius:10px; padding:10px 16px; font-weight:600; font-size:.95rem; }
+  .more > summary::-webkit-details-marker { display:none; }
+  .more > summary::after { content:"+"; font-weight:400; }
+  .more[open] > summary::after { content:"−"; }
   footer { background:var(--ink); color:#b9c2b6; border-top:0; padding:34px 0 46px; } footer a { color:var(--cream); }
 </style>
 </head>
@@ -630,7 +638,7 @@ const T = {
     outNoteSeen: 'From NASA POWER (MERRA-2 reanalysis, grid of about 50 km). A reanalysis is not a weather-station measurement, and a grid this coarse reads cooler than a city centre. Air temperature, not heat index. Two 10-year windows: a difference between them is not by itself a trend.',
     outNote: 'Median of three climate models (CMIP6 HighResMIP, bias-corrected against ERA5-Land) on a high-emissions pathway close to RCP8.5. Model output, not measurement, and air temperature, not heat index. The models differ: read the range, not one number.',
     d1: 'numbers from data', d2: 'start here',
-    strip: 'Next 72 hours', briefing: 'Your briefing', audit: 'Audit trail',
+    strip: 'Next 72 hours', briefing: 'What to do', more: 'Show all the data',
     rows: { heat: 'Heat', rain: 'Rain', air: 'Air', uv: 'UV', ctx: 'Climate', mod: 'Models' },
     modLabel: { agree: 'agree', 'differ somewhat': 'differ somewhat', differ: 'differ' }, modGap: (d) => `up to ${d} °C apart`,
     modNote: 'Models row: air temperature from two independent forecast models, ECMWF\'s physics model (IFS) and its AI model (AIFS), compared at the times both produce. A wide gap means the forecast is less certain; it does not say which model is right. The labels use this project\'s own cut points (1 and 3 °C).',
@@ -722,7 +730,7 @@ const T = {
     outNoteSeen: 'Dari NASA POWER (reanalisis MERRA-2, grid sekitar 50 km). Reanalisis bukan pengukuran stasiun cuaca, dan grid sekasar ini terbaca lebih sejuk daripada pusat kota. Ini suhu udara, bukan indeks panas. Dua jendela 10 tahun: selisih di antaranya belum tentu sebuah tren.',
     outNote: 'Median tiga model iklim (CMIP6 HighResMIP, dikoreksi bias terhadap ERA5-Land) pada jalur emisi tinggi yang mendekati RCP8.5. Ini keluaran model, bukan pengukuran, dan suhu udara, bukan indeks panas. Model saling berbeda: baca rentangnya, bukan satu angka.',
     d1: 'angka dari data', d2: 'mulai di sini',
-    strip: '72 jam ke depan', briefing: 'Ringkasan Anda', audit: 'Jejak audit',
+    strip: '72 jam ke depan', briefing: 'Yang perlu dilakukan', more: 'Tampilkan semua data',
     rows: { heat: 'Panas', rain: 'Hujan', air: 'Udara', uv: 'UV', ctx: 'Iklim', mod: 'Model' },
     modLabel: { agree: 'sepakat', 'differ somewhat': 'agak berbeda', differ: 'berbeda' }, modGap: (d) => `selisih hingga ${d} °C`,
     modNote: 'Baris model: suhu udara dari dua model prakiraan yang independen, model fisika ECMWF (IFS) dan model AI-nya (AIFS), dibandingkan pada jam yang dihasilkan keduanya. Selisih yang lebar berarti prakiraan kurang pasti; itu tidak menunjukkan model mana yang benar. Labelnya memakai batas pilihan proyek ini (1 dan 3 °C).',
@@ -1067,7 +1075,7 @@ function processLine(d) {
   return wrap;
 }
 function openAudit(id) {
-  const det = $('out').querySelector('details');
+  const det = $('out').querySelector('details.au');
   if (!det) return;
   det.open = true;
   const target = det.querySelector(`[data-au="${id}"]`) || det;
@@ -1138,20 +1146,26 @@ function render(d) {
   out.onclick = () => light([]);
   for (const w of d.warnings || []) out.appendChild(el('p', 'note', w));
 
+  // Default view is the list of points. The process, the grid, the outlook and the audit open on request.
+  const more = el('details', 'more');
+  more.appendChild(el('summary', '', L.more));
+  more.addEventListener('toggle', () => out.classList.toggle('full', more.open));
+
   const s0 = el('section', 'proc');
   const h0 = el('h2');
   const sun = document.querySelector('.logo svg').cloneNode(true); sun.setAttribute('class', 'sunmark');
   h0.append(sun, document.createTextNode(`${L.process} · ${L.readAt(clock(d.generatedAt))}`));
   s0.append(h0, processLine(d));
-  out.appendChild(s0);
+  more.appendChild(s0);
 
   const s1 = el('section'); s1.appendChild(el('h2', '', `${L.strip} · ${placeName(state.place)}`));
   s1.appendChild(strip(d));
   if ((d.context || []).length) s1.appendChild(el('p', 'note', L.ctxNote(d.context[0].source)));
   if ((d.models || []).length) s1.appendChild(el('p', 'note', L.modNote));
-  out.appendChild(s1);
+  if (!d.quiet) s1.appendChild(el('p', 'note', L.tapNote));
+  more.appendChild(s1);
 
-  const s2 = el('section'); s2.appendChild(el('h2', '', L.briefing));
+  const s2 = el('section'); s2.appendChild(el('h2', 'what', `${L.briefing} · ${placeName(state.place)}`));
   const list = el('div', 'items');
   if (d.quiet) list.appendChild(el('div', 'quiet', L.quiet));
   for (const c of d.claims) list.appendChild(item('model', c.advice, c.evidence, '✓ ' + L.verified, c.fact_ids));
@@ -1159,7 +1173,6 @@ function render(d) {
   for (const n of d.notices || []) list.appendChild(item('notice', n.evidence, n.advice, L.notice, n.fact_ids));
   if (!d.quiet && !d.claims.length && !(d.notices || []).length) list.appendChild(el('p', 'msg err', L.failed + (d.error ? ` (${d.error})` : '')));
   s2.appendChild(list);
-  if (!d.quiet) s2.appendChild(el('p', 'note', L.tapNote));
   const tools = el('div', 'tools');
   const wa = el('a', 'btn ghost', L.share);
   wa.href = 'https://wa.me/?text=' + encodeURIComponent(briefingText(d)); wa.target = '_blank'; wa.rel = 'noopener';
@@ -1175,10 +1188,10 @@ function render(d) {
 
   const s4 = el('section', 'outlook');
   s4.append(el('h2', '', L.outlookH), el('span', 'act'));
-  out.appendChild(s4);
+  more.appendChild(s4);
 
   const s3 = el('section'); s3.appendChild(el('h2', '', L.audit));
-  const det = el('details');
+  const det = el('details', 'au');
   det.appendChild(el('summary', '', d.quiet ? L.quietAudit : L.passed(d.claims.length, d.total)));
   const body = el('div', 'audit');
   const block = (id, title, lines, cls) => {
@@ -1200,7 +1213,8 @@ function render(d) {
   const [name, url] = OFFICIAL[state.place.country] || WMO;
   const a = el('a', '', name); a.href = url; a.rel = 'noopener'; p.appendChild(a);
   off.appendChild(p); body.appendChild(off);
-  det.appendChild(body); s3.appendChild(det); out.appendChild(s3);
+  det.appendChild(body); s3.appendChild(det); more.appendChild(s3);
+  out.appendChild(more);
 }
 
 // The waiting view: the sun, and the real steps, each filled in when the server reports it.

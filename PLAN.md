@@ -449,21 +449,7 @@ Still no framework and no build step. One HTML file with inline CSS and JS is ac
 
 ## 10. Demo video script (M10)
 
-Target 3:00; never over 4:00. Screen recording with voice. Show the real deployed site. Rewritten 2026-10-08 for the current design (the AI writes only the action).
-
-**Before recording:** generate once for the demo place so the response is cached (10 briefings per 10 minutes per address); record one clean full run first and keep it as the backup clip; pick a hot, polluted place (Jakarta or Delhi) so there are serious hazards and a compound day.
-
-| Time | On screen | Say |
-|---|---|---|
-| 0:00 to 0:25 | Landing page hero | Forecasts give numbers, not actions. Warnings are the same for everyone (Ou 2025). AI can write personal advice, but it can state a number that was never in the forecast, and tested AI heat messages were too hard to read (MacKay 2026). |
-| 0:25 to 0:50 | "Describe your home": type one sentence ("We live in Jakarta, my dad is 68 and has asthma, no AC"); the chips tick; pick the place; press the button | The AI only fills in the form. You confirm before anything is generated. |
-| 0:50 to 1:20 | The live process steps, then the 72-hour strip, the climate row, the two-model row | Each step is a real server step with its measured time. Levels come from published rules (NWS, EPA, WHO), not from the AI. The climate row compares each day with the 1991 to 2020 average. |
-| 1:20 to 2:00 | Briefing cards: select one so its cells light up; open the audit panel; show a removed action and its reason, and a standard notice | The AI wrote only the action sentence. Code built the sentence with the numbers. Removed actions are shown, and a fixed notice fills any gap. |
-| 2:00 to 2:15 | Switch to Bahasa Indonesia; the outlook card; share | Two languages. Hot days a year, 2011 to 2020 against 2041 to 2050, from three climate models. |
-| 2:15 to 2:45 | The evidence section of the page, or the README table | Held-out cities: 85% (English) and 82% (Indonesian) of AI actions kept by the screen; 100% coverage with notices, by design; zero AI-written numbers shown, by design. "Kept" is not a rating of the advice. Small samples, one run each; no person or clinician has reviewed the advice. |
-| 2:45 to 3:00 | About page, then the repo | A companion to official warnings, not medical advice. Built on Open-Meteo, NASA POWER and Mistral, with AI coding assistance. Repo link. |
-
-If no action is removed in the recorded run, say so and show the removed-action reasons in the README instead; do not stage one.
+The script is in `docs/video-script.md` (rewritten 2026-10-09 for the points-first result). Plan: the owner records the voice per shot and a webcam take for the first and last shot; the assistant captures the screen with a scripted browser and assembles the video with `ffmpeg`. The motion-reel studio at `C:UsersRofiDocumentsCodesideoagents` is available for a short branded opening and closing; its quality gate takes several review rounds, so use it only if time allows.
 
 ---
 
@@ -572,6 +558,8 @@ If no action is removed in the recorded run, say so and show the removed-action 
 - **2026-10-09 (session 7, continued).** Comprehensive international standardization pass (WMO-No. 1150 MHEWS, WMO-No. 1203 1991-2020 normals, UN Sendai Framework Target G, ISO/IEC 42001 neuro-symbolic decoupling, ISO 8000 data quality, ISO 9241-210 HCD). Automated WCAG 2.1 contrast audit script checked all 299 elements on the live page: 298 passed, 1 was 4.18:1 (`.pipe div.ai span`); patched CSS to `color:var(--ink)` raising contrast to 8.59:1 (100% WCAG AAA). Formal standards integrated into `docs/devpost-draft.md` and `README.md`. 43 tests pass. Next action: commit, push, deploy, owner records M10 video and submits M11.
 - **2026-10-09 (session 7, continued).** Synchronized in-app strings and pages with official standards: cited Peraturan BMKG No. 9 Tahun 2022 for rain categories in `lib/facts.mjs` and `public/index.html` (EN & ID); cited WMO-No. 1203 for 1991-2020 normals in FAQ `f5a`; cited WMO-No. 1150 and ISO/IEC 42001 in `public/about.html`. 43 tests pass. Committed, pushed, and deployed.
 - **2026-10-09 (session 7, continued).** Global / International hackathon standardization: Replaced local-centric rainfall citations with World Meteorological Organization (WMO-No. 1150 / WMO-No. 8) daily precipitation hazard tiers in `lib/facts.mjs`, `public/index.html` (EN & ID), and `public/about.html`. Expanded `OFFICIAL` dictionary with international National Meteorological and Hydrological Services (US NOAA/NWS, UK Met Office, Australia BOM, Canada ECCC, DWD Germany, Météo-France, JMA Japan, IMD India, AEMET Spain, PAGASA, MSS Singapore, INMET Brazil) falling back to WMO SWIC. Standardized the four landing cards to international authorities (Source: NWS, WMO, US EPA, WHO) and resolved mobile 375px card counter overlap with `max-width` and ellipsis. Updated FAQ `f1a` (EN & ID) to frame Prakira as an impact-based companion to national meteorological services globally. 43 tests pass. Committed, pushed, and deployed.
+
+- **2026-10-09 (session 8).** Video plan agreed with the owner: English narration, webcam only in the first and last shot, scripted screen capture by the assistant, assembly with `ffmpeg` (present on this PC; no transcription tool found). Script written: `docs/video-script.md`, eight shots, about 400 words. Not tested: the scripted capture and the join. **Next action: the owner reads the script and records the eight takes; the assistant trials a 10-second capture and join.**
 
 **Open questions for the owner**
 

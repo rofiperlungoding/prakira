@@ -44,7 +44,7 @@ Do these only when the owner asks, in this order.
 
 1. Put the YouTube link in `README.md` (under the badges) and in `docs/devpost-draft.md` where it says "add the YouTube link". Then tick M10 in `PLAN.md` section 7.
 2. Tick M11 in `PLAN.md` section 7 once the owner confirms that the public Devpost page opens logged out and every link works.
-3. **Owner's decision, do not decide it yourself:** the live page says the daily rain classes (20, 50, 100, 150 mm) come from "WMO-No. 1150 / WMO-No. 8". That was never confirmed. A search on 2026-10-10 found the same cut points in a provincial report that cites BMKG, and did not find them in either WMO document. The README and the Devpost text already say "commonly quoted from BMKG, not checked against a primary source". If the owner says "ganti", change the wording in `lib/facts.mjs` (comment), `public/index.html` (English and Indonesian strings) and `public/about.html` to match the README, run the checks in section 5, and deploy.
+3. **Done in the repository (owner decided "ganti", 2026-10-10):** the rain-class attribution now says BMKG, not checked against a primary source (`lib/facts.mjs` comment, `public/index.html` EN and ID). The ISO/IEC 42001 claim is removed from `public/about.html`. **Not deployed yet:** the live page still shows the old wording until the owner asks for a deploy.
 
 Everything else is finished. If you think something else needs doing, write it to the owner as a proposal and wait.
 

@@ -578,6 +578,8 @@ The film is made: `C:/Users/Rofi/Videos/Prakira-demo-ForgeHacks-2026.mp4` (2:34,
 
 - **2026-10-10 (session 9, close-out).** n8n workflow "Prakira uptime watch" shown as Published in the owner's n8n list (screenshot). Owner reports both API keys (n8n and Featherless) rotated. Still open: the Adaption and Momen dashboards (not checked), the rain-class source (owner to answer "ganti" or "tetap"), the 70B model on Featherless (access still 403), and whether to keep `eval/second-model.mjs`.
 
+- **2026-10-10 (session 9, wording).** Owner decided "ganti" for the rain classes and removal of the ISO/IEC 42001 claim. Done in the repository: rain attribution now BMKG, marked not checked against a primary source (`lib/facts.mjs` comment, `public/index.html` EN and ID); the ISO/IEC 42001 phrase removed from `public/about.html`. 43 tests pass. Not deployed. Not checked in a browser (text only). Keys: a scan of the repository and its history found neither the n8n key nor the Featherless key. **Next action: owner asks for a deploy, or not.**
+
 **Open questions for the owner**
 
 1. Done 2026-10-10 (section 1): the video limit is 2 to 4 minutes.

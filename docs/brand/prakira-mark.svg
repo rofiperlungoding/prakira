@@ -1,4 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Prakira">
-  <!-- Horizon: a sun rising over three lines, one for each of the three days ahead. -->
-  <rect width="64" height="64" rx="16" fill="#fff3d6"/><path d="M18 34a14 14 0 0128 0z" fill="#f4a04c" stroke="#101a13" stroke-width="3.5" stroke-linejoin="round"/><g fill="none" stroke="#101a13" stroke-width="4" stroke-linecap="round"><path d="M12 34h40"/><path d="M18 42.5h28"/><path d="M25 51h14"/></g>
-</svg>

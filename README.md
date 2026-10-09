@@ -1,4 +1,4 @@
-<p><img src="docs/brand/prakira-logo.svg" alt="Prakira" width="230"></p>
+<p><img src="docs/brand/prakira-horizontal.svg" alt="Prakira" width="300"></p>
 
 **Climate briefings with receipts.** Prakira turns the next 72 hours of heat, rain, air quality and UV into a few actions for one household, in English or Bahasa Indonesia, and shows the numbers behind every action.
 

@@ -74,17 +74,6 @@
 
   /* Meet */
   .two { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
-  .art { background:var(--soft); border-radius:14px; padding:28px; min-height:360px; display:grid; align-content:center; gap:14px; }
-  .art .row { display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
-  .art .c { border-radius:8px; padding:12px; font:600 1.35rem var(--head); background:var(--t0); opacity:.38; }
-  .art .c.on { opacity:1; box-shadow:0 0 0 2px var(--ink); }
-  .art .c small { display:block; font:500 .78rem var(--sans); margin-top:4px; }
-  .art .card { background:#fff; border:1.5px solid var(--ink); border-left:5px solid var(--ok); border-radius:10px; padding:14px 16px; }
-  .art .card b { display:block; font-weight:600; }
-  .art .card p { margin:4px 0 0; color:var(--mut); font-size:.98rem; }
-  .art .card p em { font:600 .95em var(--sans); font-style:normal; color:var(--ink); background:var(--soft); border:1px solid var(--rule); border-radius:4px; padding:0 4px; }
-  .art .wire { height:22px; border-left:2px dashed var(--ink); margin-left:40px; }
-  .pillico { width:44px; height:28px; border-radius:99px; background:var(--lime); display:grid; place-items:center; margin-bottom:12px; }
   .acc { margin-top:20px; position:relative; }
   #meet .art { align-self:stretch; }
   .acc summary { list-style:none; cursor:pointer; padding:9px 0; display:flex; align-items:center; gap:12px; font-weight:500; }
@@ -104,6 +93,11 @@
 
   /* Tool */
   #tool { background:var(--soft); }
+  .cards.three { grid-template-columns:repeat(3, 1fr); } .cards.three .pic { aspect-ratio:4 / 3; }
+  .hz.e .pic { background:var(--lime); } .hz.f .pic { background:#fff3d6; } .hz.g .pic { background:#cfe6f5; }
+  .alt summary { list-style:none; cursor:pointer; width:max-content; max-width:100%; color:var(--mut); font-size:.95rem; text-decoration:underline; }
+  .alt summary::-webkit-details-marker { display:none; }
+  .alt[open] summary { margin-bottom:10px; }
   .panel { background:#fff; border-radius:16px; padding:26px; margin-top:30px; box-shadow:0 1px 0 var(--rule); }
   .setup { display:grid; gap:16px; }
   .label { font:600 .95rem var(--sans); color:var(--ink); color:var(--mut); display:block; margin-bottom:7px; }
@@ -249,7 +243,6 @@
   .where { display:flex; gap:8px; } .where #q, .where #desc { flex:1; }
   #desc { padding:13px 15px; border:1.5px solid var(--rule); border-radius:8px; background:var(--soft); font-size:1.02rem; min-width:0; }
   #desc:focus { border-color:var(--ink); background:#fff; outline:none; }
-  .describe { padding-bottom:16px; border-bottom:1px dashed var(--rule); }
   .where .btn { white-space:nowrap; }
   .privacy { margin:8px 0 0; font-size:.85rem; color:var(--mut); }
   .linkbtn { border:0; background:none; padding:0; font:inherit; color:inherit; text-decoration:underline; cursor:pointer; }
@@ -292,7 +285,7 @@
     .links { display:none; } nav { justify-content:space-between; }
     .hero .wrap { grid-template-columns:1fr; min-height:0; padding-top:30px; }
     .stage { height:400px; } .phone { right:8%; top:20px; transform:rotate(9deg) scale(.86); transform-origin:top right; } .sticker { left:0; top:210px; width:132px; height:132px; } .sticker b { font-size:1.05rem; }
-    .two { grid-template-columns:1fr; gap:28px; } .cards { grid-template-columns:repeat(2, 1fr); } .stats { grid-template-columns:1fr; }
+    .two { grid-template-columns:1fr; gap:28px; } .cards { grid-template-columns:repeat(2, 1fr); } .cards.three { grid-template-columns:1fr; } .cards.three .pic { aspect-ratio:16 / 9; } .stats { grid-template-columns:1fr; }
     .band { padding:54px 0; } .d-start { right:-120px; }
   }
   @media (max-width:520px) {
@@ -350,8 +343,6 @@
   .hz .pic::after { content:""; position:absolute; inset:0; background:radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255,255,255,.6), transparent 55%); opacity:0; transition:opacity .3s; pointer-events:none; }
   .hz:hover .pic::after { opacity:1; }
   .hz .pic svg * { transform-box:fill-box; transform-origin:center; }
-  .art .wire { border-left:0; width:2px; background:repeating-linear-gradient(var(--ink) 0 5px, transparent 5px 10px); }
-  .art .card p em { display:inline-block; }
 
   .acc details p { transition:opacity .3s, transform .4s cubic-bezier(.2,.8,.2,1); }
   .acc details.shut p { opacity:0; transform:translateY(-6px); }
@@ -376,11 +367,6 @@
     .phone .pc span { animation:glow 3s ease-in-out 2s infinite; }
     .d-note { animation:fadeup .7s 1.2s backwards; }
 
-    .art .c.on { animation:ring 4s ease-in-out infinite; }
-    .art .row:nth-child(2) .c.on { animation-delay:.25s; }
-    .art .wire { animation:wire .5s linear infinite; }
-    .art .card p em { animation:chip 4s ease-in-out .7s infinite; }
-    .art .card p em:nth-of-type(2) { animation-delay:.95s; }
 
     .hz.a svg path:nth-child(2) { transform-origin:50% 100%; animation:merc 3.2s ease-in-out infinite; }
     .hz.b svg path { animation:drip 2.4s cubic-bezier(.5,0,.5,1) infinite; }
@@ -462,23 +448,13 @@
   </div>
 </div></header>
 
-<section class="band" id="meet"><div class="wrap two" style="align-items:start">
-  <div class="art" aria-hidden="true">
-    <div class="row"><div class="c" style="background:var(--t2)">37.2<small data-t="mL1"></small></div><div class="c on" style="background:var(--t4);color:#fff">204<small data-t="mL2"></small></div><div class="c" style="background:var(--t3)">9<small>UV</small></div></div>
-    <div class="row"><div class="c" style="background:var(--t2)">36.6<small data-t="mL1"></small></div><div class="c on" style="background:var(--t4);color:#fff">228<small data-t="mL2"></small></div><div class="c" style="background:var(--t3)">9<small>UV</small></div></div>
-    <div class="wire"></div>
-    <div class="card"><b data-t="mC2"></b><p><span data-t="artEv1"></span> <em>204</em> <span data-t="artEv2"></span> <em>228</em>.</p></div>
-  </div>
-  <div>
-    <div class="pillico" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg></div>
-    <h2 class="big" data-t="meetH"></h2>
-    <p class="lede" style="margin-left:0" data-t="meetP"></p>
-    <div class="acc">
-      <details open><summary data-t="m1q"></summary><p data-t="m1a"></p></details>
-      <details><summary data-t="m2q"></summary><p data-t="m2a"></p></details>
-      <details><summary data-t="m3q"></summary><p data-t="m3a"></p></details>
-      <details><summary data-t="m4q"></summary><p data-t="m4a"></p></details>
-    </div>
+<section class="band" id="meet"><div class="wrap">
+  <h2 class="big center" data-t="meetH"></h2>
+  <p class="lede center" data-t="meetP"></p>
+  <div class="cards three">
+    <div class="hz e"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20V11M12 20V4M19 20v-6"/></svg><span data-t="mt1s"></span></div><h3 data-t="mt1"></h3><p data-t="mt1p"></p></div>
+    <div class="hz f"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M13.5 7.5l3 3"/></svg><span data-t="mt2s"></span></div><h3 data-t="mt2"></h3><p data-t="mt2p"></p></div>
+    <div class="hz g"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="#101a13" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span data-t="mt3s"></span></div><h3 data-t="mt3"></h3><p data-t="mt3p"></p></div>
   </div>
 </div></section>
 
@@ -499,12 +475,6 @@
   <p class="lede center" data-t="toolP"></p>
   <div class="panel">
     <div class="setup">
-      <div class="describe">
-        <label class="label" for="desc" data-t="descLabel"></label>
-        <div class="where"><input id="desc" type="text" maxlength="300" autocomplete="off"><button class="btn ghost" id="fill" type="button" data-t="fill"></button></div>
-        <span class="act" id="descAct" role="status"></span>
-        <p class="privacy" data-t="descNote"></p>
-      </div>
       <div>
         <label class="label" for="q" data-t="where"></label>
         <div class="where"><input id="q" type="text" autocomplete="off" spellcheck="false"><button class="btn ghost" id="locate" type="button" data-t="locate"></button></div>
@@ -518,6 +488,12 @@
       </div>
       <div><button class="btn" id="go" type="button" disabled data-t="go"></button></div>
       <p class="msg" id="status" role="status" aria-live="polite"></p>
+      <details class="alt">
+        <summary id="descSum" data-t="descLabel"></summary>
+        <div class="where"><input id="desc" type="text" maxlength="300" autocomplete="off" aria-labelledby="descSum"><button class="btn ghost" id="fill" type="button" data-t="fill"></button></div>
+        <span class="act" id="descAct" role="status"></span>
+        <p class="privacy" data-t="descNote"></p>
+      </details>
       <p class="privacy"><span data-t="locNote"></span> <span data-t="remembered"></span> <button class="linkbtn" id="forget" type="button" data-t="forget"></button></p>
     </div>
     <div id="out"></div>
@@ -590,27 +566,23 @@ const T = {
     mC1: 'Rest in the shade and drink water often.', mC1e: 'Heat index reaches 37.2 °C today.',
     mC2: 'Wear a well-fitting mask outside.', mC2e: 'US AQI peaks at 204 today.',
     artEv1: 'US AQI peaks at', artEv2: 'today and',
-    meetH: 'Advice with receipts', meetP: 'AI can write helpful advice. It can also state a wrong number with full confidence. So in Prakira the AI writes only the action. The sentence with the numbers is built from the forecast itself, and each action is screened before you see it. Select any action to see the exact numbers behind it.',
-    m1q: 'Where do the numbers come from?', m1a: 'From the forecast data, not from the AI. The level of each hazard is set by published rules, and the sentence that states the numbers is put together by code from the same values you see in the grid. The AI is told not to write numbers, and any action that contains one is removed.',
-    m2q: 'What is checked about the AI\'s text?', m2a: 'Each action must be for a hazard that is serious for your household, contain no numbers, and not say "stay indoors" when the level is too low to justify it. Removed actions are listed with the reason in the audit trail. Prakira cannot prove that an action is the best one.',
-    m3q: 'What if the AI misses something serious?', m3a: 'Then a standard notice appears instead: fixed text, built from the data. A serious hazard is never silently left out.',
-    m4q: 'What if nothing is serious?', m4a: 'Then Prakira says so and gives no advice. Warning people when they do not need it teaches them to ignore warnings.',
+    meetH: 'Advice with receipts', meetP: 'The AI writes the action. The forecast supplies every number.', mt1: 'Numbers from the forecast', mt1p: 'Every number on the page comes from the forecast data. The AI writes none.', mt1s: 'From data', mt2: 'The AI writes the action', mt2p: 'One short action for each serious hazard, in plain words, for your household.', mt2s: 'From AI, screened', mt3: 'Nothing hidden', mt3p: 'Removed actions are shown with the reason. If nothing is serious, it says so and gives no advice.', mt3s: 'Shown to you',
     hzH: 'Four hazards, one briefing', hzP: 'Hazards rarely arrive alone. Prakira reads them together and flags the days when strong heat and polluted air coincide.',
     hz1: 'Heat', hz1p: 'Heat index from temperature and humidity, the way the US National Weather Service computes it.', hz1s: 'Source: NWS',
     hz2: 'Rain', hz2p: 'Daily rainfall with the chance of rain beside it, so a probability is never shown as a certainty.', hz2s: 'Not a flood forecast',
     hz3: 'Air', hz3p: 'US Air Quality Index with the EPA categories, plus fine particles (PM2.5).', hz3s: 'Source: US EPA, CAMS',
     hz4: 'UV', hz4p: 'Daily peak UV index with the World Health Organization action tiers.', hz4s: 'Source: WHO',
-    toolH: 'Start your briefing', toolP: 'Pick a place, say who lives there, and read what the next three days ask of you.',
-    where: 'Where', who: 'Who lives there', go: 'Generate briefing', placeholder: 'City, for example Jakarta', examples: 'Try:',
+    toolH: 'Start your briefing', toolP: 'Pick a place. Tick who lives there. Read what to do.',
+    where: 'Where?', who: 'Who lives there? Tick any that fit.', go: 'Generate briefing', placeholder: 'City, for example Jakarta', examples: 'Try:',
     selected: 'Selected:', searching: 'Search failed. Try again.', none: 'No place found.',
     loading: 'Working on your briefing…', retry: 'Try again',
     myPlace: 'Your location', locate: 'Use my location', locAsk: 'Asking your browser for your location…', locOk: 'Location found, rounded to about 1 km.',
     locDenied: 'Location permission was denied. Type a city instead.', locNone: 'Your location could not be determined.', locTimeout: 'Finding your location took too long.', locUnsupported: 'This browser cannot share a location.',
-    locNote: 'Your place is sent to this server and to Open-Meteo to fetch the forecast, and is not stored on the server.', remembered: 'Your place, household and language are remembered in this browser only.', forget: 'Forget my choices', forgotten: 'Choices cleared from this browser.',
-    descLabel: 'Describe your home in one sentence (optional)', fill: 'Fill in for me', descPh: 'We live in Depok, my dad is 68 and has asthma, no AC',
+    locNote: 'Your place goes to this server and Open-Meteo for the forecast. Nothing is stored.', remembered: 'Your choices stay in this browser.', forget: 'Forget my choices', forgotten: 'Choices cleared from this browser.',
+    descLabel: 'Or describe your home in one sentence', fill: 'Fill in for me', descPh: 'We live in Depok, my dad is 68 and has asthma, no AC',
     descRun: 'The AI is reading your description…', descShort: 'Write a few words first.', descFail: (m) => `Could not read the description (${m}). Use the form below.`,
     descTicked: (names) => `Ticked: ${names}.`, descNoProfile: 'No household details found in the sentence.', descPlace: (p) => `Searching for ${p}: pick your place below.`, descNoPlace: 'No place found in the sentence: type a city below.',
-    descNote: 'The sentence is sent to the AI provider (Mistral) to be read. Prakira does not store it; leave out names. The AI can only tick the options below and suggest a place to search for. Nothing is generated until you press the button.',
+    descNote: 'Your sentence is sent to the AI provider (Mistral) and not stored. Leave out names. The AI only ticks the options above.',
     searchRun: 'Searching…', found: (n) => `${n} place${n === 1 ? '' : 's'} found`,
     process: 'Process', skipped: 'not needed', secs: (x) => `${x} s`, tryN: (n) => `try ${n}`, noResult: 'The server sent no result.',
     steps: { forecast: 'Read the forecast', climate: 'Compare with the 30-year normal', models: 'Compare two forecast models', rules: 'Set levels by rule', model: 'AI writes the actions', verify: 'Screen every action', notices: 'Fill any gap', cache: 'Saved briefing' },
@@ -686,27 +658,23 @@ const T = {
     mC1: 'Istirahat di tempat teduh dan sering minum air.', mC1e: 'Indeks panas mencapai 37,2 °C hari ini.',
     mC2: 'Pakai masker yang pas saat di luar.', mC2e: 'US AQI memuncak di 204 hari ini.',
     artEv1: 'US AQI memuncak di', artEv2: 'hari ini dan',
-    meetH: 'Saran yang ada buktinya', meetP: 'AI bisa menulis saran yang membantu. AI juga bisa menyebut angka yang salah dengan penuh keyakinan. Karena itu di Prakira AI hanya menulis tindakan. Kalimat yang memuat angka disusun dari prakiraan itu sendiri, dan tiap tindakan disaring sebelum Anda melihatnya. Pilih satu tindakan untuk melihat angka persis di baliknya.',
-    m1q: 'Dari mana angkanya?', m1a: 'Dari data prakiraan, bukan dari AI. Tingkat tiap bahaya ditetapkan oleh aturan terbitan, dan kalimat yang menyebut angka disusun oleh kode dari nilai yang sama dengan yang Anda lihat di tabel. AI diminta tidak menulis angka, dan tindakan yang memuat angka dibuang.',
-    m2q: 'Apa yang diperiksa dari tulisan AI?', m2a: 'Tiap tindakan harus tentang bahaya yang serius bagi rumah tangga Anda, tidak memuat angka, dan tidak menyuruh "tetap di dalam rumah" bila tingkatnya terlalu rendah untuk itu. Tindakan yang dibuang dicantumkan beserta alasannya di jejak audit. Prakira tidak bisa membuktikan bahwa suatu tindakan adalah yang terbaik.',
-    m3q: 'Bagaimana jika AI melewatkan hal serius?', m3a: 'Maka muncul pemberitahuan standar: teks tetap yang disusun dari data. Bahaya serius tidak pernah hilang diam-diam.',
-    m4q: 'Bagaimana jika tidak ada yang serius?', m4a: 'Prakira mengatakannya dan tidak memberi saran. Memperingatkan orang saat tidak perlu membuat mereka terbiasa mengabaikan peringatan.',
+    meetH: 'Saran yang ada buktinya', meetP: 'AI menulis tindakannya. Semua angka berasal dari prakiraan.', mt1: 'Angka dari prakiraan', mt1p: 'Semua angka di halaman berasal dari data prakiraan. AI tidak menulis satu pun.', mt1s: 'Dari data', mt2: 'AI menulis tindakannya', mt2p: 'Satu tindakan singkat untuk tiap bahaya serius, dengan kata sederhana, untuk rumah tangga Anda.', mt2s: 'Dari AI, disaring', mt3: 'Tidak ada yang disembunyikan', mt3p: 'Tindakan yang dibuang ditampilkan beserta alasannya. Jika tidak ada yang serius, Prakira mengatakannya dan tidak memberi saran.', mt3s: 'Ditampilkan',
     hzH: 'Empat bahaya, satu ringkasan', hzP: 'Bahaya jarang datang sendirian. Prakira membacanya bersama dan menandai hari ketika panas tinggi dan udara tercemar terjadi bersamaan.',
     hz1: 'Panas', hz1p: 'Indeks panas dari suhu dan kelembapan, dengan cara hitung US National Weather Service.', hz1s: 'Sumber: NWS',
     hz2: 'Hujan', hz2p: 'Curah hujan harian beserta peluang hujannya, sehingga peluang tidak ditampilkan sebagai kepastian.', hz2s: 'Bukan prakiraan banjir',
     hz3: 'Udara', hz3p: 'Indeks Kualitas Udara AS dengan kategori EPA, ditambah partikel halus (PM2,5).', hz3s: 'Sumber: US EPA, CAMS',
     hz4: 'UV', hz4p: 'Puncak indeks UV harian dengan tingkat tindakan Organisasi Kesehatan Dunia.', hz4s: 'Sumber: WHO',
-    toolH: 'Mulai ringkasan Anda', toolP: 'Pilih tempat, sebutkan siapa yang tinggal di sana, dan baca apa yang perlu dilakukan tiga hari ke depan.',
-    where: 'Lokasi', who: 'Siapa yang tinggal di sana', go: 'Buat ringkasan', placeholder: 'Kota, misalnya Jakarta', examples: 'Coba:',
+    toolH: 'Mulai ringkasan Anda', toolP: 'Pilih tempat. Centang siapa yang tinggal di sana. Baca apa yang perlu dilakukan.',
+    where: 'Di mana?', who: 'Siapa yang tinggal di sana? Centang yang sesuai.', go: 'Buat ringkasan', placeholder: 'Kota, misalnya Jakarta', examples: 'Coba:',
     selected: 'Dipilih:', searching: 'Pencarian gagal. Coba lagi.', none: 'Tempat tidak ditemukan.',
     loading: 'Menyiapkan ringkasan Anda…', retry: 'Coba lagi',
     myPlace: 'Lokasi Anda', locate: 'Pakai lokasi saya', locAsk: 'Meminta lokasi Anda ke browser…', locOk: 'Lokasi ditemukan, dibulatkan ke sekitar 1 km.',
     locDenied: 'Izin lokasi ditolak. Ketik nama kota saja.', locNone: 'Lokasi Anda tidak dapat ditentukan.', locTimeout: 'Pencarian lokasi terlalu lama.', locUnsupported: 'Browser ini tidak dapat membagikan lokasi.',
-    locNote: 'Tempat Anda dikirim ke server ini dan ke Open-Meteo untuk mengambil prakiraan, dan tidak disimpan di server.', remembered: 'Tempat, isi rumah, dan bahasa Anda hanya diingat di browser ini.', forget: 'Lupakan pilihan saya', forgotten: 'Pilihan dihapus dari browser ini.',
-    descLabel: 'Ceritakan rumah Anda dalam satu kalimat (opsional)', fill: 'Isikan untuk saya', descPh: 'Kami tinggal di Depok, ayah saya 68 tahun dan asma, tanpa AC',
+    locNote: 'Tempat Anda dikirim ke server ini dan Open-Meteo untuk prakiraan. Tidak ada yang disimpan.', remembered: 'Pilihan Anda hanya tersimpan di browser ini.', forget: 'Lupakan pilihan saya', forgotten: 'Pilihan dihapus dari browser ini.',
+    descLabel: 'Atau ceritakan rumah Anda dalam satu kalimat', fill: 'Isikan untuk saya', descPh: 'Kami tinggal di Depok, ayah saya 68 tahun dan asma, tanpa AC',
     descRun: 'AI sedang membaca cerita Anda…', descShort: 'Tulis beberapa kata dulu.', descFail: (m) => `Cerita tidak dapat dibaca (${m}). Pakai formulir di bawah.`,
     descTicked: (names) => `Dicentang: ${names}.`, descNoProfile: 'Tidak ada keterangan isi rumah di kalimat itu.', descPlace: (p) => `Mencari ${p}: pilih tempat Anda di bawah.`, descNoPlace: 'Tidak ada nama tempat di kalimat itu: ketik kota di bawah.',
-    descNote: 'Kalimat ini dikirim ke penyedia AI (Mistral) untuk dibaca. Prakira tidak menyimpannya; jangan sertakan nama. AI hanya dapat mencentang pilihan di bawah dan mengusulkan tempat untuk dicari. Tidak ada yang dibuat sebelum Anda menekan tombol.',
+    descNote: 'Kalimat Anda dikirim ke penyedia AI (Mistral) dan tidak disimpan. Jangan sertakan nama. AI hanya mencentang pilihan di atas.',
     searchRun: 'Mencari…', found: (n) => `${n} tempat ditemukan`,
     process: 'Proses', skipped: 'tidak diperlukan', secs: (x) => `${x} dtk`, tryN: (n) => `percobaan ${n}`, noResult: 'Server tidak mengirim hasil.',
     steps: { forecast: 'Membaca prakiraan', climate: 'Membandingkan dengan normal 30 tahun', models: 'Membandingkan dua model prakiraan', rules: 'Menetapkan tingkat dengan aturan', model: 'AI menulis tindakan', verify: 'Menyaring setiap tindakan', notices: 'Mengisi celah', cache: 'Ringkasan tersimpan' },
@@ -871,6 +839,7 @@ async function search() {
     } catch { s.textContent = ''; act('searchAct', 'bad', t().searching); }
 }
 $('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 300); });
+$('q').addEventListener('keydown', (e) => { if (e.key === 'Enter' && $('sugg').dataset.live) $('sugg').querySelector('button')?.click(); });
 
 // "Describe your home": the AI reads one sentence and proposes form choices. Its answer was already
 // reduced on the server to allowed options and a plain place name; here it only ticks chips and starts a
@@ -1386,7 +1355,7 @@ function countUp(n) {
         setTimeout(() => n.classList.remove('rv', 'in'), 1900);
       }
     }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-    for (const n of document.querySelectorAll('h2.big, .band .lede, .art, .acc details, .hz, .panel, .steps li, .pipe, .stat, .fine')) {
+    for (const n of document.querySelectorAll('h2.big, .band .lede, .acc details, .hz, .panel, .steps li, .pipe, .stat, .fine')) {
       n.classList.add('rv');
       n.style.setProperty('--d', [...n.parentNode.children].indexOf(n) % 6);
       io.observe(n);

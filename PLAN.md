@@ -576,6 +576,8 @@ The film is made: `C:/Users/Rofi/Videos/Prakira-demo-ForgeHacks-2026.mp4` (2:34,
 
 - **2026-10-10 (session 9, Featherless).** Second-model check, `eval/second-model.mjs` (untracked, not for the README). Ten fixed scenarios, no forecast and no archive call. Same prompt as `lib/llm.mjs`, same screen (`lib/verify.mjs`). Mistral `open-mistral-nemo`: 18 of 27 actions kept (66.7%), AI covers 18 of 23 serious hazards (78.3%). Featherless `Qwen/Qwen2.5-7B-Instruct`: 15 of 26 kept (57.7%), covers 15 of 23 (65.2%). One run each, temperature 0.2, 10 scenarios: small sample, not comparable with the README table (held-out, live data). The main cause of rejection in both is the reviewed word list (`seek`, `change`, `boxes`, `damp`, `puddles`), not the model. Not tried: `meta-llama/Llama-3.3-70B-Instruct` is gated on Featherless and needs a HuggingFace connection, which only the owner can do. Output saved in `eval/out/` (ignored by git). **Next action: owner decides whether to keep the script, and whether to connect HuggingFace for the 70B model.**
 
+- **2026-10-10 (session 9, close-out).** n8n workflow "Prakira uptime watch" shown as Published in the owner's n8n list (screenshot). Owner reports both API keys (n8n and Featherless) rotated. Still open: the Adaption and Momen dashboards (not checked), the rain-class source (owner to answer "ganti" or "tetap"), the 70B model on Featherless (access still 403), and whether to keep `eval/second-model.mjs`.
+
 **Open questions for the owner**
 
 1. Done 2026-10-10 (section 1): the video limit is 2 to 4 minutes.

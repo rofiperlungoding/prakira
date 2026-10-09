@@ -410,7 +410,7 @@
   .cards { counter-reset:c; }
   .hz { counter-increment:c; }
   .hz .pic { border-radius:18px; }
-  .hz .pic span { top:14px; bottom:auto; left:16px; }
+  .hz .pic span { top:14px; bottom:auto; left:16px; max-width:calc(100% - 48px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .hz .pic::before { content:"0" counter(c); position:absolute; right:16px; top:14px; font:500 .88rem var(--sans); }
   .hz.a .pic, .hz.e .pic { background:var(--cream); }
   .hz.b .pic, .hz.g .pic { background:var(--sun); }
@@ -616,8 +616,8 @@ const T = {
     meetH: 'Advice with receipts', meetP: 'The AI writes the action. The forecast supplies every number.', mt1: 'Numbers from the forecast', mt1p: 'Every number on the page comes from the forecast data. The AI writes none.', mt1s: 'From data', mt2: 'The AI writes the action', mt2p: 'One short action for each serious hazard, in plain words, for your household.', mt2s: 'From AI, screened', mt3: 'Nothing hidden', mt3p: 'Removed actions are shown with the reason. If nothing is serious, it says so and gives no advice.', mt3s: 'Shown to you',
     hzH: 'Four hazards, one briefing', hzP: 'Hazards rarely arrive alone. Prakira reads them together and flags the days when strong heat and polluted air coincide.',
     hz1: 'Heat', hz1p: 'Heat index from temperature and humidity, the way the US National Weather Service computes it.', hz1s: 'Source: NWS',
-    hz2: 'Rain', hz2p: 'Daily rainfall with the chance of rain beside it, so a probability is never shown as a certainty.', hz2s: 'Not a flood forecast',
-    hz3: 'Air', hz3p: 'US Air Quality Index with the EPA categories, plus fine particles (PM2.5).', hz3s: 'Source: US EPA, CAMS',
+    hz2: 'Rain', hz2p: 'Daily rainfall with the chance of rain beside it, so a probability is never shown as a certainty.', hz2s: 'Source: WMO',
+    hz3: 'Air', hz3p: 'US Air Quality Index with the EPA categories, plus fine particles (PM2.5).', hz3s: 'Source: US EPA',
     hz4: 'UV', hz4p: 'Daily peak UV index with the World Health Organization action tiers.', hz4s: 'Source: WHO',
     toolH: 'Start your briefing', toolP: 'Pick a place. Tick who lives there. Read what to do.',
     where: 'Where?', who: 'Who lives there? Tick any that fit.', go: 'Generate briefing', placeholder: 'City, for example Jakarta', examples: 'Try:',
@@ -708,8 +708,8 @@ const T = {
     meetH: 'Saran yang ada buktinya', meetP: 'AI menulis tindakannya. Semua angka berasal dari prakiraan.', mt1: 'Angka dari prakiraan', mt1p: 'Semua angka di halaman berasal dari data prakiraan. AI tidak menulis satu pun.', mt1s: 'Dari data', mt2: 'AI menulis tindakannya', mt2p: 'Satu tindakan singkat untuk tiap bahaya serius, dengan kata sederhana, untuk rumah tangga Anda.', mt2s: 'Dari AI, disaring', mt3: 'Tidak ada yang disembunyikan', mt3p: 'Tindakan yang dibuang ditampilkan beserta alasannya. Jika tidak ada yang serius, Prakira mengatakannya dan tidak memberi saran.', mt3s: 'Ditampilkan',
     hzH: 'Empat bahaya, satu ringkasan', hzP: 'Bahaya jarang datang sendirian. Prakira membacanya bersama dan menandai hari ketika panas tinggi dan udara tercemar terjadi bersamaan.',
     hz1: 'Panas', hz1p: 'Indeks panas dari suhu dan kelembapan, dengan cara hitung US National Weather Service.', hz1s: 'Sumber: NWS',
-    hz2: 'Hujan', hz2p: 'Curah hujan harian beserta peluang hujannya, sehingga peluang tidak ditampilkan sebagai kepastian.', hz2s: 'Bukan prakiraan banjir',
-    hz3: 'Udara', hz3p: 'Indeks Kualitas Udara AS dengan kategori EPA, ditambah partikel halus (PM2,5).', hz3s: 'Sumber: US EPA, CAMS',
+    hz2: 'Hujan', hz2p: 'Curah hujan harian beserta peluang hujannya, sehingga peluang tidak ditampilkan sebagai kepastian.', hz2s: 'Sumber: WMO',
+    hz3: 'Udara', hz3p: 'Indeks Kualitas Udara AS dengan kategori EPA, ditambah partikel halus (PM2,5).', hz3s: 'Sumber: US EPA',
     hz4: 'UV', hz4p: 'Puncak indeks UV harian dengan tingkat tindakan Organisasi Kesehatan Dunia.', hz4s: 'Sumber: WHO',
     toolH: 'Mulai ringkasan Anda', toolP: 'Pilih tempat. Centang siapa yang tinggal di sana. Baca apa yang perlu dilakukan.',
     where: 'Di mana?', who: 'Siapa yang tinggal di sana? Centang yang sesuai.', go: 'Buat ringkasan', placeholder: 'Kota, misalnya Jakarta', examples: 'Coba:',

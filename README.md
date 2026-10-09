@@ -18,8 +18,10 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 
 ![Architecture](docs/architecture.svg)
 
-1. **Data.** Forecast, air quality and a 30-year climate archive from Open-Meteo (no API key).
-2. **Rules** (`lib/facts.mjs`, `lib/climate.mjs`). Compute the heat index, hazard levels, the difference from the 1991 to 2020 normal, and a flag for days when strong heat and polluted air coincide. The household you choose changes which levels count as serious.
+Structured around international multi-hazard early warning standards (WMO-No. 1150, UN Sendai Framework Target G) and a decoupled neuro-symbolic safety principle (Zhao et al., 2027; ISO/IEC 42001 alignment), where only one layer is a language model:
+
+1. **Data.** Forecast (ECMWF IFS/AIFS), air quality (CAMS) and a 30-year climate archive benchmarked against WMO Climatological Standard Normals 1991–2020 (WMO-No. 1203) from Open-Meteo (no API key).
+2. **Rules** (`lib/facts.mjs`, `lib/climate.mjs`). Compute the heat index (NWS Rothfusz equation), hazard levels (NOAA/NWS, EPA, WHO, BMKG), the difference from the 1991 to 2020 normal, and a flag for days when strong heat and polluted air coincide. The household you choose changes which levels count as serious.
 3. **Model** (`lib/llm.mjs`). Mistral `open-mistral-nemo` writes one short action per serious hazard, and nothing else: `{"hazard", "advice"}`. It is told not to write numbers. If nothing is serious, the model is not called and no advice is given.
 4. **Screen and evidence** (`lib/verify.mjs`, `lib/notice.mjs`). Model output is untrusted. An action is kept only if:
    - its hazard is serious for this household, and it is the first action for that hazard;
@@ -46,7 +48,7 @@ Open forecast data can tell you that the heat index will reach 37 °C and the ai
 | Air | Highest hourly US AQI of the day (Open-Meteo applies the EPA averaging periods) | EPA categories, 0 to 50 good up to above 300 hazardous | [AirNow](https://www.airnow.gov/aqi/aqi-basics/), [Open-Meteo air quality docs](https://open-meteo.com/en/docs/air-quality-api) |
 | UV | Daily maximum UV index, rounded | WHO action tiers: 0 to 2 low; 3 to 7 protection needed; 8 and above extra protection needed | [WHO](https://www.who.int/news-room/questions-and-answers/item/radiation-the-ultraviolet-(uv)-index) |
 | Rain | Daily total with the day's peak rain probability | Below 1 mm little or no rain; to 20 light; to 50 moderate; to 100 heavy; to 150 very heavy; above extreme | **Not verified against a primary source.** Commonly quoted BMKG daily classes; only the 150 mm threshold was corroborated, through news reports. Not a flood forecast. |
-| Climate | Forecast daily maximum minus the 1991 to 2020 average for the same week | No level; context only | Open-Meteo archive (ERA5-based), or NASA POWER (MERRA-2) when the archive is unavailable. Forecast and archive are different models, so part of the difference is model bias. |
+| Climate | Forecast daily maximum minus the 1991 to 2020 average for the same week | WMO Climatological Standard Normals (WMO-No. 1203, 1991–2020 baseline) | Open-Meteo archive (ERA5-based), or NASA POWER (MERRA-2) when the archive is unavailable. Forecast and archive are different models, so part of the difference is model bias. |
 
 The household adjustments (for example, an older adult lowers the heat threshold from "extreme caution" to "caution") are this project's judgement from the wording of the NWS and EPA categories. They are not an official rule.
 

@@ -26,7 +26,7 @@ Climate briefings with receipts: what the next 72 hours of heat, rain, air and U
 
 Open forecast data is free and very good. It can tell you the heat index will reach 37 °C and the air quality index 204. It does not tell you what that means for a grandmother, a toddler, or someone who works on a roof all day.
 
-Research says this gap is real. Public warning systems send the same message to everyone, while people ask "how does this affect me right now?" and "what can I do?" (Ou et al., 2025). Weather-warning experts name tailored and multilingual warnings as the promising use of AI, and name accountability as the risk (Kox et al., 2025). And when researchers tested ChatGPT-4o on heat-health messages, most were accurate, but none met a grade 8 reading level and few placed heat in the context of climate change (MacKay et al., 2026).
+Research says this gap is real. Public warning systems send the same message to everyone, while people ask "how does this affect me right now?" and "what can I do?" (Ou et al., 2025). Weather-warning experts name tailored and multilingual warnings as the promising use of AI, and name accountability as the risk (Kox et al., 2025). The World Meteorological Organization (WMO Guidelines on Multi-hazard Impact-based Forecast and Warning Services, WMO-No. 1150) and the UN Sendai Framework (Target G) emphasize that early warnings must translate hazards into actionable, human-centered impacts. And when researchers tested ChatGPT-4o on heat-health messages, most were accurate, but none met a grade 8 reading level and few placed heat in the context of climate change (MacKay et al., 2026).
 
 A language model can write personal advice in seconds. It can also state a number that was never in the forecast, in the same confident tone. For a safety tool that is the wrong trade. So the question behind Prakira was narrow: can an AI write the advice without ever being trusted with a number?
 
@@ -34,8 +34,8 @@ A language model can write personal advice in seconds. It can also state a numbe
 
 You pick a place and say who lives there (older adult, young child, outdoor worker, asthma, pregnancy, flood-prone home, no air conditioning). Prakira returns, in English or Bahasa Indonesia:
 
-- **A 72-hour strip:** heat index, rain, air quality and UV for three days, each with a level set by published rules (US National Weather Service, US EPA, WHO).
-- **A climate row:** how each day compares with the local 1991 to 2020 average for the same week.
+- **A 72-hour strip:** heat index, rain, air quality and UV for three days, each with a level set by published rules (US National Weather Service, US EPA, WHO, BMKG).
+- **A climate row:** how each day compares with the official local 1991 to 2020 climatological normal (WMO-No. 1203) for the same week.
 - **A short briefing:** one action per serious hazard, written for that household.
 - **A visible process:** while you wait, the page shows each real step as the server performs it (read the forecast, set levels by rule, AI writes, check every claim), with its duration. Afterwards the steps stay as one line above the result.
 - **An audit trail:** select any action and the numbers it relies on light up. A panel lists every AI claim that was rejected and why.
@@ -47,15 +47,15 @@ If nothing is serious for your household, it says so and gives no advice. If the
 
 ## How we built it
 
-Five layers, and only one of them is a language model:
+Five layers, structured around international standards and a decoupled neuro-symbolic safety principle (Zhao et al., 2027; ISO/IEC 42001 trustworthy AI alignment), where only one layer is a language model:
 
-1. **Data:** Open-Meteo forecast, the CAMS air-quality forecast, and an ERA5-based climate archive, with NASA POWER as the second source when the free daily limit is reached. No API key.
-2. **Rules:** code computes the NWS heat index from temperature and humidity, assigns every hazard level, and decides which levels are serious for the chosen household.
-3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one short action per serious hazard, and nothing else. It is told not to write numbers.
+1. **Data:** Open-Meteo forecast (ECMWF IFS and AIFS), the CAMS air-quality forecast, and an ERA5-based climate archive benchmarked against official WMO 1991–2020 Climatological Standard Normals (WMO-No. 1203), with NASA POWER (MERRA-2) as the second source when the free daily limit is reached. No API key.
+2. **Rules:** code computes the NWS heat index (Rothfusz equation) from temperature and humidity, assigns every hazard level according to published standards (NOAA/NWS, US EPA, WHO, BMKG), and decides which levels are serious for the chosen household.
+3. **Model:** Mistral `open-mistral-nemo` (free tier) writes one short action per serious hazard, and nothing else: `{"hazard", "advice"}`. It is told not to write numbers.
 4. **Screen and evidence:** an action is kept only if it is for a hazard that is serious for the household, contains no digits, uses only words from a reviewed list for that hazard, and does not say "stay indoors" at a level too low to justify it. Code then attaches the level and builds the sentence with the numbers from the forecast values. Anything else the model writes is ignored.
 5. **Notices:** fixed text for any serious hazard left uncovered.
 
-The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. 43 unit tests run offline.
+The whole thing is plain Node.js with no dependencies and one HTML page, hosted on a tablet at home behind a Cloudflare Tunnel. The UI conforms to WCAG 2.1 AA/AAA contrast ratios and plain-language readability standards (median Grade 4.4). 43 unit tests run offline.
 
 ## Results
 

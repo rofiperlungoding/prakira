@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prakira teleprompter</title>
+<style>
+  /* Text sits at the top of the window so it is close to the webcam lens. Drag the window to the top edge of the screen. */
+  * { box-sizing:border-box; }
+  body { margin:0; background:#101a13; color:#fff3d6; font:500 var(--fs, 44px)/1.35 "Outfit", "Segoe UI", system-ui, sans-serif; }
+  header { position:fixed; inset:0 0 auto 0; z-index:2; display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:8px 12px; background:#101a13; border-bottom:1px solid #2b3a30; font:500 14px/1.2 "Segoe UI", system-ui, sans-serif; }
+  header b { color:#f4a04c; margin-right:auto; font-size:16px; }
+  button { font:inherit; color:#fff3d6; background:#1d2a21; border:1px solid #3a4b40; border-radius:8px; padding:6px 10px; cursor:pointer; }
+  button:hover, button.on { border-color:#f4a04c; }
+  button:focus-visible { outline:2px solid #f4a04c; outline-offset:2px; }
+  main { max-width:22em; margin:0 auto; padding:70px 20px 80vh; }
+  p { margin:0 0 .7em; text-wrap:pretty; }
+  .cue { font:500 16px/1.4 "Segoe UI", system-ui, sans-serif; color:#b9c2b6; margin-bottom:1.4em; }
+  small { color:#b9c2b6; }
+</style>
+</head>
+<body>
+<header>
+  <b id="title"></b>
+  <button id="prev" title="Left arrow">◀ Shot</button>
+  <button id="next" title="Right arrow">Shot ▶</button>
+  <button id="play" title="Space">Scroll</button>
+  <button id="slow" title="Down arrow">Slower</button>
+  <button id="fast" title="Up arrow">Faster</button>
+  <button id="small" title="-">A−</button>
+  <button id="big" title="+">A+</button>
+  <small id="info"></small>
+</header>
+<main id="text"></main>
+<script>
+// Narration from docs/video-script.md. Keep the two in step.
+const SHOTS = [
+  ['1 · Hello', 'WEBCAM. Look at the lens.', ["Hi, I'm Rofi, a student from Indonesia.", 'This is Prakira: climate briefings with receipts.']],
+  ['2 · The problem', 'Voice only.', ['A weather app tells me the heat index is 37 and the air quality index is 235.', 'It does not tell me what that means for my grandmother.', 'Public warnings send one message to everyone.', 'An AI can write personal advice, but it can also state a number that was never in the forecast.', 'And in one study of 31 AI heat messages, none was easy enough to read.']],
+  ['3 · Ask', 'Voice only.', ['So here is all you do.', 'Pick a place. Tick who lives there. Press the button.', 'While you wait, you see each real step as the server does it:', 'read the forecast, set the levels by rule, let the AI write, then check what it wrote.']],
+  ['4 · The answer', 'Voice only.', ['The answer is a short list.', 'Each point is one thing to do, with the numbers behind it.', 'The levels come from published rules: the US National Weather Service for heat, the EPA for air, the World Health Organization for UV.', 'The household changes which levels count as serious.', 'The AI wrote only the action. It never writes a number.', 'Every figure here was put in by code, straight from the forecast.']],
+  ['5 · The receipts', 'Voice only.', ['If you want everything, open all the data.', 'Select a point, and the numbers it relies on light up.', 'This row compares each day with the local average for 1991 to 2020, so you see climate, not only weather.', 'And this is the audit trail.', 'It lists what the AI wrote that was removed, and why.', 'If the AI misses a serious hazard, a fixed notice takes its place, so nothing serious goes missing.']],
+  ['6 · Two more things', 'Voice only.', ['It works in Bahasa Indonesia as well.', 'And if you do not want to fill in a form, describe your home in one sentence.', 'The AI ticks the boxes. You still press the button.']],
+  ['7 · Does it work', 'Voice only. Say the numbers as written.', ['We tested it on 35 cities.', "On the 15 cities the system was never tuned on, 85 percent of the AI's actions passed the screen in English, and 81 percent in Indonesian.", 'The rest were removed and replaced by a notice.', 'Passing the screen is not a rating of the advice.', 'No doctor has reviewed it.', 'These are small samples, and we say so on the page.']],
+  ['8 · Close', 'WEBCAM. Look at the lens.', ['Prakira does not replace official warnings. It sits beside them.', 'I built it during ForgeHacks with open data from Open-Meteo, a Mistral model, and AI coding help.', 'The code and the method are public.', 'Thank you.']],
+];
+const $ = (id) => document.getElementById(id);
+let shot = 0, speed = 40, size = 44, playing = false, last = 0, y = 0;
+
+function show() {
+  const [name, cue, lines] = SHOTS[shot];
+  $('title').textContent = `Shot ${name}`;
+  const m = $('text'); m.textContent = '';
+  const c = document.createElement('div'); c.className = 'cue'; c.textContent = cue; m.appendChild(c);
+  for (const l of lines) { const p = document.createElement('p'); p.textContent = l; m.appendChild(p); }
+  stop(); scrollTo(0, 0); info();
+}
+function info() { $('info').textContent = `${shot + 1}/${SHOTS.length} · speed ${speed} · size ${size}`; document.body.style.setProperty('--fs', size + 'px'); }
+function stop() { playing = false; $('play').classList.remove('on'); $('play').textContent = 'Scroll'; }
+function tick(now) {
+  if (!playing) return;
+  y += speed * (now - last) / 1000; last = now;
+  scrollTo(0, y);
+  if (innerHeight + scrollY >= document.body.scrollHeight - 2) return stop();
+  requestAnimationFrame(tick);
+}
+function toggle() {
+  if (playing) return stop();
+  playing = true; y = scrollY; last = performance.now();
+  $('play').classList.add('on'); $('play').textContent = 'Stop';
+  requestAnimationFrame(tick);
+}
+const go = (d) => { shot = Math.max(0, Math.min(SHOTS.length - 1, shot + d)); show(); };
+const set = (ds, df) => { speed = Math.max(10, Math.min(200, speed + ds)); size = Math.max(22, Math.min(90, size + df)); info(); };
+$('prev').onclick = () => go(-1); $('next').onclick = () => go(1); $('play').onclick = toggle;
+$('slow').onclick = () => set(-10, 0); $('fast').onclick = () => set(10, 0);
+$('small').onclick = () => set(0, -4); $('big').onclick = () => set(0, 4);
+addEventListener('keydown', (e) => {
+  const k = { ArrowRight: () => go(1), ArrowLeft: () => go(-1), ' ': toggle, ArrowUp: () => set(10, 0), ArrowDown: () => set(-10, 0), '+': () => set(0, 4), '=': () => set(0, 4), '-': () => set(0, -4) }[e.key];
+  if (k) { e.preventDefault(); k(); }
+});
+show();
+</script>
+</body>
+</html>

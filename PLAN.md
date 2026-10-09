@@ -572,6 +572,8 @@ The film is made: `C:/Users/Rofi/Videos/Prakira-demo-ForgeHacks-2026.mp4` (2:34,
 
 - **2026-10-10 (session 9, end).** The owner reported that the project is submitted on Devpost (not checked by the assistant: the public page was not opened). The owner will continue with Gemini. `GEMINI.md` rewritten as a full handover: state, the three open items, rules, what went wrong in the earlier Gemini session and the rule that follows from it, the checks before each commit. **Next action: put the YouTube link in the README and tick M10; tick M11 when the owner confirms the public page; the rain-class source is the owner's decision.**
 
+- **2026-10-10 (session 9, ops).** Uptime alert set up in the owner's n8n Cloud account: a schedule every 5 minutes calls `/healthz` on the live site and emails the owner when the answer is not 200. Imported through the n8n API; the Gmail credential and the recipient were set by the owner in the editor and the owner reports it is published. Not verified by the assistant: whether the workflow is active. The workflow JSON stays outside the repository. The owner's n8n API key was pasted into chat: it must be rotated. Not verified: the alert itself (no outage was simulated). **Next action: owner rotates the n8n key; owner confirms the workflow is active in n8n.**
+
 **Open questions for the owner**
 
 1. Done 2026-10-10 (section 1): the video limit is 2 to 4 minutes.

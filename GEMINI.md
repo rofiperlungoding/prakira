@@ -14,6 +14,7 @@ Read this file fully before you touch anything. Then read `AGENTS.md` and `PLAN.
 | Tests | `npm test`: 43 of 43 pass |
 | Devpost text | `docs/devpost-draft.md` (one block per form field) and `docs/devpost-about.md` (the About text) |
 | Pictures | `docs/screenshots/` (retaken from the live site on 2026-10-10), `docs/architecture.svg` |
+| Uptime alert | An n8n Cloud workflow in the owner's account checks `https://prakira.rofihosted.space/healthz` every 5 minutes and emails the owner if the answer is not 200. Owner reports it is published (2026-10-10). Not checked by the assistant. Its JSON is kept outside the repository on purpose |
 
 ## 1b. Sponsor benefits: status from the owner (2026-10-10)
 
@@ -33,6 +34,8 @@ Owner's report, not checked by the assistant. Redemption codes are left out on p
 Rules for these benefits:
 - They are for the owner's own use. Using them does not change the project. Do not add a feature because a benefit is available.
 - Do not put a redemption code in any file in this repository.
+- n8n is used only for the uptime alert above. Do not add n8n workflows for anything else without asking the owner first.
+- **API keys:** the owner's n8n API key was pasted into chat on 2026-10-10 and has to be rotated. Never ask for a key in chat, never write a key to a file, never print one. If a task needs a key, tell the owner which key and where to put it (an environment variable on the owner's PC).
 - If the owner asks you to use one, ask first which benefit and what for. Do not sign up for anything or accept terms on the owner's behalf.
 
 ## 2. What is still open
